@@ -1,0 +1,19 @@
+//
+// Handles the intent to provide a suggestion
+//
+
+'use strict';
+
+const playgame = require('../PlayGame');
+const bjUtils = require('../BlackjackUtils');
+
+module.exports = {
+  handleIntent: function() {
+    this.attributes.suggestRequests = (this.attributes.suggestRequests + 1) || 1;
+    playgame.playBlackjackAction(this.attributes,
+      this.event.request.locale, {action: 'suggest'},
+      (error, response, speech, reprompt) => {
+      bjUtils.emitResponse(this, error, response, speech, reprompt);
+    });
+  },
+};

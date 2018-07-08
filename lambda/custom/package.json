@@ -1,0 +1,40 @@
+{
+  "name": "blackjack-party",
+  "version": "1.0.0",
+  "description": "Blackjack Party Alexa Skill",
+  "main": "lambda/custom/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "alexa-speech-utils": "~0.0.4",
+    "ask-sdk": "^2.0.7",
+    "aws-sdk": "^2.248.1",
+    "blackjack-strategy": "^1.3.2",
+    "dashbot": "^9.9.1",
+    "request": "^2.85.0",
+    "seedrandom": "^2.4.3"
+  },
+  "devDependencies": {
+    "eslint-config-google": "^0.7.1",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^3.0.1"
+  },
+  "scripts": {
+    "test": "test\\app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gsdriver/blackjack-party.git"
+  },
+  "keywords": [
+    "blackjack",
+    "alexa"
+  ],
+  "author": "Garrett Vargas <gsdriver@live.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gsdriver/blackjack-party/issues"
+  },
+  "homepage": "https://github.com/gsdriver/blackjack-party#readme"
+}

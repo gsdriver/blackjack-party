@@ -1,0 +1,12 @@
+node_modules
+build
+package-lock.json
+PlayBlackjack.zip
+play-blackjack-alexa.zip
+PlayGame.zip
+*.bat
+src/test.json
+.idea
+summary.csv
+attributes.txt
+seed.txt
