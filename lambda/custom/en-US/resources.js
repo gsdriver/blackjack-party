@@ -5,11 +5,8 @@
 const resources = {
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'What else can I help with?',
-  'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
-  'READ_BANKROLL_WITH_ACHIEVEMENT': 'You have ${0} and {1} achievement points. ',
-  'SELECT_GAME_TITLE': 'Select a game',
   // From Betting.js
-  'BAD_BET_FORMAT': 'Unable to place a bet for {0}',
+  'BAD_BET_FORMAT': 'I can\'t place a bet for {0}',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'I\'m sorry, I didn\'t catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'I\'m sorry, I don\'t understand how to {0}. Please provide an action like hit or stand. What else can I help with?',
@@ -20,23 +17,12 @@ const resources = {
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   // From Help.js
   'HELP_GENERIC_HELP': 'You can play a game by saying Deal <break time=\'200ms\'/> or you can say enable training mode if you would like me to prompt when your play differs from Basic Strategy. <break time=\'300ms\'/> Now, what can I help you with?',
-  'HELP_CARD_TITLE': 'Blackjack Commands',
-  'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet. You can say READ HIGH SCORES to hear the current leader board.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
-  'HELP_ACHIEVEMENT_POINTS': 'You earn 100 achievement points for every tournament win <break time=\'200ms\'/> 10 points each day you play <break time=\'200ms\'/> 5 points for a natural winning blackjack <break time=\'200ms\'/> and N points for each streak of N winning hands more than one. ',
-  'HELP_ACHIEVEMENT_CARD_TEXT': '\nYou earn achievement points as you play which is how the high score board is determined. You earn points as follows:\n - 100 achievement points each time you win the Tuesday Tournament\n - 10 points each day you play\n - 5 points for a natural winning blackjack\n - N points for each streak of N winning hands more than one.\n',
+  'HELP_CARD_TITLE': 'Blackjack Party Commands',
+  'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet. You can say READ HIGH SCORES to hear the bankrolls for each member of your party.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules of the game.',
   // From Launch.js
-  'LAUNCH_WELCOME': '{"standard":"Welcome to Blackjack Party. "}',
+  'LAUNCH_WELCOME': '{"standard":"Thanks for joining Blackjack Party! "}',
   'LAUNCH_INITIAL_WELCOME': '{"standard":""}',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
-  'LAUNCH_ENABLE_TRAINING': 'say enable training mode',
-  'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
-  'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
-  'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
-  // From Reset.js
-  'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
-  'RESET_COMPLETED': 'You have $5000. Say bet to start a new game.',
-  'RESET_REPROMPT': 'Say bet to start a new game.',
-  'RESET_ABORTED': 'Game not reset. Say bet to start a new game.',
   // From Rules.js
   'RULES_CARD_TITLE': 'Blackjack Rules',
   // From Training.js
@@ -115,19 +101,6 @@ const resources = {
   'PLAYER_HIT_NOTBUSTED': 'You got {0} for a total of {1}. |Here\'s {0} for a total of {1}. |I have {0} for you giving you {1}. ',
   'GOOD_HIT_OPTIONS': 'I have {0} for you giving you {1}. Not bad! |You got {0} for a total of {1}. Good hit. |Here\'s {0} for a total of {1}. ',
   'GREAT_HIT_OPTIONS': 'Look at this, I have {0} giving you {1}. |It\'s {0} for a total of {1}! Nice hit! |Here\'s a beauty, {0} for a total of {1}. ',
-  'WINNING_STREAK': '{1} points for {0} wins in a row',
-  'FIRST_DAILY_HAND': '10 points for your first hand of the day',
-  'NATURAL_BLACKJACK': '5 points for a natural blackjack ',
-  'POINTS_EARNED_SCORE': 'You earned {0} giving you {1} achievement points. ',
-  'POINTS_EARNED_NOSCORE': 'You earned {0}. ',
-  'LEADER_RANKING': 'You have {0} achievement points ranking you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
-  'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
-  'LEADER_TOP_SCORES': 'The top {0} achievement scores are ',
-  'LEADER_BANKROLL_RANKING': 'You have ${0} ranking you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
-  'LEADER_BANKROLL_FORMAT': '${0}',
-  'LEADER_TOP_BANKROLLS': 'The top {0} bankrolls are ',
-  'LEADER_ACHIEVEMENT_HELP': ' <break time=\'300ms\'/> Ask for help to hear how you earn achievement points',
-  'MORE_THAN_PLAYERS': 'over {0}',
 };
 
 module.exports = {
