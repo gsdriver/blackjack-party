@@ -12,6 +12,7 @@ const Rules = require('./intents/Rules');
 const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
+const SessionEnd = require('./intents/SessionEnd');
 const Training = require('./intents/Training');
 const Unhandled = require('./intents/Unhandled');
 const gameService = require('./GameService');
@@ -62,13 +63,23 @@ const requestInterceptor = {
 const saveResponseInterceptor = {
   process(handlerInput) {
     return new Promise((resolve, reject) => {
-      handlerInput.attributesManager.savePersistentAttributes()
+      const response = handlerInput.responseBuilder.getResponse();
+      if (response && response.shouldEndSession) {
+        // We are meant to end the session
+        console.log('Saving attributes');
+        const attributes = handlerInput.attributesManager.getSessionAttributes();
+        attributes.temp = undefined;
+        handlerInput.attributesManager.setPersistentAttributes(attributes);
+        handlerInput.attributesManager.savePersistentAttributes()
         .then(() => {
           resolve();
         })
         .catch((error) => {
           reject(error);
         });
+      } else {
+        resolve();
+      }
     });
   },
 };
@@ -116,6 +127,7 @@ function runGame(event, context, callback) {
       Suggest,
       TakeSuggestion,
       Insurance,
+      SessionEnd,
       Unhandled
     )
     .addErrorHandlers(ErrorHandler)

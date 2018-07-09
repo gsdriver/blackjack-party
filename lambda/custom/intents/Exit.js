@@ -13,8 +13,7 @@ module.exports = {
     // Can always handle with Stop and Cancel
     if (request.type === 'IntentRequest') {
       if ((request.intent.name === 'AMAZON.CancelIntent')
-        || (request.intent.name === 'AMAZON.StopIntent')
-        || (request.intent.name === 'SessionEndedRequest')) {
+        || (request.intent.name === 'AMAZON.StopIntent')) {
         return true;
       }
 
@@ -45,7 +44,9 @@ module.exports = {
       return new Promise((resolve, reject) => {
         ads.getAd(attributes, 'blackjack-party', event.request.locale, (adText) => {
           exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
-          handlerInput.responseBuilder.speak(exitSpeech);
+          handlerInput.responseBuilder
+            .speak(exitSpeech)
+            .withShouldEndSession(true);
           resolve();
         });
       });

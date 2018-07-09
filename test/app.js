@@ -310,7 +310,7 @@ if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
   const fs = require('fs');
 
   // Clear is a special case - delete this entry from the DB and delete the attributes.txt file
-  dynamodb.deleteItem({TableName: 'PlayBlackjack', Key: { userId: {S: USERID}}}, function (error, data) {
+  dynamodb.deleteItem({TableName: 'BlackjackParty', Key: { id: {S: USERID}}}, function (error, data) {
     console.log("Deleted " + error);
     if (fs.existsSync(attributeFile)) {
       fs.unlinkSync(attributeFile);
