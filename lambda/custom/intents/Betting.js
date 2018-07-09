@@ -5,39 +5,63 @@
 'use strict';
 
 const playgame = require('../PlayGame');
-const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
-  handleIntent: function() {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    if ((request.type === 'IntentRequest') &&
+        ((request.intent.name === 'AMAZON.YesIntent')
+          || (request.intent.name === 'BettingIntent'))) {
+      // Bet is only allowed if it's in the list of possible actions
+      const attributes = handlerInput.attributesManager.getSessionAttributes();
+      const game = attributes[attributes.currentGame];
+      if (game && (game.possibleActions.indexOf('bet') >= 0)) {
+        return true;
+      }
+    }
+
+    return false;
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../' + event.request.locale + '/resources');
+    const game = attributes[attributes.currentGame];
     let amount = 0;
-    const res = require('../' + this.event.request.locale + '/resources');
-    const game = this.attributes[this.attributes.currentGame];
 
     // Curious what language is betting...
-    console.log('Bet invoked for ' + this.event.request.locale);
+    console.log('Bet invoked for ' + event.request.locale);
 
-    if (this.event.request.intent.slots && this.event.request.intent.slots.Amount
-      && this.event.request.intent.slots.Amount.value) {
-      amount = this.event.request.intent.slots.Amount.value;
+    if (event.request.intent.slots && event.request.intent.slots.Amount
+      && event.request.intent.slots.Amount.value) {
+      amount = event.request.intent.slots.Amount.value;
     }
 
     // If the bet is non-numeric, refuse it
     if (isNaN(amount)) {
       const betError = res.strings.BAD_BET_FORMAT.replace('{0}', amount);
-      bjUtils.emitResponse(this, betError, null, null, null);
+      handlerInput.responseBuilder
+        .speak(betError)
+        .reprompt(res.strings.ERROR_REPROMPT);
     } else {
       // Take the bet
-      const action = {action: 'bet', amount: amount, firsthand: this.attributes.temp.firsthand};
+      const action = {action: 'bet', amount: amount, firsthand: attributes.temp.firsthand};
 
-      playgame.playBlackjackAction(this.attributes, this.event.request.locale, action,
+      playgame.playBlackjackAction(attributes, event.request.locale, action,
         (error, response, speech, reprompt) => {
         if (!error) {
-          this.attributes.temp.firsthand = undefined;
+          attributes.temp.firsthand = undefined;
           game.timestamp = Date.now();
           game.hands = (game.hands) ? (game.hands + 1) : 1;
+          handlerInput.responseBuilder
+            .speak(speech)
+            .reprompt(reprompt);
+        } else {
+          handlerInput.responseBuilder
+            .speak(error)
+            .reprompt(res.strings.ERROR_REPROMPT);
         }
-
-        bjUtils.emitResponse(this, error, response, speech, reprompt);
       });
     }
   },

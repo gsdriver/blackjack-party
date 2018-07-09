@@ -4,23 +4,29 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
-  handleIntent: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
-    let speech = playgame.getContextualHelp(this, !this.attributes.bot);
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return ((request.type === 'IntentRequest')
+      && (request.intent.name === 'AMAZON.HelpIntent'));
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../' + event.request.locale + '/resources');
+    let speech = bjUtils.getContextualHelp(event, attributes, !attributes.bot);
     if (!speech) {
       speech = res.strings.HELP_GENERIC_HELP;
     }
-    speech = res.strings.HELP_ACHIEVEMENT_POINTS + speech;
 
     let cardContent = '';
     cardContent += res.strings.HELP_ACHIEVEMENT_CARD_TEXT;
     cardContent += res.strings.HELP_CARD_TEXT;
-    bjUtils.emitResponse(this, null, null,
-        speech, speech, res.strings.HELP_CARD_TITLE,
-        cardContent);
+    handlerInput.responseBuilder
+      .speak(speech)
+      .reprompt(speech)
+      .withSimpleCard(res.strings.HELP_CARD_TITLE, cardContent);
   },
 };

@@ -5,27 +5,35 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
-  handleIntent: function() {
+  canHandle: function(handlerInput) {
+    // This one is last in the list
+    return true;
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../' + event.request.locale + '/resources');
+
     // Echo back the action that we heard, why this isn't valid at this time,
     // and what the possible actions are for them to say
-    const res = require('../' + this.event.request.locale + '/resources');
-
-    if (!this.event.request.intent) {
+    if (!event.request.intent) {
       // Something we really don't handle
       console.log('Error - Unhandled didn\'t get an intent');
-      bjUtils.emitResponse(this, null, null,
-          res.strings.INTERNAL_ERROR, res.strings.ERROR_REPROMPT);
+      handlerInput.responseBuilder
+        .speak(res.strings.INTERNAL_ERROR)
+        .reprompt(res.strings.ERROR_REPROMPT);
     } else {
-      let speech = res.buildUnhandledResponse(this.event.request.intent,
-          bjUtils.getState(this.attributes));
-      const reprompt = playgame.getContextualHelp(this);
+      let speech = res.buildUnhandledResponse(event.request.intent,
+          bjUtils.getState(attributes));
+      const reprompt = bjUtils.getContextualHelp(event, attributes);
 
       speech += reprompt;
-      bjUtils.emitResponse(this, null, null, speech, reprompt);
+      handlerInput.responseBuilder
+        .speak(speech)
+        .reprompt(reprompt);
     }
   },
 };

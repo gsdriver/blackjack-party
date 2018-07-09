@@ -1,53 +1,79 @@
 'use strict';
 
 const playgame = require('../PlayGame');
-const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
-  handleIntent: function() {
-    // First make sure we have an action
-    const res = require('../' + this.event.request.locale + '/resources');
-    const actionSlot = this.event.request.intent.slots.Action;
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
 
-    if (!actionSlot) {
-      bjUtils.emitResponse(this, null, null,
-              res.strings.BLACKJACKINTENT_NO_ACTION, res.strings.ERROR_REPROMPT);
-    } else if (!actionSlot.value) {
-      bjUtils.emitResponse(this, null, null,
-              res.strings.BLACKJACKINTENT_UNKNOWN_ACTION.replace('{0}', actionSlot.value),
-              res.strings.ERROR_REPROMPT);
-    } else {
-      // Let's play this action
-      const actionObj = {action: res.getBlackjackAction(actionSlot)};
-
-      if (!actionObj.action) {
-        // What did they specify?
-        console.log('NULL ACTION: ' + JSON.stringify(this.event.request));
-        actionObj.action = actionSlot.value;
+    if (request.type === 'IntentRequest') {
+      const attributes = handlerInput.attributesManager.getSessionAttributes();
+      const game = attributes[attributes.currentGame];
+      if (request.intent.name === 'BlackjackIntent') {
+        // Valid if we are in game
+        if (game && (game.suggestion ||
+          ((game.possibleActions.indexOf('bet') == -1) &&
+           (game.possibleActions.indexOf('noinsurance') == -1)))) {
+          return true;
+        }
+      } else if (request.intent.name === 'AMAZON.YesIntent') {
+        // Valid if we are in game (no suggestion) AND there is
+        // only one possible action we can take
+        if (game && !game.suggestion && game.possibleActions &&
+          (game.possibleActions.length == 1) &&
+          (game.possibleActions[0] !== 'bet') &&
+          (game.possibleActions[0] !== 'noinsurance')) {
+          return true;
+        }
       }
-
-      playgame.playBlackjackAction(this.attributes,
-          this.event.request.locale,
-          actionObj, (error, response, speech, reprompt) => {
-        bjUtils.emitResponse(this, error, response, speech, reprompt);
-      });
     }
-  },
-  handleYesIntent: function() {
-    // Valid if there is only one option - otherwise, repeat and ask for clarification
-    const game = this.attributes[this.attributes.currentGame];
 
-    if (game.possibleActions && (game.possibleActions.length == 1)) {
-      // Play this action
-      const actionObj = {action: game.possibleActions[0]};
-      playgame.playBlackjackAction(this.attributes,
-          this.event.request.locale,
-          actionObj, (error, response, speech, reprompt) => {
-        bjUtils.emitResponse(this, error, response, speech, reprompt);
-      });
+    return false;
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../' + event.request.locale + '/resources');
+    const game = attributes[attributes.currentGame];
+    const actionObj = {};
+
+    if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
+      actionObj.action = game.possibleActions[0];
     } else {
-      // Ambiguous - punt to unhandled
-      this.emit('Unhandled');
+      // First make sure we have an action
+      const actionSlot = event.request.intent.slots.Action;
+      if (!actionSlot) {
+        handlerInput.responseBuilder
+          .speak(res.strings.BLACKJACKINTENT_NO_ACTION)
+          .reprompt(res.strings.ERROR_REPROMPT);
+      } else if (!actionSlot.value) {
+        handlerInput.responseBuilder
+          .speak(res.strings.BLACKJACKINTENT_UNKNOWN_ACTION.replace('{0}', actionSlot.value))
+          .reprompt(res.strings.ERROR_REPROMPT);
+      } else {
+        // Let's play this action
+        actionObj.action = res.getBlackjackAction(actionSlot);
+        if (!actionObj.action) {
+          // What did they specify?
+          console.log('NULL ACTION: ' + JSON.stringify(event.request));
+          actionObj.action = actionSlot.value;
+        }
+      }
+    }
+
+    if (actionObj.action) {
+      playgame.playBlackjackAction(attributes, event.request.locale,
+          actionObj, (error, response, speech, reprompt) => {
+        if (!error) {
+          handlerInput.responseBuilder
+            .speak(speech)
+            .reprompt(reprompt);
+        } else {
+          handlerInput.responseBuilder
+            .speak(error)
+            .reprompt(res.strings.ERROR_REPROMPT);
+        }
+      });
     }
   },
 };

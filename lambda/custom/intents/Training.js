@@ -5,25 +5,27 @@
 'use strict';
 
 const bjUtils = require('../BlackjackUtils');
-const playgame = require('../PlayGame');
 
 module.exports = {
-  handleEnableIntent: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
-    const reprompt = playgame.getContextualHelp(this);
-    const speech = res.strings.TRAINING_ON + reprompt;
-    const game = this.attributes[this.attributes.currentGame];
-
-    game.training = true;
-    bjUtils.emitResponse(this, null, null, speech, reprompt);
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return ((request.type === 'IntentRequest')
+      && ((request.intent.name === 'EnableTrainingIntent')
+        || (request.intent.name === 'DisableTrainingIntent')));
   },
-  handleDisableIntent: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
-    const reprompt = playgame.getContextualHelp(this);
-    const speech = res.strings.TRAINING_OFF + reprompt;
-    const game = this.attributes[this.attributes.currentGame];
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../' + event.request.locale + '/resources');
+    const enable = (handlerInput.requestEnvelope.request.intent.name === 'EnableTrainingIntent');
+    const game = attributes[attributes.currentGame];
 
-    game.training = undefined;
-    bjUtils.emitResponse(this, null, null, speech, reprompt);
+    const reprompt = bjUtils.getContextualHelp(event, attributes);
+    const speech = (enable ? res.strings.TRAINING_ON : res.strings.TRAINING_OFF) + reprompt;
+
+    game.training = (enable ? true : undefined);
+    handlerInput.responseBuilder
+      .speak(speech)
+      .reprompt(reprompt);
   },
 };

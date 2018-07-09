@@ -121,14 +121,14 @@ module.exports = {
     }
   },
   // Reads back the rules in play
-  readRules: function(attributes, locale, callback) {
+  readRules: function(attributes, locale) {
     resources = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
 
     const reprompt = listValidActions(game, locale, 'full');
     const speech = rulesToText(locale, game.rules) + reprompt;
 
-    callback(speech, reprompt);
+    return {speech: speech, reprompt: reprompt};
   },
   // Reads back the current hand and game state
   readCurrentHand: function(attributes, locale) {
@@ -137,46 +137,6 @@ module.exports = {
     const reprompt = listValidActions(game, locale, 'full');
     const speech = readHand(attributes, game, locale) + ' ' + reprompt;
     return {speech: speech, reprompt: reprompt};
-  },
-  // Gets contextual help based on the current state of the game
-  getContextualHelp: function(context, helpPrompt) {
-    const attributes = context.attributes;
-    resources = require('./' + context.event.request.locale + '/resources');
-    const game = attributes[attributes.currentGame];
-    let result = '';
-
-    // In some states, the choices are yes or no
-    if ((context.handler.state == 'CONFIRMRESET') ||
-          (context.handler.state == 'INSURANCEOFFERED')) {
-      result = resources.strings.HELP_YOU_CAN_SAY_YESNO;
-    } else if (game.possibleActions) {
-      // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
-      if (game.possibleActions.indexOf('noinsurance') > -1) {
-        // It's possible you can't take insurance because you don't have enough money
-        if (game.possibleActions.indexOf('insurance') > -1) {
-          result = ((game.playerHands[0].total === 21) && (game.rules.blackjackBonus == 0.5))
-              ? resources.strings.HELP_TAKE_INSURANCE_BLACKJACK
-              : resources.strings.HELP_TAKE_INSURANCE;
-        } else {
-          result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
-        }
-      } else {
-        const actions = game.possibleActions.map((x) => resources.mapPlayOption(x));
-        actions.push(resources.strings.HELP_YOU_CAN_SAY_LEADER);
-        if (helpPrompt && !game.training) {
-          actions.push(resources.strings.HELP_YOU_CAN_SAY_ENABLE_TRAINING);
-        }
-        result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: context.event.request.locale}));
-      }
-    } else if (!helpPrompt) {
-      result = resources.strings.TRAINING_REPROMPT;
-    }
-
-    if (helpPrompt) {
-      result += resources.strings.HELP_MORE_OPTIONS;
-    }
-
-    return result;
   },
 };
 
