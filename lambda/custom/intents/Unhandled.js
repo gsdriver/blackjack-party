@@ -5,7 +5,7 @@
 
 'use strict';
 
-const bjUtils = require('../BlackjackUtils');
+const playgame = require('../PlayGame');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -27,8 +27,8 @@ module.exports = {
         .reprompt(res.strings.ERROR_REPROMPT);
     } else {
       let speech = res.buildUnhandledResponse(event.request.intent,
-          bjUtils.getState(attributes));
-      const reprompt = bjUtils.getContextualHelp(event, attributes);
+          playgame.getState(attributes));
+      const reprompt = playgame.getContextualHelp(event, attributes);
 
       speech += reprompt;
       handlerInput.responseBuilder

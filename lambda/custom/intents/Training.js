@@ -4,7 +4,7 @@
 
 'use strict';
 
-const bjUtils = require('../BlackjackUtils');
+const playgame = require('../PlayGame');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -20,7 +20,7 @@ module.exports = {
     const enable = (handlerInput.requestEnvelope.request.intent.name === 'EnableTrainingIntent');
     const game = attributes[attributes.currentGame];
 
-    const reprompt = bjUtils.getContextualHelp(event, attributes);
+    const reprompt = playgame.getContextualHelp(event, attributes);
     const speech = (enable ? res.strings.TRAINING_ON : res.strings.TRAINING_OFF) + reprompt;
 
     game.training = (enable ? true : undefined);
