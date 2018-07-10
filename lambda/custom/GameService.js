@@ -12,7 +12,6 @@ availableGames = {
   'standard': {version: '1.0.0',
      deck: {cards: []},
      dealerHand: {cards: []},
-     playerHands: [],
      rules: {
        hitSoft17: false,         // Does dealer hit soft 17
        surrender: 'late',        // Surrender offered - none, late, or early
@@ -26,8 +25,6 @@ availableGames = {
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
      },
      activePlayer: 'none',
-     currentPlayerHand: 0,
-     specialState: null,
      bankroll: STARTING_BANKROLL,
      lastBet: 100,
      possibleActions: [],
@@ -41,11 +38,15 @@ module.exports = {
 
     if (availableGames[game]) {
       newGame = JSON.parse(JSON.stringify(availableGames[game]));
+      const now = Date.now();
 
       // Start by shuffling the deck
+      // For now, stick with one player
       shuffleDeck(newGame, userId);
       newGame.dealerHand.cards = [];
-      newGame.playerHands = [];
+      newGame.players = [now];
+      newGame.playerHands = {};
+      newGame.playerHands[now] = [];
 
       // Get the next possible actions
       setNextActions(newGame);
@@ -63,13 +64,13 @@ module.exports = {
         return game.possibleActions[0];
       }
 
-      const playerCards = game.playerHands[game.currentPlayerHand].cards.map(
+      const playerCards = getCurrentHand(game).cards.map(
             (card) => ((card.rank) > 10 ? 10 : card.rank));
 
       game.rules.strategyComplexity = 'advanced';
       return suggest.GetRecommendedPlayerAction(playerCards,
             ((game.dealerHand.cards[1].rank > 10) ? 10 : game.dealerHand.cards[1].rank),
-            game.playerHands.length,
+            getCurrentPlayer(game).hands.length,
             game.possibleActions.indexOf('insurance') < 0, game.rules);
     } else {
       return 'notplayerturn';
@@ -77,6 +78,8 @@ module.exports = {
   },
   userAction: function(attributes, action, value, callback) {
     const game = attributes[attributes.currentGame];
+    const currentPlayer = getCurrentPlayer(game);
+    const currentHand = getCurrentHand(game);
     let error;
 
     // Is this a valid action?
@@ -113,13 +116,13 @@ module.exports = {
 
       case 'hit':
         // Pop the top card off the deck for the player
-        game.playerHands[game.currentPlayerHand].cards.push(game.deck.cards.shift());
+        currentHand.cards.push(game.deck.cards.shift());
 
         // If they busted, it is the dealer's turn
-        const total = handTotal(game.playerHands[game.currentPlayerHand].cards).total;
+        const total = handTotal(currentHand.cards).total;
         if (total > 21) {
           // Sorry, you lose - it's the dealer's turn now
-          game.playerHands[game.currentPlayerHand].busted = true;
+          currentHand.busted = true;
           nextHand(game);
         } else if (total == 21) {
           // You have 21 - go to the next hand
@@ -134,11 +137,11 @@ module.exports = {
 
       case 'insurance':
         // If they are taking insurance, deduct the amount from the bankroll
-        game.bankroll -= (game.playerHands[game.currentPlayerHand].bet / 2);
+        game.bankroll -= (currentHand.bet / 2);
         // FALL THROUGH!
       case 'noinsurance':
         // OK, check if the dealer has 21 - if so, game is over
-        game.specialState = action;
+        currentPlayer.specialState = action;
         if (handTotal(game.dealerHand.cards).total == 21) {
           // Game over (go to the dealer)
           game.dealerHand.outcome = 'dealerblackjack';
@@ -151,35 +154,35 @@ module.exports = {
 
       case 'surrender':
         // Well, that's that
-        game.bankroll -= (game.playerHands[game.currentPlayerHand].bet / 2);
-        game.specialState = action;
+        game.bankroll -= (getCurrentHand(game).bet / 2);
+        currentPlayer.specialState = action;
         nextHand(game);
         break;
 
       case 'double':
         // For this, we mimick a hit and a stand, and set the special state to doubled
-        game.bankroll -= game.playerHands[game.currentPlayerHand].bet;
-        game.playerHands[game.currentPlayerHand].bet *= 2;
-        game.playerHands[game.currentPlayerHand].cards.push(game.deck.cards.shift());
+        game.bankroll -= currentHand.bet;
+        currentHand.bet *= 2;
+        currentHand.cards.push(game.deck.cards.shift());
         nextHand(game);
         break;
 
       case 'split':
         // OK, split these cards into another hand
         const newHand = {
-          bet: game.playerHands[game.currentPlayerHand].bet,
+          bet: currentHand.bet,
           busted: false,
           cards: [],
         };
 
         game.bankroll -= newHand.bet;
-        newHand.cards.push(game.playerHands[game.currentPlayerHand].cards.shift());
+        newHand.cards.push(currentHand.cards.shift());
 
         // Pop the top card off the deck back into the current hand
-        game.playerHands[game.currentPlayerHand].cards.push(game.deck.cards.shift());
+        currentHand.cards.push(game.deck.cards.shift());
 
         // And add this to the player's hand.  Whew
-        game.playerHands.push(newHand);
+        currentPlayer.hands.push(newHand);
         break;
 
       default:
@@ -193,8 +196,13 @@ module.exports = {
       if (game.activePlayer == 'dealer') {
         playDealerHand(game);
 
-        for (let i = 0; i < game.playerHands.length; i++) {
-          determineWinner(game, game.playerHands[i]);
+        for (let j = 0; j < game.players.length; j++) {
+          game.players.forEach((player) => {
+            for (let i = 0; i < game.playerHands[player].hands.length; i++) {
+              determineWinner(game, game.playerHands[player],
+                  game.playerHands[player].hands[i]);
+            }
+          });
         }
 
         setNextActions(game);
@@ -208,6 +216,12 @@ module.exports = {
     }
 
     callback(error);
+  },
+  isPlayerBlackjack: function(game, player) {
+    const check = (player ? player : game.players[0]);
+    return ((game.playerHands[check].hands.length == 1) &&
+      (handTotal(game.playerHands[check].hands[0].cards) == 21) &&
+      (game.playerHands[check].hands[0].length == 2));
   },
 };
 
@@ -228,12 +242,14 @@ function updateGame(game) {
   game.dealerHand.total = dealerTotal.total;
   game.dealerHand.soft = dealerTotal.soft;
 
-  for (i = 0; i < game.playerHands.length; i++) {
-    const playerTotal = handTotal(game.playerHands[i].cards);
+  game.players.forEach((player) => {
+    for (i = 0; i < game.playerHands[player].hands.length; i++) {
+      const playerTotal = handTotal(game.playerHands[player].hands[i].cards);
 
-    game.playerHands[i].total = playerTotal.total;
-    game.playerHands[i].soft = playerTotal.soft;
-  }
+      game.playerHands[player].hands[i].total = playerTotal.total;
+      game.playerHands[player].hands[i].soft = playerTotal.soft;
+    }
+  });
 }
 
 function deal(attributes, betAmount) {
@@ -247,23 +263,29 @@ function deal(attributes, betAmount) {
 
   // Clear out the hands
   game.dealerHand.cards = [];
-  game.playerHands = [];
+  game.playerHands = {};
 
-  // Now deal the cards
-  newHand.cards.push(game.deck.cards.shift());
+  // Now deal the cards - first two to each player
+  game.players.forEach((player) => {
+    const hand = Object.assign({}, newHand);
+    hand.cards.push(game.deck.cards.shift());
+    hand.cards.push(game.deck.cards.shift());
+    game.playerHands[player] = {hands: [], currentPlayerHand: 0};
+    game.playerHands[player].hands.push(hand);
+    game.playerHands[player].specialState = null;
+  });
+
+  // And finally the dealer
   game.dealerHand.cards.push(game.deck.cards.shift());
-  newHand.cards.push(game.deck.cards.shift());
   game.dealerHand.cards.push(game.deck.cards.shift());
-  game.playerHands.push(newHand);
 
   // Reset state variables
-  game.specialState = null;
   game.lastBet = betAmount;
   game.dealerHand.outcome = 'playing';
 
   // And set the next hand (to the player)
   game.activePlayer = 'none';
-  game.currentPlayerHand = 0;
+  game.currentPlayer = 0;
   nextHand(game);
 }
 
@@ -305,17 +327,21 @@ function shuffleDeck(game, userId) {
 
 function setNextActions(game) {
   // Lots of special rules if you split Aces
-  const splitAces = (game.activePlayer == 'player') && ((game.playerHands.length > 1) && (game.playerHands[game.currentPlayerHand].cards[0].rank == 1));
+  const currentPlayer = getCurrentPlayer(game);
+  const currentHand = getCurrentHand(game);
+  const splitAces = (game.activePlayer == 'player') &&
+      ((currentPlayer.hands.length > 1) &&
+      (currentHand.cards[0].rank == 1));
 
   game.possibleActions = [];
 
   // Special situations if we just dealt
-  if ((game.activePlayer == 'player') && (game.playerHands.length == 1) && (game.playerHands[0].cards.length == 2)) {
+  if ((game.activePlayer == 'player') && (currentPlayer.hands.length == 1) && (currentHand.cards.length == 2)) {
     // Insurance if the dealer has an ace showing
     // and they haven't already taken action on insurance
-    if ((game.dealerHand.cards[1].rank == 1) && (game.specialState == null)) {
+    if ((game.dealerHand.cards[1].rank == 1) && (currentPlayer.specialState == null)) {
       // To take insurance, they have to have enough in the bankroll
-      if ((game.playerHands[0].bet / 2) <= game.bankroll) {
+      if ((currentHand.bet / 2) <= game.bankroll) {
         game.possibleActions.push('insurance');
       }
 
@@ -336,25 +362,18 @@ function setNextActions(game) {
 
   // If you can double any cards (Spanish 21), then set that as long as it's still their turn
   if ((game.activePlayer == 'player') && (game.rules.double == 'anyCards')
-      && (game.playerHands[game.currentPlayerHand].bet <= game.bankroll)) {
+      && (currentHand.bet <= game.bankroll)) {
     game.possibleActions.push('double');
   }
 
-  if ((game.activePlayer == 'player') && game.rules.surrenderAfterDouble
-    && (game.playerHands.length == 1) && (game.playerHands[0].cards.length == 3)
-    && (game.playerHands[0].bet > game.lastBet)) {
-    // Spanish 21 - surrender after double
-    game.possibleActions.push('surrender');
-  }
-
   // Other actions are only available for the first two cards of a hand
-  if ((game.activePlayer == 'player') && (game.playerHands[game.currentPlayerHand].cards.length == 2)) {
+  if ((game.activePlayer == 'player') && (currentHand.cards.length == 2)) {
     // Double down - not allowed if you split Aces
-    if (!splitAces && (game.playerHands[game.currentPlayerHand].bet <= game.bankroll)) {
+    if (!splitAces && (currentHand.bet <= game.bankroll)) {
       // Whether you can double is dictated by either
       // the rules.double or rules.doubleaftersplit variable
-      const doubleRules = (game.playerHands.length == 1) ? game.rules.double : (game.rules.doubleaftersplit ? game.rules.double : 'none');
-      const playerTotal = handTotal(game.playerHands[game.currentPlayerHand].cards).total;
+      const doubleRules = (currentPlayer.hands.length == 1) ? game.rules.double : (game.rules.doubleaftersplit ? game.rules.double : 'none');
+      const playerTotal = handTotal(currentHand.cards).total;
 
       switch (doubleRules) {
         case 'any':
@@ -380,12 +399,11 @@ function setNextActions(game) {
     }
 
     // Split
-    const currentHand = game.playerHands[game.currentPlayerHand];
     if (((currentHand.cards[0].rank == currentHand.cards[1].rank)
         || ((currentHand.cards[0].rank > 9) && (currentHand.cards[1].rank > 9)))
         && (currentHand.bet <= game.bankroll)) {
       // OK, they can split if they haven't reached the maximum number of allowable hands
-      if (game.playerHands.length < game.rules.maxSplitHands) {
+      if (currentPlayer.hands.length < game.rules.maxSplitHands) {
         // Oh - one more case; if they had Aces we have to check the resplit Aces rule
         if (!splitAces || game.rules.resplitAces) {
           game.possibleActions.push('split');
@@ -400,7 +418,7 @@ function setNextActions(game) {
     game.possibleActions.unshift('stand');
 
     // You can hit as long as you don't have 21
-    if (handTotal(game.playerHands[game.currentPlayerHand].cards).total < 21) {
+    if (handTotal(currentHand.cards).total < 21) {
       // One more case - if you split Aces you only get one card (so you can't hit)
       if (!splitAces) {
         game.possibleActions.unshift('hit');
@@ -426,12 +444,21 @@ function setNextActions(game) {
 }
 
 function nextHand(game) {
+  const currentPlayer = getCurrentPlayer(game);
+
   // If it's none, it goes to player 0
   if (game.activePlayer == 'none') {
-    // It's the player's turn unless the player has a blackjack (and the dealer doesn't
+    // It's the player's turn unless ALL PLAYERS have a blackjack (and the dealer doesn't
     // have an ace showing), or if the dealer has a blackjack with a 10 up
-    game.currentPlayerHand = 0;
-    if (handTotal(game.playerHands[0].cards).total == 21) {
+    game.currentPlayer = 0;
+    let allPlayerBlackjack = true;
+    game.players.forEach((player) => {
+      if (!module.exports.isPlayerBlackjack(game, player)) {
+        allPlayerBlackjack = false;
+      }
+    });
+
+    if (allPlayerBlackjack) {
       game.activePlayer = (game.dealerHand.cards[1].rank == 1) ? 'player' : 'dealer';
     } else if ((handTotal(game.dealerHand.cards).total == 21)
         && (game.dealerHand.cards[1].rank != 1)) {
@@ -441,13 +468,16 @@ function nextHand(game) {
       game.activePlayer = 'player';
     }
   } else if (game.activePlayer == 'player') {
-      if (game.currentPlayerHand < game.playerHands.length - 1) {
+      if (currentPlayer.currentPlayerHand < currentPlayer.hands.length - 1) {
         // Still the player's turn - move to the next hand
         // Note that we'll probably need to give them a second card
-        game.currentPlayerHand++;
-        if (game.playerHands[game.currentPlayerHand].cards.length < 2) {
-          game.playerHands[game.currentPlayerHand].cards.push(game.deck.cards.shift());
+        currentPlayer.currentPlayerHand++;
+        const currentHand = getCurrentHand(game);
+        if (currentHand.cards.length < 2) {
+          currentHand.cards.push(game.deck.cards.shift());
         }
+      } else if (game.currentPlayer < game.players.length - 1) {
+        game.currentPlayer++;
       } else {
         // Now it's the dealer's turn
         game.activePlayer = 'dealer';
@@ -461,21 +491,30 @@ function nextHand(game) {
 function playDealerHand(game) {
   let handValue = handTotal(game.dealerHand.cards);
   let allPlayerHandsBusted = true; // Assume everyone busted until proven otherwise
-  const playerBlackjack = ((game.playerHands.length == 1)
-    && (handTotal(game.playerHands[0].cards).total == 21)
-    && (game.playerHands[0].cards.length == 2));
+  let allPlayerBlackjack = true;
+  let allPlayerSurrender = true;
 
   // If all players have busted, we won't play thru
-  for (let i = 0; i < game.playerHands.length; i++) {
-    if (!game.playerHands[i].busted) {
-      // Someone didn't bust
-      allPlayerHandsBusted = false;
-      break;
+  game.players.forEach((player) => {
+    for (let i = 0; i < game.playerHands[player].hands.length; i++) {
+      if (!game.playerHands[player].hands[i].busted) {
+        // Someone didn't bust
+        allPlayerHandsBusted = false;
+        break;
+      }
     }
-  }
 
-  // If all hands busted, or player has blackjack, or player surrendered we don't play
-  if (!allPlayerHandsBusted && !playerBlackjack && (game.specialState != 'surrender')) {
+    if (game.playerHands[player].specialState != 'surrender') {
+      allPlayerSurrender = false;
+    }
+
+    if (!module.exports.isPlayerBlackjack(game, player)) {
+      allPlayerBlackjack = false;
+    }
+  });
+
+  // If all hands busted, or all players have blackjack, or all players surrendered we don't play
+  if (!allPlayerHandsBusted && !allPlayerBlackjack && !allPlayerSurrender) {
     while ((handValue.total < 17) ||
         ((handValue.total == 17) && game.rules.hitSoft17 && handValue.soft)) {
       game.dealerHand.cards.push(game.deck.cards.shift());
@@ -487,20 +526,20 @@ function playDealerHand(game) {
   nextHand(game);
 }
 
-function determineWinner(game, playerHand) {
+function determineWinner(game, player, playerHand) {
   const dealerTotal = handTotal(game.dealerHand.cards).total;
   const playerTotal = handTotal(playerHand.cards).total;
   const dealerBlackjack = ((dealerTotal == 21) && (game.dealerHand.cards.length == 2));
-  const playerBlackjack = ((game.playerHands.length == 1)
+  const playerBlackjack = ((player.hands.length == 1)
         && (playerTotal == 21) && (playerHand.cards.length == 2));
   let specialPayout;
 
   // Did they surrender?  If so, that's that
-  if (game.specialState == 'surrender') {
+  if (player.specialState == 'surrender') {
     playerHand.outcome = 'surrender';
   } else {
     // Did they take insurance?  If they did and the dealer has a blackjack, they win
-    if (game.specialState == 'insurance') {
+    if (player.specialState == 'insurance') {
       // Note that insurance bets are off the initial bet (not the doubled amount)
       if (dealerBlackjack) {
         // Well what do you know
@@ -639,3 +678,11 @@ function handTotal(cards) {
   return retval;
 }
 
+function getCurrentHand(game) {
+  const player = getCurrentPlayer(game);
+  return (player ? player.hands[player.currentPlayerHand] : undefined);
+}
+
+function getCurrentPlayer(game) {
+  return game.playerHands[game.players[game.currentPlayer]];
+}

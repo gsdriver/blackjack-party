@@ -99,10 +99,7 @@ module.exports = {
             attributes.temp.drawBoard = true;
 
             // Special case - give a full read-out if this is a natural blackjack
-            const playerBlackjack = ((game.playerHands.length == 1)
-              && (game.activePlayer == 'player')
-              && (game.playerHands[0].cards.length == 2)
-              && (game.playerHands[0].total == 21));
+            const playerBlackjack = (game.activePlayer == 'player') && gameService.isPlayerBlackjack(game);
 
             // If this was the first hand, or they specified a value, tell them how much they bet
             if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
@@ -195,7 +192,7 @@ function listValidActions(game, locale, type) {
       // It's possible you can't take insurance because you don't have enough money
       if (game.possibleActions.indexOf('insurance') > -1) {
         // Do you have blackjack?
-        result = ((game.playerHands[0].total === 21) && (game.rules.blackjackBonus == 0.5))
+        result = (gameService.isPlayerBlackjack(game) && (game.rules.blackjackBonus == 0.5))
             ? resources.strings.ASK_TAKE_INSURANCE_BLACKJACK
             : resources.strings.ASK_TAKE_INSURANCE;
       } else {
@@ -224,13 +221,19 @@ function tellResult(attributes, locale, action, oldGame) {
 
   // It's possible they did something other than stand on the previous hand if this is a split
   // If so, read that off first (but try to avoid it if they just stood on the prior hand)
-  if ((oldGame.activePlayer == 'player') && (game.currentPlayerHand != oldGame.currentPlayerHand)) {
-    const oldHand = game.playerHands[oldGame.currentPlayerHand];
+  const newCurrentHand = game.playerHands[game.players[game.currentPlayer]]
+    .currentPlayerHand;
+  const oldCurrentHand = oldGame.playerHands[oldGame.players[oldGame.currentPlayer]]
+    .currentPlayerHand;
+
+  if ((oldGame.activePlayer == 'player') &&
+    ((game.currentPlayer != oldGame.currentPlayer) || (newCurrentHand != oldCurrentHand))) {
+    const oldHand = game.playerHands[oldGame.players[oldGame.currentPlayer]].hands[oldCurrentHand];
 
     // I don't want to re-read this hand if they just stood, so let's make sure they busted
     // or split Aces (which only draws one card) or did a double before we read this hand.
     if ((oldHand.total >= 21) ||
-      (oldHand.bet > game.playerHands[game.currentPlayerHand].bet)) {
+      (oldHand.bet > getCurrentHand(game).bet)) {
       if (oldHand.total > 21) {
         result = resources.strings.RESULT_AFTER_HIT_BUST
           .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
@@ -241,7 +244,8 @@ function tellResult(attributes, locale, action, oldGame) {
       }
 
       // And now preface with the next hand before we tell them what happened
-      result += readHandNumber(game, game.currentPlayerHand);
+      result += readHandNumber(game,
+          game.playerHands[game.players[game.currentPlayer]].currentPlayerHand);
     }
   }
 
@@ -327,30 +331,31 @@ function readGameResult(attributes) {
   let i;
   let outcome = '';
   const game = attributes[attributes.currentGame];
+  const currentPlayer = getCurrentPlayer(game);
 
-  if (game.playerHands.length > 1) {
+  if (currentPlayer.hands.length > 1) {
   // If more than one hand and the outcome is the same, say all hands
     let allSame = true;
-    game.playerHands.map((x) => {
-      if (x.outcome != game.playerHands[0].outcome) {
+    currentPlayer.hands.map((x) => {
+      if (x.outcome != currentPlayer.hands[0].outcome) {
         allSame = false;
       }
     });
 
     if (allSame) {
       // This means you have multiple hands that all had the same outcome
-      outcome += resources.mapMultipleOutcomes(game.playerHands[0].outcome,
-          game.playerHands.length);
+      outcome += resources.mapMultipleOutcomes(currentPlayer.hands[0].outcome,
+          currentPlayer.hands.length);
       outcome += ' ';
     } else {
       // Read each hand
-      for (i = 0; i < game.playerHands.length; i++) {
+      for (i = 0; i < currentPlayer.hands.length; i++) {
         outcome += readHandNumber(game, i);
-        outcome += resources.mapOutcome(game.playerHands[i].outcome);
+        outcome += resources.mapOutcome(currentPlayer.hands[i].outcome);
       }
     }
   } else {
-    outcome += resources.mapOutcome(game.playerHands[0].outcome);
+    outcome += resources.mapOutcome(currentPlayer.hands[0].outcome);
   }
 
   // They are no longer a new user
@@ -367,7 +372,7 @@ function readGameResult(attributes) {
  */
 function readHit(attributes, locale) {
   const game = attributes[attributes.currentGame];
-  const currentHand = game.playerHands[game.currentPlayerHand];
+  const currentHand = getCurrentHand(game);
   const cardText = resources.readCard(currentHand.cards[currentHand.cards.length - 1], 'article', game.readSuit);
   const cardRank = currentHand.cards[currentHand.cards.length - 1].rank;
   let result;
@@ -436,7 +441,7 @@ function readStand(attributes, locale) {
 function readSplit(attributes, locale) {
   const game = attributes[attributes.currentGame];
   let result;
-  const pairCard = game.playerHands[game.currentPlayerHand].cards[0];
+  const pairCard = getCurrentHand(game).cards[0];
 
   if (pairCard.rank >= 10) {
     result = resources.strings.SPLIT_TENS;
@@ -491,19 +496,20 @@ function readInsurance(attributes, locale) {
 function readHand(attributes, game, locale) {
   let result = '';
   let resultFormat;
+  const currentPlayer = getCurrentPlayer(game);
 
   // It's possible there is no hand
-  if (game.playerHands.length == 0) {
+  if (!currentPlayer || (currentPlayer.hands.length == 0)) {
     return '';
   }
-  const currentHand = game.playerHands[game.currentPlayerHand];
+  const currentHand = getCurrentHand(game);
   if (!currentHand) {
     // We're about to blow up - log for diagnosis
     console.log('currentHand is undefined: ' + JSON.stringify(game));
   }
 
   // If they have more than one hand, then say the hand number
-  result += readHandNumber(game, game.currentPlayerHand);
+  result += readHandNumber(game, currentPlayer.currentPlayerHand);
   const readCards = utils.and(currentHand.cards.map((x) => {
     return resources.readCard(x, false, game.readSuit);
   }), {locale: locale});
@@ -515,7 +521,7 @@ function readHand(attributes, game, locale) {
     result += resultFormat.replace('{0}', readCards).replace('{1}', currentHand.total);
   } else if (game.activePlayer == 'none') {
     // If no active player, use past tense
-    if ((game.playerHands.length == 1) && (currentHand.cards.length == 2)
+    if ((currentPlayer.hands.length == 1) && (currentHand.cards.length == 2)
       && (currentHand.total == 21)) {
       result += resources.strings.READHAND_PLAYER_TOTAL_END_BLACKJACK.replace('{0}', readCards);
     } else {
@@ -524,7 +530,7 @@ function readHand(attributes, game, locale) {
       result += resultFormat.replace('{0}', readCards).replace('{1}', currentHand.total);
     }
   } else {
-    if ((game.playerHands.length == 1) && (currentHand.cards.length == 2)
+    if ((currentPlayer.hands.length == 1) && (currentHand.cards.length == 2)
       && (currentHand.total == 21)) {
       result += resources.strings.READHAND_PLAYER_TOTAL_ACTIVE_BLACKJACK.replace('{0}', readCards);
     } else {
@@ -552,8 +558,9 @@ function readHand(attributes, game, locale) {
 //
 function readHandNumber(game, handNumber) {
   let result = '';
+  const currentPlayer = getCurrentPlayer(game);
 
-  if (game.playerHands.length > 1) {
+  if (currentPlayer.hands.length > 1) {
     result = resources.mapHandNumber(handNumber);
   }
 
@@ -621,4 +628,13 @@ function rulesToText(locale, rules, changeRules) {
   }
 
   return text;
+}
+
+function getCurrentHand(game) {
+  const player = getCurrentPlayer(game);
+  return player.hands[player.currentPlayerHand];
+}
+
+function getCurrentPlayer(game) {
+  return game.playerHands[game.players[game.currentPlayer]];
 }
