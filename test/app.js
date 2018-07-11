@@ -15,6 +15,8 @@ function BuildEvent(argv)
     var blackjackIntent = {"name": "BlackjackIntent", "slots": {"Action": {"name": "Action", "value": ""}}};
     var suggestIntent = {"name": "SuggestIntent", "slots": {}};
     var readRulesIntent = {"name": "RulesIntent", "slots": {}};
+    var addPlayerIntent = {"name": "AddPlayerIntent", "slots": {}};
+    var playerNameIntent = {"name": "PlayerNameIntent", "slots": {"Name": {"name": "Name", "value": ""}}};
     var betIntent = {"name": "BettingIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
     var yesIntent = {"name": "AMAZON.YesIntent", "slots": {}};
     var noIntent = {"name": "AMAZON.NoIntent", "slots": {}};
@@ -214,6 +216,18 @@ function BuildEvent(argv)
     else if (argv[2] == "stop")
     {
         lambda.request.intent = stopIntent;;
+    }
+    else if (argv[2] == "addplayer")
+    {
+        lambda.request.intent = addPlayerIntent;;
+    }
+    else if (argv[2] == "playername")
+    {
+        if (argv.length > 3)
+        {
+            playerNameIntent.slots.Name.value = argv[3];
+        }
+        lambda.request.intent = playerNameIntent;
     }
     else if (argv[2] == "bet")
     {

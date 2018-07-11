@@ -14,6 +14,9 @@ const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const SessionEnd = require('./intents/SessionEnd');
 const Training = require('./intents/Training');
+const AddPlayer = require('./intents/AddPlayer');
+const PlayerName = require('./intents/PlayerName');
+const ConfirmName = require('./intents/ConfirmName');
 const Unhandled = require('./intents/Unhandled');
 const gameService = require('./GameService');
 const AWS = require('aws-sdk');
@@ -117,12 +120,15 @@ function runGame(event, context, callback) {
 
   const skillFunction = skillBuilder.addRequestHandlers(
       Launch,
+      ConfirmName,
       Exit,
       Help,
       Repeat,
       Rules,
       Training,
       Betting,
+      AddPlayer,
+      PlayerName,
       Blackjack,
       Suggest,
       TakeSuggestion,

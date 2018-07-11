@@ -193,6 +193,35 @@ module.exports = {
       return 'INGAME';
     }
   },
+  addPlayer: function(attributes) {
+    const game = attributes[attributes.currentGame];
+    let id = attributes.temp.addingPlayer;
+
+    // If there is a name, let's see if they are already on the list
+    if (!attributes.playerList) {
+      attributes.playerList = {};
+    }
+    if (attributes.temp.addingName) {
+      let playerId;
+      for (playerId in attributes.playerList) {
+        if (attributes.playerList[playerId].name == attributes.temp.addingName) {
+          // They are already in the master list, so don't re-add
+          id = playerId;
+        }
+      };
+    }
+
+    // Add to the table
+    game.players.push(id);
+    game.playerHands[id] = {};
+    if (!attributes.playerList[id]) {
+      attributes.playerList[id] = {};
+      attributes.playerList[id].name = attributes.temp.addingName;
+    }
+
+    attributes.temp.addingPlayer = undefined;
+    attributes.temp.addingName = undefined;
+  },
 };
 
 //
@@ -320,7 +349,7 @@ function tellResult(attributes, locale, action, oldGame) {
   }
   // Always say new player if current player shifted
   if ((game.currentPlayer != oldGame.currentPlayer) && (game.players.length > 1)) {
-    result += resources.strings.CURRENT_PLAYER.replace('{0}', game.currentPlayer + 1);
+    result += readPlayerName(attributes);
   }
   // So what happened?
   switch (action) {
@@ -717,6 +746,20 @@ function rulesToText(locale, rules, changeRules) {
   }
 
   return text;
+}
+
+function readPlayerName(attributes) {
+  const game = attributes[attributes.currentGame];
+  const id = game.players[game.currentPlayer];
+  let name;
+
+  if (attributes.playerList[id] && attributes.playerList[id].name) {
+    name = attributes.playerList[id].name + ' <break time=\'200ms\'/> ';
+  } else {
+    name = resources.strings.CURRENT_PLAYER.replace('{0}', game.currentPlayer + 1);
+  }
+
+  return name;
 }
 
 function getCurrentHand(game) {

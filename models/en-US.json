@@ -111,6 +111,28 @@
           ]
         },
         {
+          "name": "AddPlayerIntent",
+          "samples": [
+            "add a player",
+            "add a new player",
+            "new player",
+            "additional player",
+            "add another player"
+          ]
+        },
+        {
+          "name": "PlayerNameIntent",
+          "slots": [
+            {
+              "name": "Name",
+              "type": "AMAZON.US_FIRST_NAME"
+            }
+          ],
+          "samples": [
+            "{Name}"
+          ]
+        },
+        {
           "name": "EnableTrainingIntent",
           "samples": [
             "turn on training mode",

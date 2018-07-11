@@ -38,16 +38,13 @@ module.exports = {
 
     if (availableGames[game]) {
       newGame = JSON.parse(JSON.stringify(availableGames[game]));
-      const now = Date.now();
 
       // Start by shuffling the deck
       // For now, stick with one player
       shuffleDeck(newGame, userId);
       newGame.dealerHand.cards = [];
-      newGame.players = [now, now+1];
       newGame.playerHands = {};
-      newGame.playerHands[now] = [];
-      newGame.playerHands[now+1] = [];
+      newGame.players = [];
 
       // Get the next possible actions
       setNextActions(newGame);
@@ -692,5 +689,8 @@ function getCurrentHand(game) {
 }
 
 function getCurrentPlayer(game) {
-  return game.playerHands[game.players[game.currentPlayer]];
+  if ((game.currentPlayer !== undefined) && game.playerHands) {
+    return game.playerHands[game.players[game.currentPlayer]];
+  }
+  return undefined;
 }

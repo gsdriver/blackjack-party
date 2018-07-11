@@ -33,6 +33,11 @@ module.exports = {
     // Curious what language is betting...
     console.log('Bet invoked for ' + event.request.locale);
 
+    // First off, if they were in the midst of adding a player, add it
+    if (attributes.temp.addingPlayer) {
+      playgame.addPlayer(attributes);
+    }
+
     if (event.request.intent.slots && event.request.intent.slots.Amount
       && event.request.intent.slots.Amount.value) {
       amount = event.request.intent.slots.Amount.value;
