@@ -277,36 +277,51 @@ function tellResult(attributes, locale, action, oldGame) {
   let result = '';
   const game = attributes[attributes.currentGame];
 
-  // It's possible they did something other than stand on the previous hand if this is a split
-  // If so, read that off first (but try to avoid it if they just stood on the prior hand)
-  const newCurrentHand = game.playerHands[game.players[game.currentPlayer]]
-    .currentPlayerHand;
-  const oldCurrentHand = oldGame.playerHands[oldGame.players[oldGame.currentPlayer]]
-    .currentPlayerHand;
-
-  if ((oldGame.activePlayer == 'player') &&
-    ((game.currentPlayer != oldGame.currentPlayer) || (newCurrentHand != oldCurrentHand))) {
-    const oldHand = game.playerHands[oldGame.players[oldGame.currentPlayer]].hands[oldCurrentHand];
-
-    // I don't want to re-read this hand if they just stood, so let's make sure they busted
-    // or split Aces (which only draws one card) or did a double before we read this hand.
-    if ((oldHand.total >= 21) ||
-      (oldHand.bet > getCurrentHand(game).bet)) {
-      if (oldHand.total > 21) {
-        result = resources.strings.RESULT_AFTER_HIT_BUST
-          .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
-      } else {
-        result = resources.strings.RESULT_AFTER_HIT_NOBUST
-          .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit))
-          .replace('{1}', oldHand.total);
-      }
-
-      // And now preface with the next hand before we tell them what happened
-      result += readHandNumber(game,
-          game.playerHands[game.players[game.currentPlayer]].currentPlayerHand);
-    }
+  // If all players are done with insurance decisions, first say
+  // whether the dealer had a blackjack or not
+  if ((action == 'insurance') || (action == 'noinsurance')) {
+    result += readInsurance(attributes, locale, true);
+  }
+  // If you surrendered, acknowledge before we move to the next player
+  if (action == 'surrender') {
+    result += readSurrender(attributes, locale, true);
   }
 
+  if (oldGame.activePlayer == 'player') {
+    // It's possible they did something other than stand on the previous hand if this is a split
+    // If so, read that off first (but try to avoid it if they just stood on the prior hand)
+    const newCurrentHand = game.playerHands[game.players[game.currentPlayer]]
+      .currentPlayerHand;
+    const oldCurrentHand = oldGame.playerHands[oldGame.players[oldGame.currentPlayer]]
+      .currentPlayerHand;
+
+    if ((game.currentPlayer != oldGame.currentPlayer) || (newCurrentHand != oldCurrentHand)) {
+      const oldHand = game.playerHands[oldGame.players[oldGame.currentPlayer]]
+        .hands[oldCurrentHand];
+
+      // I don't want to re-read this hand if they just stood, so let's make sure they busted
+      // or split Aces (which only draws one card) or did a double before we read this hand.
+      if ((oldHand.total >= 21) ||
+        (oldHand.bet > getCurrentHand(game).bet)) {
+        if (oldHand.total > 21) {
+          result += resources.strings.RESULT_AFTER_HIT_BUST
+            .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
+        } else {
+          result += resources.strings.RESULT_AFTER_HIT_NOBUST
+            .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit))
+            .replace('{1}', oldHand.total);
+        }
+
+        // And now preface with the next hand before we tell them what happened
+        result += readHandNumber(game,
+            game.playerHands[game.players[game.currentPlayer]].currentPlayerHand);
+      }
+    }
+  }
+  // Always say new player if current player shifted
+  if ((game.currentPlayer != oldGame.currentPlayer) && (game.players.length > 1)) {
+    result += resources.strings.CURRENT_PLAYER.replace('{0}', game.currentPlayer + 1);
+  }
   // So what happened?
   switch (action) {
     case 'resetbankroll':
@@ -516,13 +531,21 @@ function readSplit(attributes, locale) {
 /*
  * You surrendered, so the game is over
  */
-function readSurrender(attributes, locale) {
+function readSurrender(attributes, locale, surrenderResult) {
   const game = attributes[attributes.currentGame];
   let result;
 
-  // Rub it in by saying what the dealer had
-  result = readDealerAction(game, locale);
-  result += ' ' + readGameResult(attributes);
+  // If they surrendered then acknowledge before we move on
+  if (surrenderResult && (game.players.length > 1)) {
+    result = resources.strings.SURRENDER_RESULT;
+  } else if (game.activePlayer != 'player') {
+    // Rub it in by saying what the dealer had
+    result = readDealerAction(game, locale);
+    result += ' ' + readGameResult(attributes);
+  } else {
+    // Next player - read their hand
+    result = readHand(attributes, game, locale);
+  }
 
   return result;
 }
@@ -531,18 +554,26 @@ function readSurrender(attributes, locale) {
  * Say whether the dealer had blackjack - if not, reiterate the current hand,
  * if so then we're done and let them know to bet
  */
-function readInsurance(attributes, locale) {
+function readInsurance(attributes, locale, readDealer) {
   const game = attributes[attributes.currentGame];
-  let result;
+  let result = '';
 
-  if (game.dealerHand.outcome == 'dealerblackjack') {
-    // Game over
-    result = resources.strings.DEALER_HAD_BLACKJACK;
-    result += readGameResult(attributes);
-  } else if (game.dealerHand.outcome == 'nodealerblackjack') {
-    // No blackjack - so what do you want to do now?
-    result = resources.strings.DEALER_NO_BLACKJACK;
-    result += readHand(attributes, game, locale);
+  if (readDealer) {
+    if (game.dealerHand.outcome == 'dealerblackjack') {
+      // Game over
+      result = resources.strings.DEALER_HAD_BLACKJACK;
+    } else if (game.dealerHand.outcome == 'nodealerblackjack') {
+      // No blackjack - so what do you want to do now?
+      result = resources.strings.DEALER_NO_BLACKJACK;
+    }
+  } else {
+    if (game.dealerHand.outcome == 'dealerblackjack') {
+      // Game over
+      result = readGameResult(attributes);
+    } else {
+      // Game is still active - what do you want to do?
+      result = readHand(attributes, game, locale);
+    }
   }
 
   return result;

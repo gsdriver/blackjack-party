@@ -30,6 +30,7 @@ const resources = {
   'TRAINING_OFF': 'Training mode turned off. ',
   'TRAINING_REPROMPT': 'What can I help you with?',
   // From PlayGame.js
+  'CURRENT_PLAYER': '<say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> ',
   'PROMPT_TRAINING': 'You can say enter training mode if you would like me to tell you when your play differs from Basic Strategy',
   'PROMPT_LEADER_BOARD': 'You can say read high scores to hear the leader board. ',
   'PROACTIVE_SUGGESTION': ' I\'ve noticed you haven\'t {0} recently and wanted to remind you that the book would say you should {1} on this hand.',

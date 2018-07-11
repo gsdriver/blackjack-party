@@ -44,9 +44,10 @@ module.exports = {
       // For now, stick with one player
       shuffleDeck(newGame, userId);
       newGame.dealerHand.cards = [];
-      newGame.players = [now];
+      newGame.players = [now, now+1];
       newGame.playerHands = {};
       newGame.playerHands[now] = [];
+      newGame.playerHands[now+1] = [];
 
       // Get the next possible actions
       setNextActions(newGame);
@@ -140,15 +141,21 @@ module.exports = {
         game.bankroll -= (currentHand.bet / 2);
         // FALL THROUGH!
       case 'noinsurance':
-        // OK, check if the dealer has 21 - if so, game is over
         currentPlayer.specialState = action;
-        if (handTotal(game.dealerHand.cards).total == 21) {
-          // Game over (go to the dealer)
-          game.dealerHand.outcome = 'dealerblackjack';
-          nextHand(game);
+        // Go to the next player for their decision
+        if (game.currentPlayer < (game.players.length - 1)) {
+          game.currentPlayer++;
         } else {
-          // Let the player know there was no blackjack
-          game.dealerHand.outcome = 'nodealerblackjack';
+          // OK, check if the dealer has 21 - if so, game is over
+          if (handTotal(game.dealerHand.cards).total == 21) {
+            // Game over (go to the dealer)
+            game.dealerHand.outcome = 'dealerblackjack';
+            nextHand(game);
+          } else {
+            // Let the players know there was no blackjack
+            game.currentPlayer = 0;
+            game.dealerHand.outcome = 'nodealerblackjack';
+          }
         }
         break;
 
@@ -255,6 +262,7 @@ function updateGame(game) {
 function deal(attributes, betAmount) {
   const game = attributes[attributes.currentGame];
   const newHand = {bet: 0, busted: false, cards: []};
+  let hand;
 
   // Make sure the betAmount is valid
   newHand.bet = Number(betAmount);
@@ -267,7 +275,7 @@ function deal(attributes, betAmount) {
 
   // Now deal the cards - first two to each player
   game.players.forEach((player) => {
-    const hand = Object.assign({}, newHand);
+    hand = JSON.parse(JSON.stringify(newHand));
     hand.cards.push(game.deck.cards.shift());
     hand.cards.push(game.deck.cards.shift());
     game.playerHands[player] = {hands: [], currentPlayerHand: 0};
