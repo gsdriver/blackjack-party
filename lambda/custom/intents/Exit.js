@@ -22,7 +22,7 @@ module.exports = {
       if (request.intent.name === 'AMAZON.NoIntent') {
         const attributes = handlerInput.attributesManager.getSessionAttributes();
         const game = attributes[attributes.currentGame];
-        if (game && (game.possibleActions.indexOf('bet') >= 0)) {
+        if (game && (game.possibleActions.indexOf('deal') >= 0)) {
           return true;
         }
       }

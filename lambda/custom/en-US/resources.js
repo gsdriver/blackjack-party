@@ -13,11 +13,14 @@ const resources = {
   'CONFIRM_ADD_PLAYER': 'Say add a player to add more players, or deal to start the game.',
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'What else can I help with?',
-  // From Betting.js
+  // From BetAmount.js
   'BAD_BET_FORMAT': 'I can\'t place a bet for {0}',
+  'BET_AMOUNT_SET': 'Bet set to ${0}. ',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'I\'m sorry, I didn\'t catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'I\'m sorry, I don\'t understand how to {0}. Please provide an action like hit or stand. What else can I help with?',
+  // From ChangeBets.js
+  'CHANGEBETS_REPROMPT': 'Say the amount you would like to bet. ',
   // From Exit.js
   'EXIT_GOODBYE': 'Goodbye.',
   'EXIT_GOODBYE_NAMES': 'Goodbye {0}.',
@@ -30,7 +33,7 @@ const resources = {
   // From Launch.js
   'LAUNCH_WELCOME': '{"standard":"Thanks for joining Blackjack Party! "}',
   'LAUNCH_INITIAL_WELCOME': '{"standard":""}',
-  'LAUNCH_START_GAME': 'Say add a player to start a new table or bet to start a new game with this table',
+  'LAUNCH_START_GAME': 'Say add a player to start a new table or deal to start a new game with this table',
   'LAUNCH_START_HAND_INPROGRESS': 'Say add a player to start a new table or pick up where you left off. ',
   'LAUNCH_ADD_PLAYER': 'This skill lets up to six people play at a Blackjack table. What is the name of the first player? ',
   'LAUNCH_TABLE_INPROGRESS': 'You have a table in progress ',
@@ -53,7 +56,7 @@ const resources = {
   'SUGGESTED_PLAY_REPROMPT': 'Would you like to {0}?',
   'REPORT_ERROR': 'There was an error: {0}',
   'INVALID_ACTION': 'I\'m sorry, {0} is not a valid action at this time. ',
-  'YOU_BET_TEXT': 'You bet ${0}. ',
+  'YOU_BET_TEXT': 'Everyone bet ${0}. ',
   'YOUR_BANKROLL_TEXT': 'You have ${0}. ',
   'READ_ABOUT_LEADER_BOARD': 'Say read high scores to hear the leader board. ',
   'HELP_TAKE_INSURANCE': 'You can say yes to take insurance or no to decline insurance.',
@@ -135,7 +138,7 @@ module.exports = {
       'split': 'split',
       'shuffle': 'shuffle', 'shuffle deck': 'shuffle',
       'reset': 'resetbankroll', 'reset bankroll': 'resetbankroll',
-      'bet': 'bet', 'deal': 'bet'};
+      'bet': 'deal', 'deal': 'deal'};
     const action = actionMapping[actionSlot.value.toLowerCase()];
 
     // Look it up in lowercase
@@ -206,7 +209,7 @@ module.exports = {
   mapPlayOption: function(option) {
     const optionMapping = {'resetbankroll': 'reset game',
                           'shuffle': 'shuffle',
-                          'bet': 'bet',
+                          'deal': 'deal',
                           'hit': 'hit',
                           'stand': 'stand',
                           'double': 'double down',
@@ -278,6 +281,10 @@ module.exports = {
       case 'SuggestIntent':
         response += 'give a suggestion ';
         break;
+      case 'ChangeBetsIntent':
+      case 'BetAmountIntent':
+        response += 'change bets ';
+        break;
       case 'ResetIntent':
         response += 'reset the game ';
         break;
@@ -287,8 +294,8 @@ module.exports = {
       case 'AMAZON.NoIntent':
         response = 'No doesn\'t make sense ';
         break;
-      case 'BettingIntent':
-        response += 'place a new bet ';
+      case 'DealIntent':
+        response += 'deal a new game ';
         break;
       case 'RulesIntent':
         response += 'read the rules ';

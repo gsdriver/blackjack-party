@@ -44,7 +44,17 @@
           ]
         },
         {
-          "name": "BettingIntent",
+          "name": "ChangeBetsIntent",
+          "samples": [
+            "change the bet amounts",
+            "change the bets",
+            "change bets",
+            "bet different amounts",
+            "place different bets"
+          ]
+        },
+        {
+          "name": "BetAmountIntent",
           "slots": [
             {
               "name": "Amount",
@@ -53,21 +63,19 @@
           ],
           "samples": [
             "bet {Amount}",
-            "play {Amount}",
             "bet for {Amount}",
-            "play for {Amount}",
             "bet {Amount} dollars",
-            "play {Amount} dollars",
             "bet for {Amount} dollars",
-            "play for {Amount} dollars",
-            "bet {Amount} dollar",
-            "play {Amount} dollar",
-            "bet for {Amount} dollar",
-            "play for {Amount} dollar",
-            "do bet",
+            "{Amount} dollars",
+            "{Amount}"
+          ]
+        },
+        {
+          "name": "DealIntent",
+          "samples": [
             "do deal",
             "deal",
-            "bet"
+            "play"
           ]
         },
         {

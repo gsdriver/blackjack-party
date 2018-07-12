@@ -56,7 +56,6 @@ module.exports = {
         sendUserCallback(attributes, speechError, null, null, null, callback);
       } else {
         // OK, let's post this action and get a new game state
-        const betAmount = (action.amount ? action.amount : game.lastBet);
         const oldGame = JSON.parse(JSON.stringify(game));
 
         // If they are in training mode, first check if this is the right action
@@ -86,7 +85,7 @@ module.exports = {
 
         // If there was a suggestion, remove it as we have taken a play
         game.suggestion = undefined;
-        gameService.userAction(attributes, action.action, betAmount, (speechError) => {
+        gameService.userAction(attributes, action.action, (speechError) => {
           let error;
 
           if (speechError) {
@@ -102,8 +101,8 @@ module.exports = {
             const playerBlackjack = (game.activePlayer == 'player') && gameService.isPlayerBlackjack(game);
 
             // If this was the first hand, or they specified a value, tell them how much they bet
-            if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
-              speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', betAmount);
+            if ((action.action === 'deal') && (action.firsthand || (action.amount > 0))) {
+              speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', game.startingBet);
             }
 
             // Pose this as a question whether it's the player or dealer's turn
@@ -133,7 +132,7 @@ module.exports = {
     const game = attributes[attributes.currentGame];
     const reprompt = listValidActions(game, locale, 'full');
 
-    let speech = readPlayerName(attributes);
+    let speech = module.exports.readPlayerName(attributes);
     if (readBankroll) {
       speech += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', gameService.getBankroll(attributes));
     }
@@ -185,7 +184,7 @@ module.exports = {
     const game = attributes[attributes.currentGame];
 
     // New game - ready to start a new game
-    if (game.possibleActions.indexOf('bet') >= 0) {
+    if (game.possibleActions.indexOf('deal') >= 0) {
       if (attributes.newUser) {
         return 'FIRSTTIMEPLAYER';
       }
@@ -228,6 +227,20 @@ module.exports = {
 
     attributes.temp.addingPlayer = undefined;
     attributes.temp.addingName = undefined;
+  },
+  readPlayerName: function(attributes, playerPos) {
+    const game = attributes[attributes.currentGame];
+    const currentPlayer = (playerPos === undefined) ? game.currentPlayer : playerPos;
+    const id = game.players[currentPlayer];
+    let name;
+
+    if (attributes.playerList[id] && attributes.playerList[id].name) {
+      name = attributes.playerList[id].name + ' <break time=\'200ms\'/> ';
+    } else {
+      name = resources.strings.CURRENT_PLAYER.replace('{0}', currentPlayer + 1);
+    }
+
+    return name;
   },
 };
 
@@ -356,7 +369,7 @@ function tellResult(attributes, locale, action, oldGame) {
   }
   // Always say new player and read their hand if current player shifted
   if ((game.currentPlayer != oldGame.currentPlayer) && (game.players.length > 1)) {
-    result += readPlayerName(attributes);
+    result += module.exports.readPlayerName(attributes);
     result += readHand(attributes, game, attributes.playerLocale);
   } else {
     // So what happened?
@@ -367,7 +380,7 @@ function tellResult(attributes, locale, action, oldGame) {
       case 'shuffle':
         result += resources.strings.RESULT_DECK_SHUFFLED;
         break;
-      case 'bet':
+      case 'deal':
         // A new hand was dealt
         result += readHand(attributes, game, locale);
         // If it is not the player's turn (could happen on dealer blackjack)
@@ -463,7 +476,7 @@ function readPlayerResult(attributes, playerPos) {
   const game = attributes[attributes.currentGame];
   const currentPlayer = game.playerHands[game.players[playerPos]];
 
-  outcome = readPlayerName(attributes, playerPos);
+  outcome = module.exports.readPlayerName(attributes, playerPos);
   if (currentPlayer.hands.length > 1) {
     // If more than one hand and the outcome is the same, say all hands
     let allSame = true;
@@ -772,19 +785,4 @@ function rulesToText(locale, rules, changeRules) {
   }
 
   return text;
-}
-
-function readPlayerName(attributes, playerPos) {
-  const game = attributes[attributes.currentGame];
-  const currentPlayer = (playerPos === undefined) ? game.currentPlayer : playerPos;
-  const id = game.players[currentPlayer];
-  let name;
-
-  if (attributes.playerList[id] && attributes.playerList[id].name) {
-    name = attributes.playerList[id].name + ' <break time=\'200ms\'/> ';
-  } else {
-    name = resources.strings.CURRENT_PLAYER.replace('{0}', currentPlayer + 1);
-  }
-
-  return name;
 }

@@ -12,7 +12,7 @@ module.exports = {
       if (request.intent.name === 'BlackjackIntent') {
         // Valid if we are in game
         if (game && (game.suggestion ||
-          ((game.possibleActions.indexOf('bet') == -1) &&
+          ((game.possibleActions.indexOf('deal') == -1) &&
            (game.possibleActions.indexOf('noinsurance') == -1)))) {
           return true;
         }
@@ -21,7 +21,7 @@ module.exports = {
         // only one possible action we can take
         if (game && !game.suggestion && game.possibleActions &&
           (game.possibleActions.length == 1) &&
-          (game.possibleActions[0] !== 'bet') &&
+          (game.possibleActions[0] !== 'deal') &&
           (game.possibleActions[0] !== 'noinsurance')) {
           return true;
         }

@@ -14,7 +14,7 @@ module.exports = {
       // Suggest is only allowed if we aren't at the start of a hand
       const attributes = handlerInput.attributesManager.getSessionAttributes();
       const game = attributes[attributes.currentGame];
-      if (game && (game.possibleActions.indexOf('bet') == -1)) {
+      if (game && (game.possibleActions.indexOf('deal') == -1)) {
         return true;
       }
     }

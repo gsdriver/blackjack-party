@@ -4,7 +4,9 @@ const Alexa = require('ask-sdk');
 const CanFulfill = require('./intents/CanFulfill');
 const Launch = require('./intents/Launch');
 const Blackjack = require('./intents/Blackjack');
-const Betting = require('./intents/Betting');
+const Deal = require('./intents/Deal');
+const ChangeBets = require('./intents/ChangeBets');
+const BetAmount = require('./intents/BetAmount');
 const Suggest = require('./intents/Suggest');
 const TakeSuggestion = require('./intents/TakeSuggestion');
 const Insurance = require('./intents/Insurance');
@@ -126,13 +128,15 @@ function runGame(event, context, callback) {
       Repeat,
       Rules,
       Training,
-      Betting,
+      Deal,
+      ChangeBets,
       AddPlayer,
       PlayerName,
       Blackjack,
       Suggest,
       TakeSuggestion,
       Insurance,
+      BetAmount,
       SessionEnd,
       Unhandled
     )

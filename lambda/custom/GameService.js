@@ -25,7 +25,7 @@ availableGames = {
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
      },
      activePlayer: 'none',
-     lastBet: 100,
+     startingBet: 100,
      possibleActions: [],
      canReset: true,
   },
@@ -73,7 +73,7 @@ module.exports = {
       return 'notplayerturn';
     }
   },
-  userAction: function(attributes, action, value, callback) {
+  userAction: function(attributes, action, callback) {
     const game = attributes[attributes.currentGame];
     const currentPlayer = module.exports.getCurrentPlayer(game);
     const currentHand = module.exports.getCurrentHand(game);
@@ -98,17 +98,26 @@ module.exports = {
         shuffleDeck(game, attributes.userId);
         break;
 
-      case 'bet':
+      case 'deal':
         // Validate the bet and deal the next hand
-        // BUGBUG -- for now the bet applies to ALL player hands
-        if (value < game.rules.minBet) {
-          error = 'bettoosmall';
-        } else if (value > getMinBankroll(attributes)) {
-          error = 'betoverbankroll';
-        } else if (value > game.rules.maxBet) {
-          error = 'bettoolarge';
-        } else {
-          deal(attributes, value);
+        // Make sure each player's bet meets the requirements
+        game.players.forEach((player) => {
+          if (!attributes.playerList[player].bet) {
+            attributes.playerList[player].bet = game.startingBet;
+          }
+
+          const value = attributes.playerList[player].bet;
+          if (value < game.rules.minBet) {
+            error = 'bettoosmall';
+          } else if (value > getMinBankroll(attributes)) {
+            error = 'betoverbankroll';
+          } else if (value > game.rules.maxBet) {
+            error = 'bettoolarge';
+          }
+        });
+
+        if (!error) {
+          deal(attributes);
         }
         break;
 
@@ -275,13 +284,11 @@ function updateGame(game) {
   });
 }
 
-function deal(attributes, betAmount) {
+function deal(attributes) {
   const game = attributes[attributes.currentGame];
   const newHand = {bet: 0, busted: false, cards: []};
   let hand;
 
-  // Make sure the betAmount is valid
-  newHand.bet = Number(betAmount);
   newHand.outcome = 'playing';
 
   // Clear out the hands
@@ -296,6 +303,7 @@ function deal(attributes, betAmount) {
     game.playerHands[player] = {hands: [], currentPlayerHand: 0};
     game.playerHands[player].hands.push(hand);
     game.playerHands[player].specialState = null;
+    hand.bet = Number(attributes.playerList[player].bet);
     attributes.playerList[player].bankroll -= hand.bet;
   });
 
@@ -304,7 +312,6 @@ function deal(attributes, betAmount) {
   game.dealerHand.cards.push(game.deck.cards.shift());
 
   // Reset state variables
-  game.lastBet = betAmount;
   game.dealerHand.outcome = 'playing';
 
   // And set the next hand (to the player)
@@ -458,7 +465,7 @@ function setNextActions(attributes) {
     if (bankroll < game.rules.minBet) {
       game.possibleActions.push('resetbankroll');
     } else if (game.deck.cards.length > 20) {
-      game.possibleActions.push('bet');
+      game.possibleActions.push('deal');
     }
 
     // Shuffle if there aren't enough cards to play
