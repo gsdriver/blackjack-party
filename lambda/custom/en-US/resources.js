@@ -19,8 +19,8 @@ const resources = {
   'BLACKJACKINTENT_NO_ACTION': 'I\'m sorry, I didn\'t catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'I\'m sorry, I don\'t understand how to {0}. Please provide an action like hit or stand. What else can I help with?',
   // From Exit.js
-  'EXIT_BANKROLL': 'You are leaving with ${0}.',
   'EXIT_GOODBYE': 'Goodbye.',
+  'EXIT_GOODBYE_NAMES': 'Goodbye {0}.',
   // From HighScore.js
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   // From Help.js
@@ -30,8 +30,11 @@ const resources = {
   // From Launch.js
   'LAUNCH_WELCOME': '{"standard":"Thanks for joining Blackjack Party! "}',
   'LAUNCH_INITIAL_WELCOME': '{"standard":""}',
-  'LAUNCH_START_GAME': 'Say bet to start a new game',
+  'LAUNCH_START_GAME': 'Say add a player to start a new table or bet to start a new game with this table',
   'LAUNCH_ADD_PLAYER': 'This skill lets up to six people play at a Blackjack table. What is the name of the first player? ',
+  'LAUNCH_TABLE_INPROGRESS': 'You have a table in progress ',
+  'LAUNCH_TABLE_NAMES': 'with {0} players including {1}. ',
+  'LAUNCH_TABLE_PLAYERS': 'with {0} players. ',
   // From Rules.js
   'RULES_CARD_TITLE': 'Blackjack Rules',
   // From Training.js

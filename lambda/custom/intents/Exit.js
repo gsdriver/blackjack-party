@@ -5,6 +5,7 @@
 'use strict';
 
 const ads = require('../ads');
+const speechUtils = require('alexa-speech-utils')();
 
 module.exports = {
   canHandle(handlerInput) {
@@ -35,15 +36,31 @@ module.exports = {
     const res = require('../' + event.request.locale + '/resources');
     const game = attributes[attributes.currentGame];
     let exitSpeech = '';
+    let byeText;
 
-    // Tell them how much money they are leaving with
-    exitSpeech = res.strings.EXIT_BANKROLL.replace('{0}', game.bankroll) + ' ';
+    if (game.players && game.players.length) {
+      const names = [];
+
+      game.players.forEach((player) => {
+        if (attributes.playerList[player].name) {
+          names.push(attributes.playerList[player].name);
+        }
+      });
+      if (names.length) {
+        byeText = res.strings.EXIT_GOODBYE_NAMES
+          .replace('{0}', speechUtils.and(names, {locale: event.request.locale}));
+      }
+    }
+    if (!byeText) {
+      byeText = res.strings.EXIT_GOODBYE;
+    }
+
     if (attributes.bot) {
-      handlerInput.responseBuilder.speak(exitSpeech);
+      handlerInput.responseBuilder.speak(byeText);
     } else {
       return new Promise((resolve, reject) => {
         ads.getAd(attributes, 'blackjack-party', event.request.locale, (adText) => {
-          exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
+          exitSpeech += (adText + ' ' + byeText);
           handlerInput.responseBuilder
             .speak(exitSpeech)
             .withShouldEndSession(true);

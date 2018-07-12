@@ -5,6 +5,7 @@
 'use strict';
 
 const playgame = require('../PlayGame');
+const speechUtils = require('alexa-speech-utils')();
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -30,15 +31,34 @@ module.exports = {
       launchSpeech += res.strings.LAUNCH_ADD_PLAYER;
       reprompt = res.strings.LAUNCH_ADD_PLAYER;
     } else {
+      // See if they want to continue with this table
+      const names = [];
+
+      game.players.forEach((player) => {
+        if (attributes.playerList[player].name) {
+          names.push(attributes.playerList[player].name);
+        }
+      });
+      launchSpeech += res.strings.LAUNCH_TABLE_INPROGRESS;
+      if (names.length) {
+        launchSpeech += res.strings.LAUNCH_TABLE_NAMES
+          .replace('{0}', game.players.length)
+          .replace('{1}', speechUtils.and(names, {locale: event.request.locale}));
+      } else {
+        launchSpeech += res.strings.LAUNCH_TABLE_PLAYERS.replace('{0}', game.players.length);
+      }
+
       // Figure out what the current game state is - give them option to reset
       const output = playgame.readCurrentHand(attributes, event.request.locale);
       if (game.activePlayer === 'player') {
         // They are in the middle of a hand; remind them what they have
         launchSpeech += output.speech;
+        launchSpeech += res.strings.LAUNCH_ADD_PLAYER;
       } else {
         launchSpeech += res.strings.LAUNCH_START_GAME;
       }
       reprompt = output.reprompt;
+      attributes.temp.resetTable = true;
     }
 
     handlerInput.responseBuilder

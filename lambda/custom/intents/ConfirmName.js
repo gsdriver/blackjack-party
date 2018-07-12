@@ -12,7 +12,7 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     return ((request.type === 'IntentRequest')
-      && attributes.temp.addingPlayer
+      && attributes.temp.addingName
       && ((request.intent.name === 'AMAZON.YesIntent') ||
           (request.intent.name === 'AMAZON.NoIntent')));
   },

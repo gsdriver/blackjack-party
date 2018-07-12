@@ -20,6 +20,14 @@ module.exports = {
     const game = attributes[attributes.currentGame];
     const res = require('../' + event.request.locale + '/resources');
 
+    // If reset table is true, nuke the current table and start over
+    if (attributes.temp.resetTable) {
+      game.players = [];
+      game.playerHands = {};
+      game.currentPlayer = undefined;
+      attributes.temp.resetTable = undefined;
+    }
+
     // New player!  If there was a player already being added, add them
     if (attributes.temp.addingPlayer) {
       playgame.addPlayer(attributes);

@@ -57,8 +57,14 @@ module.exports = {
         (error, response, speech, reprompt) => {
         if (!error) {
           attributes.temp.firsthand = undefined;
-          game.timestamp = Date.now();
-          game.hands = (game.hands) ? (game.hands + 1) : 1;
+
+          // Set each player's timestamp and hands played
+          game.players.forEach((player) => {
+            attributes.playerList[player].timestamp = Date.now();
+            attributes.playerList[player].hands
+              = (attributes.playerList[player].hands + 1) || 1;
+          });
+
           handlerInput.responseBuilder
             .speak(speech)
             .reprompt(reprompt);
