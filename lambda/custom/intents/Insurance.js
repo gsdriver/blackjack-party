@@ -20,7 +20,7 @@ module.exports = {
         }
       } else if (request.intent.name === 'AMAZON.NoIntent') {
         if (game && game.possibleActions &&
-          (game.possibleActions.indexOf('insurance') >= 0)) {
+          (game.possibleActions.indexOf('noinsurance') >= 0)) {
           return true;
         }
       }

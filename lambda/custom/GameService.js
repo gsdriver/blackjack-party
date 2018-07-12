@@ -25,7 +25,6 @@ availableGames = {
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
      },
      activePlayer: 'none',
-     bankroll: STARTING_BANKROLL,
      lastBet: 100,
      possibleActions: [],
      canReset: true,
@@ -47,9 +46,9 @@ module.exports = {
       newGame.players = [];
 
       // Get the next possible actions
-      setNextActions(newGame);
       attributes[game] = newGame;
       attributes.currentGame = game;
+      setNextActions(attributes);
     }
 
     return newGame;
@@ -62,13 +61,13 @@ module.exports = {
         return game.possibleActions[0];
       }
 
-      const playerCards = getCurrentHand(game).cards.map(
+      const playerCards = module.exports.getCurrentHand(game).cards.map(
             (card) => ((card.rank) > 10 ? 10 : card.rank));
 
       game.rules.strategyComplexity = 'advanced';
       return suggest.GetRecommendedPlayerAction(playerCards,
             ((game.dealerHand.cards[1].rank > 10) ? 10 : game.dealerHand.cards[1].rank),
-            getCurrentPlayer(game).hands.length,
+            module.exports.getCurrentPlayer(game).hands.length,
             game.possibleActions.indexOf('insurance') < 0, game.rules);
     } else {
       return 'notplayerturn';
@@ -76,8 +75,8 @@ module.exports = {
   },
   userAction: function(attributes, action, value, callback) {
     const game = attributes[attributes.currentGame];
-    const currentPlayer = getCurrentPlayer(game);
-    const currentHand = getCurrentHand(game);
+    const currentPlayer = module.exports.getCurrentPlayer(game);
+    const currentHand = module.exports.getCurrentHand(game);
     let error;
 
     // Is this a valid action?
@@ -90,8 +89,8 @@ module.exports = {
     // OK, take action
     switch (action) {
       case 'resetbankroll':
-        // Reset the bankroll
-        game.bankroll = STARTING_BANKROLL;
+        // Reset the bankroll for this player
+        attributes.playerList[game.players[game.currentPlayer]].bankroll = STARTING_BANKROLL;
         break;
 
       case 'shuffle':
@@ -101,9 +100,10 @@ module.exports = {
 
       case 'bet':
         // Validate the bet and deal the next hand
+        // BUGBUG -- for now the bet applies to ALL player hands
         if (value < game.rules.minBet) {
           error = 'bettoosmall';
-        } else if (value > game.bankroll) {
+        } else if (value > getMinBankroll(attributes)) {
           error = 'betoverbankroll';
         } else if (value > game.rules.maxBet) {
           error = 'bettoolarge';
@@ -135,7 +135,7 @@ module.exports = {
 
       case 'insurance':
         // If they are taking insurance, deduct the amount from the bankroll
-        game.bankroll -= (currentHand.bet / 2);
+        attributes.playerList[game.players[game.currentPlayer]].bankroll -= (currentHand.bet / 2);
         // FALL THROUGH!
       case 'noinsurance':
         currentPlayer.specialState = action;
@@ -158,14 +158,15 @@ module.exports = {
 
       case 'surrender':
         // Well, that's that
-        game.bankroll -= (getCurrentHand(game).bet / 2);
+        attributes.playerList[game.players[game.currentPlayer]].bankroll -=
+            (module.exports.getCurrentHand(game).bet / 2);
         currentPlayer.specialState = action;
         nextHand(game);
         break;
 
       case 'double':
         // For this, we mimick a hit and a stand, and set the special state to doubled
-        game.bankroll -= currentHand.bet;
+        attributes.playerList[game.players[game.currentPlayer]].bankroll -= currentHand.bet;
         currentHand.bet *= 2;
         currentHand.cards.push(game.deck.cards.shift());
         nextHand(game);
@@ -179,7 +180,7 @@ module.exports = {
           cards: [],
         };
 
-        game.bankroll -= newHand.bet;
+        attributes.playerList[game.players[game.currentPlayer]].bankroll -= newHand.bet;
         newHand.cards.push(currentHand.cards.shift());
 
         // Pop the top card off the deck back into the current hand
@@ -200,22 +201,19 @@ module.exports = {
       if (game.activePlayer == 'dealer') {
         playDealerHand(game);
 
-        for (let j = 0; j < game.players.length; j++) {
-          game.players.forEach((player) => {
-            for (let i = 0; i < game.playerHands[player].hands.length; i++) {
-              determineWinner(game, game.playerHands[player],
-                  game.playerHands[player].hands[i]);
-            }
-          });
-        }
+        game.players.forEach((player) => {
+          for (let i = 0; i < game.playerHands[player].hands.length; i++) {
+            determineWinner(attributes, player, i);
+          }
+        });
 
-        setNextActions(game);
+        setNextActions(attributes);
         updateGame(game);
         callback(error);
         return;
       }
 
-      setNextActions(game);
+      setNextActions(attributes);
       updateGame(game);
     }
 
@@ -226,6 +224,27 @@ module.exports = {
     return ((game.playerHands[check].hands.length == 1) &&
       (handTotal(game.playerHands[check].hands[0].cards) == 21) &&
       (game.playerHands[check].hands[0].length == 2));
+  },
+  getCurrentHand: function(game) {
+    const player = module.exports.getCurrentPlayer(game);
+    return (player ? player.hands[player.currentPlayerHand] : undefined);
+  },
+  getCurrentPlayer: function(game) {
+    if ((game.currentPlayer !== undefined) && game.playerHands) {
+      return game.playerHands[game.players[game.currentPlayer]];
+    }
+    return undefined;
+  },
+  getBankroll: function(attributes) {
+    const game = attributes[attributes.currentGame];
+    let bankroll;
+    if (game.players && (game.currentPlayer !== undefined)) {
+      bankroll = attributes.playerList[game.players[game.currentPlayer]].bankroll;
+    }
+    return bankroll;
+  },
+  getStartingBankroll: function() {
+    return STARTING_BANKROLL;
   },
 };
 
@@ -263,7 +282,6 @@ function deal(attributes, betAmount) {
 
   // Make sure the betAmount is valid
   newHand.bet = Number(betAmount);
-  game.bankroll -= newHand.bet;
   newHand.outcome = 'playing';
 
   // Clear out the hands
@@ -278,6 +296,7 @@ function deal(attributes, betAmount) {
     game.playerHands[player] = {hands: [], currentPlayerHand: 0};
     game.playerHands[player].hands.push(hand);
     game.playerHands[player].specialState = null;
+    attributes.playerList[player].bankroll -= hand.bet;
   });
 
   // And finally the dealer
@@ -330,14 +349,15 @@ function shuffleDeck(game, userId) {
   game.activePlayer = 'none';
 }
 
-function setNextActions(game) {
+function setNextActions(attributes) {
   // Lots of special rules if you split Aces
-  const currentPlayer = getCurrentPlayer(game);
-  const currentHand = getCurrentHand(game);
+  const game = attributes[attributes.currentGame];
+  const currentPlayer = module.exports.getCurrentPlayer(game);
+  const currentHand = module.exports.getCurrentHand(game);
   const splitAces = (game.activePlayer == 'player') &&
       ((currentPlayer.hands.length > 1) &&
       (currentHand.cards[0].rank == 1));
-
+  const bankroll = module.exports.getBankroll(attributes);
   game.possibleActions = [];
 
   // Special situations if we just dealt
@@ -346,7 +366,7 @@ function setNextActions(game) {
     // and they haven't already taken action on insurance
     if ((game.dealerHand.cards[1].rank == 1) && (currentPlayer.specialState == null)) {
       // To take insurance, they have to have enough in the bankroll
-      if ((currentHand.bet / 2) <= game.bankroll) {
+      if ((currentHand.bet / 2) <= bankroll) {
         game.possibleActions.push('insurance');
       }
 
@@ -367,14 +387,14 @@ function setNextActions(game) {
 
   // If you can double any cards (Spanish 21), then set that as long as it's still their turn
   if ((game.activePlayer == 'player') && (game.rules.double == 'anyCards')
-      && (currentHand.bet <= game.bankroll)) {
+      && (currentHand.bet <= bankroll)) {
     game.possibleActions.push('double');
   }
 
   // Other actions are only available for the first two cards of a hand
   if ((game.activePlayer == 'player') && (currentHand.cards.length == 2)) {
     // Double down - not allowed if you split Aces
-    if (!splitAces && (currentHand.bet <= game.bankroll)) {
+    if (!splitAces && (currentHand.bet <= bankroll)) {
       // Whether you can double is dictated by either
       // the rules.double or rules.doubleaftersplit variable
       const doubleRules = (currentPlayer.hands.length == 1) ? game.rules.double : (game.rules.doubleaftersplit ? game.rules.double : 'none');
@@ -406,7 +426,7 @@ function setNextActions(game) {
     // Split
     if (((currentHand.cards[0].rank == currentHand.cards[1].rank)
         || ((currentHand.cards[0].rank > 9) && (currentHand.cards[1].rank > 9)))
-        && (currentHand.bet <= game.bankroll)) {
+        && (currentHand.bet <= bankroll)) {
       // OK, they can split if they haven't reached the maximum number of allowable hands
       if (currentPlayer.hands.length < game.rules.maxSplitHands) {
         // Oh - one more case; if they had Aces we have to check the resplit Aces rule
@@ -435,7 +455,7 @@ function setNextActions(game) {
     // At this point you can either bet (next hand) or shuffle if there
     // aren't enough cards.  If you are out of money (and can't cover the minimum bet),
     // we make you first reset the bankroll
-    if (game.bankroll < game.rules.minBet) {
+    if (bankroll < game.rules.minBet) {
       game.possibleActions.push('resetbankroll');
     } else if (game.deck.cards.length > 20) {
       game.possibleActions.push('bet');
@@ -449,7 +469,7 @@ function setNextActions(game) {
 }
 
 function nextHand(game) {
-  const currentPlayer = getCurrentPlayer(game);
+  const currentPlayer = module.exports.getCurrentPlayer(game);
 
   // If it's none, it goes to player 0
   if (game.activePlayer == 'none') {
@@ -477,7 +497,7 @@ function nextHand(game) {
         // Still the player's turn - move to the next hand
         // Note that we'll probably need to give them a second card
         currentPlayer.currentPlayerHand++;
-        const currentHand = getCurrentHand(game);
+        const currentHand = module.exports.getCurrentHand(game);
         if (currentHand.cards.length < 2) {
           currentHand.cards.push(game.deck.cards.shift());
         }
@@ -531,7 +551,10 @@ function playDealerHand(game) {
   nextHand(game);
 }
 
-function determineWinner(game, player, playerHand) {
+function determineWinner(attributes, playerId, hand) {
+  const game = attributes[attributes.currentGame];
+  const player = game.playerHands[playerId];
+  const playerHand = game.playerHands[playerId].hands[hand];
   const dealerTotal = handTotal(game.dealerHand.cards).total;
   const playerTotal = handTotal(playerHand.cards).total;
   const dealerBlackjack = ((dealerTotal == 21) && (game.dealerHand.cards.length == 2));
@@ -548,79 +571,18 @@ function determineWinner(game, player, playerHand) {
       // Note that insurance bets are off the initial bet (not the doubled amount)
       if (dealerBlackjack) {
         // Well what do you know
-        game.bankroll += (3 * playerHand.bet / 2);
+        attributes.playerList[playerId].bankroll += (3 * playerHand.bet / 2);
       }
     }
 
     // Start with blackjack
     if (playerBlackjack) {
-      playerHand.outcome = (dealerBlackjack && !(game.rules.pay21 && game.rules.pay21.playerWin))
-            ? 'push' : 'blackjack';
+      playerHand.outcome = (dealerBlackjack) ? 'push' : 'blackjack';
     } else if (dealerBlackjack) {
       game.dealerHand.outcome = 'dealerblackjack';
       playerHand.outcome = 'loss';
     } else if (playerTotal > 21) {
       playerHand.outcome = 'loss';
-    } else if ((playerTotal == 21) && game.rules.pay21) {
-      // Special payouts of 21's (as long as you didn't double)!
-      playerHand.outcome = 'win';
-      if (playerHand.bet == game.lastBet) {
-        if (game.rules.pay21.handLength) {
-          if (game.rules.pay21.handLength.max &&
-            game.rules.pay21.handLength.max.cards &&
-            playerHand.cards.length >= game.rules.pay21.handLength.max.cards) {
-            specialPayout = game.rules.pay21.handLength.max.payout;
-          } else if (game.rules.pay21.handLength[playerHand.cards.length]) {
-            specialPayout = game.rules.pay21.handLength[playerHand.cards.length];
-          }
-        }
-        if (game.rules.pay21.cardCombos) {
-          // Do the cards math the pattern?
-          let combo;
-          let match;
-          for (combo in game.rules.pay21.cardCombos) {
-            if (!match && (combo !== 'suit')) {
-              const ranks = combo.split('|');
-              if (ranks.length == playerHand.cards.length) {
-                // Sort playerCards
-                const playerCards = JSON.parse(JSON.stringify(playerHand.cards));
-                playerCards.sort((a, b) => (a.rank - b.rank));
-                let i;
-
-                match = combo;
-                for (i = 0; i < playerCards.length; i++) {
-                  if (playerCards[i].rank != ranks[i]) {
-                    // No match
-                    match = undefined;
-                  }
-                }
-              }
-            }
-          }
-
-          // Do we have a match?
-          if (match) {
-            // Great!  Are they suited?
-            let isSuited;
-            if (game.rules.pay21.cardCombos.suit) {
-              isSuited = true;
-              let i;
-
-              for (i = 1; i < playerHand.cards.length; i++) {
-                if (playerHand.cards[i].suit !== playerHand.cards[0].suit) {
-                  isSuited = false;
-                }
-              }
-            }
-
-            if (isSuited) {
-              specialPayout = game.rules.pay21.cardCombos.suit[playerHand.cards[0].suit];
-            } else {
-              specialPayout = game.rules.pay21.cardCombos[match];
-            }
-          }
-        }
-      }
     } else {
       if (dealerTotal > 21) {
         playerHand.outcome = 'win';
@@ -636,19 +598,21 @@ function determineWinner(game, player, playerHand) {
 
   switch (playerHand.outcome) {
     case 'blackjack':
-      game.bankroll += Math.floor(playerHand.bet * game.rules.blackjackBonus);
+      attributes.playerList[playerId].bankroll +=
+        Math.floor(playerHand.bet * game.rules.blackjackBonus);
       // FALL THROUGH
     case 'win':
       if (specialPayout) {
         console.log('Special payout ratio ' + specialPayout);
-        game.bankroll += Math.floor((1 + specialPayout) * playerHand.bet);
+        attributes.playerList[playerId].bankroll +=
+          Math.floor((1 + specialPayout) * playerHand.bet);
       } else {
-        game.bankroll += (playerHand.bet * 2);
+        attributes.playerList[playerId].bankroll += (playerHand.bet * 2);
       }
       break;
     case 'push':
     case 'surrender':
-      game.bankroll += playerHand.bet;
+      attributes.playerList[playerId].bankroll += playerHand.bet;
       break;
     default:
       // I already took the money off the bankroll, you don't get any back
@@ -683,14 +647,14 @@ function handTotal(cards) {
   return retval;
 }
 
-function getCurrentHand(game) {
-  const player = getCurrentPlayer(game);
-  return (player ? player.hands[player.currentPlayerHand] : undefined);
-}
+function getMinBankroll(attributes) {
+  const game = attributes[attributes.currentGame];
+  let minBankroll;
+  game.players.forEach((player) => {
+    if ((minBankroll === undefined) || (attributes.playerList[player].bankroll < minBankroll)) {
+      minBankroll = attributes.playerList[player].bankroll;
+    }
+  });
 
-function getCurrentPlayer(game) {
-  if ((game.currentPlayer !== undefined) && game.playerHands) {
-    return game.playerHands[game.players[game.currentPlayer]];
-  }
-  return undefined;
+  return minBankroll;
 }

@@ -280,6 +280,13 @@ function BuildEvent(argv)
         lambda.request.intent = blackjackIntent;
     }
 
+    // Write the last action
+    fs.writeFile('lastaction.txt', JSON.stringify(lambda), (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+
     return lambda;
 }
 

@@ -128,11 +128,16 @@ module.exports = {
     return {speech: speech, reprompt: reprompt};
   },
   // Reads back the current hand and game state
-  readCurrentHand: function(attributes, locale) {
+  readCurrentHand: function(attributes, locale, readBankroll) {
     resources = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
     const reprompt = listValidActions(game, locale, 'full');
-    const speech = readHand(attributes, game, locale) + ' ' + reprompt;
+
+    let speech = readPlayerName(attributes);
+    if (readBankroll) {
+      speech += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', gameService.getBankroll(attributes));
+    }
+    speech += readHand(attributes, game, locale) + ' ' + reprompt;
     return {speech: speech, reprompt: reprompt};
   },
   // Gets contextual help based on the current state of the game
@@ -216,6 +221,8 @@ module.exports = {
     game.playerHands[id] = {};
     if (!attributes.playerList[id]) {
       attributes.playerList[id] = {};
+      attributes.playerList[id].bankroll = gameService.getStartingBankroll();
+      attributes.playerList[id].high = gameService.getStartingBankroll();
       attributes.playerList[id].name = attributes.temp.addingName;
     }
 
@@ -331,7 +338,7 @@ function tellResult(attributes, locale, action, oldGame) {
       // I don't want to re-read this hand if they just stood, so let's make sure they busted
       // or split Aces (which only draws one card) or did a double before we read this hand.
       if ((oldHand.total >= 21) ||
-        (oldHand.bet > getCurrentHand(game).bet)) {
+        (oldHand.bet > gameService.getCurrentHand(game).bet)) {
         if (oldHand.total > 21) {
           result += resources.strings.RESULT_AFTER_HIT_BUST
             .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
@@ -347,57 +354,58 @@ function tellResult(attributes, locale, action, oldGame) {
       }
     }
   }
-  // Always say new player if current player shifted
+  // Always say new player and read their hand if current player shifted
   if ((game.currentPlayer != oldGame.currentPlayer) && (game.players.length > 1)) {
     result += readPlayerName(attributes);
-  }
-  // So what happened?
-  switch (action) {
-    case 'resetbankroll':
-      result += resources.strings.RESULT_BANKROLL_RESET;
-      break;
-    case 'shuffle':
-      result += resources.strings.RESULT_DECK_SHUFFLED;
-      break;
-    case 'bet':
-      // A new hand was dealt
-      result += readHand(attributes, game, locale);
-      // If it is not the player's turn (could happen on dealer blackjack)
-      // then read the game result here too
-      if (game.activePlayer != 'player') {
-        result += ' ' + readGameResult(attributes);
-      }
-      break;
-    case 'hit':
-    case 'double':
-      // Tell them the new card, the total, and the dealer up card (or what they did)
-      result += readHit(attributes, locale);
-      break;
-    case 'stand':
-      // OK, let's read what the dealer had, what they drew, and what happened
-      result += readStand(attributes, locale);
-      break;
-    case 'insurance':
-    case 'noinsurance':
-      // Say whether the dealer had blackjack, and what the next thing is to do
-      result += readInsurance(attributes, locale);
-      break;
-    case 'split':
-      // OK, now you have multiple hands - makes reading the game state more interesting
-      result += readSplit(attributes, locale);
-      break;
-    case 'surrender':
-      result += readSurrender(attributes, locale);
-      break;
+    result += readHand(attributes, game, attributes.playerLocale);
+  } else {
+    // So what happened?
+    switch (action) {
+      case 'resetbankroll':
+        result += resources.strings.RESULT_BANKROLL_RESET;
+        break;
+      case 'shuffle':
+        result += resources.strings.RESULT_DECK_SHUFFLED;
+        break;
+      case 'bet':
+        // A new hand was dealt
+        result += readHand(attributes, game, locale);
+        // If it is not the player's turn (could happen on dealer blackjack)
+        // then read the game result here too
+        if (game.activePlayer != 'player') {
+          result += ' ' + readGameResult(attributes);
+        }
+        break;
+      case 'hit':
+      case 'double':
+        // Tell them the new card, the total, and the dealer up card (or what they did)
+        result += readHit(attributes, locale);
+        break;
+      case 'stand':
+        // OK, let's read what the dealer had, what they drew, and what happened
+        result += readStand(attributes, locale);
+        break;
+      case 'insurance':
+      case 'noinsurance':
+        // Say whether the dealer had blackjack, and what the next thing is to do
+        result += readInsurance(attributes, locale);
+        break;
+      case 'split':
+        // OK, now you have multiple hands - makes reading the game state more interesting
+        result += readSplit(attributes, locale);
+        break;
+      case 'surrender':
+        result += readSurrender(attributes, locale);
+        break;
     }
+  }
 
   if ((oldGame.activePlayer == 'player') && (game.activePlayer != 'player')) {
-    // OK, game over - so let's give the new total
-    if (!game.high || (game.bankroll > game.high)) {
-      game.high = game.bankroll;
+    // OK, game over - is this a new high bankroll?
+    const bankroll = gameService.getBankroll(attributes);
+    if (bankroll > attributes.playerList[game.players[game.currentPlayer]].high) {
+      attributes.playerList[game.players[game.currentPlayer]].high = bankroll;
     }
-
-    result += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
   }
 
   return result;
@@ -430,13 +438,34 @@ function readDealerAction(game, locale) {
 // Read the result of the game
 //
 function readGameResult(attributes) {
+  // Read the result for each player
+  let outcome = '';
+  const game = attributes[attributes.currentGame];
+  let i;
+  for (i = 0; i < game.players.length; i++) {
+    outcome += readPlayerResult(attributes, i);
+  }
+
+  // They are no longer a new user
+  if (attributes.newUser) {
+    attributes.newUser = undefined;
+  }
+
+  return outcome;
+}
+
+//
+// Read the result of the game
+//
+function readPlayerResult(attributes, playerPos) {
   let i;
   let outcome = '';
   const game = attributes[attributes.currentGame];
-  const currentPlayer = getCurrentPlayer(game);
+  const currentPlayer = game.playerHands[game.players[playerPos]];
 
+  outcome = readPlayerName(attributes, playerPos);
   if (currentPlayer.hands.length > 1) {
-  // If more than one hand and the outcome is the same, say all hands
+    // If more than one hand and the outcome is the same, say all hands
     let allSame = true;
     currentPlayer.hands.map((x) => {
       if (x.outcome != currentPlayer.hands[0].outcome) {
@@ -460,10 +489,8 @@ function readGameResult(attributes) {
     outcome += resources.mapOutcome(currentPlayer.hands[0].outcome);
   }
 
-  // They are no longer a new user
-  if (attributes.newUser) {
-    attributes.newUser = undefined;
-  }
+  outcome += resources.strings.YOUR_BANKROLL_TEXT
+    .replace('{0}', attributes.playerList[game.players[playerPos]].bankroll);
 
   // What was the outcome?
   return outcome;
@@ -474,7 +501,7 @@ function readGameResult(attributes) {
  */
 function readHit(attributes, locale) {
   const game = attributes[attributes.currentGame];
-  const currentHand = getCurrentHand(game);
+  const currentHand = gameService.getCurrentHand(game);
   const cardText = resources.readCard(currentHand.cards[currentHand.cards.length - 1], 'article', game.readSuit);
   const cardRank = currentHand.cards[currentHand.cards.length - 1].rank;
   let result;
@@ -533,7 +560,6 @@ function readStand(attributes, locale) {
     result = readDealerAction(game, locale);
     result += ' ' + readGameResult(attributes);
   }
-
   return result;
 }
 
@@ -543,7 +569,7 @@ function readStand(attributes, locale) {
 function readSplit(attributes, locale) {
   const game = attributes[attributes.currentGame];
   let result;
-  const pairCard = getCurrentHand(game).cards[0];
+  const pairCard = gameService.getCurrentHand(game).cards[0];
 
   if (pairCard.rank >= 10) {
     result = resources.strings.SPLIT_TENS;
@@ -614,13 +640,13 @@ function readInsurance(attributes, locale, readDealer) {
 function readHand(attributes, game, locale) {
   let result = '';
   let resultFormat;
-  const currentPlayer = getCurrentPlayer(game);
+  const currentPlayer = gameService.getCurrentPlayer(game);
 
   // It's possible there is no hand
   if (!currentPlayer || (currentPlayer.hands.length == 0)) {
     return '';
   }
-  const currentHand = getCurrentHand(game);
+  const currentHand = gameService.getCurrentHand(game);
   if (!currentHand) {
     // We're about to blow up - log for diagnosis
     console.log('currentHand is undefined: ' + JSON.stringify(game));
@@ -676,7 +702,7 @@ function readHand(attributes, game, locale) {
 //
 function readHandNumber(game, handNumber) {
   let result = '';
-  const currentPlayer = getCurrentPlayer(game);
+  const currentPlayer = gameService.getCurrentPlayer(game);
 
   if (currentPlayer.hands.length > 1) {
     result = resources.mapHandNumber(handNumber);
@@ -748,25 +774,17 @@ function rulesToText(locale, rules, changeRules) {
   return text;
 }
 
-function readPlayerName(attributes) {
+function readPlayerName(attributes, playerPos) {
   const game = attributes[attributes.currentGame];
-  const id = game.players[game.currentPlayer];
+  const currentPlayer = (playerPos === undefined) ? game.currentPlayer : playerPos;
+  const id = game.players[currentPlayer];
   let name;
 
   if (attributes.playerList[id] && attributes.playerList[id].name) {
     name = attributes.playerList[id].name + ' <break time=\'200ms\'/> ';
   } else {
-    name = resources.strings.CURRENT_PLAYER.replace('{0}', game.currentPlayer + 1);
+    name = resources.strings.CURRENT_PLAYER.replace('{0}', currentPlayer + 1);
   }
 
   return name;
-}
-
-function getCurrentHand(game) {
-  const player = getCurrentPlayer(game);
-  return player.hands[player.currentPlayerHand];
-}
-
-function getCurrentPlayer(game) {
-  return game.playerHands[game.players[game.currentPlayer]];
 }

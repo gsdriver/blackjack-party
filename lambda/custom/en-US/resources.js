@@ -31,6 +31,7 @@ const resources = {
   'LAUNCH_WELCOME': '{"standard":"Thanks for joining Blackjack Party! "}',
   'LAUNCH_INITIAL_WELCOME': '{"standard":""}',
   'LAUNCH_START_GAME': 'Say add a player to start a new table or bet to start a new game with this table',
+  'LAUNCH_START_HAND_INPROGRESS': 'Say add a player to start a new table or pick up where you left off. ',
   'LAUNCH_ADD_PLAYER': 'This skill lets up to six people play at a Blackjack table. What is the name of the first player? ',
   'LAUNCH_TABLE_INPROGRESS': 'You have a table in progress ',
   'LAUNCH_TABLE_NAMES': 'with {0} players including {1}. ',

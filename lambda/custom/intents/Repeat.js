@@ -16,13 +16,10 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../' + event.request.locale + '/resources');
-    const output = playgame.readCurrentHand(attributes, event.request.locale);
-    const game = attributes[attributes.currentGame];
+    const output = playgame.readCurrentHand(attributes, event.request.locale, true);
 
-    const speech = res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll) + output.speech;
     handlerInput.responseBuilder
-      .speak(speech)
+      .speak(output.speech)
       .reprompt(output.reprompt);
   },
 };

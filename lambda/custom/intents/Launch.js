@@ -52,8 +52,8 @@ module.exports = {
       const output = playgame.readCurrentHand(attributes, event.request.locale);
       if (game.activePlayer === 'player') {
         // They are in the middle of a hand; remind them what they have
+        launchSpeech += res.strings.LAUNCH_START_HAND_INPROGRESS;
         launchSpeech += output.speech;
-        launchSpeech += res.strings.LAUNCH_ADD_PLAYER;
       } else {
         launchSpeech += res.strings.LAUNCH_START_GAME;
       }
