@@ -10,6 +10,7 @@ const BetAmount = require('./intents/BetAmount');
 const Suggest = require('./intents/Suggest');
 const TakeSuggestion = require('./intents/TakeSuggestion');
 const Insurance = require('./intents/Insurance');
+const HighScore = require('./intents/HighScore');
 const Rules = require('./intents/Rules');
 const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
@@ -128,6 +129,7 @@ function runGame(event, context, callback) {
       Repeat,
       Rules,
       Training,
+      HighScore,
       Deal,
       ChangeBets,
       AddPlayer,

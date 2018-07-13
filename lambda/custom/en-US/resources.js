@@ -30,7 +30,10 @@ const resources = {
   'EXIT_GOODBYE': 'Goodbye.',
   'EXIT_GOODBYE_NAMES': 'Goodbye {0}.',
   // From HighScore.js
+  'HIGHSCORE_NONAME': 'an unnamed player',
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
+  'HIGHSCORE_LEADERS': 'The top {0} peak bankrolls are {1}. ',
+  'HIGHSCORE_LEADER_FORMAT': '{0} at ${1}',
   // From Help.js
   'HELP_GENERIC_HELP': 'You can play a game by saying Deal <break time=\'200ms\'/> or you can say enable training mode if you would like me to prompt when your play differs from Basic Strategy. <break time=\'300ms\'/> Now, what can I help you with?',
   'HELP_CARD_TITLE': 'Blackjack Party Commands',
