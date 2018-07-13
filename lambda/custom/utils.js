@@ -174,7 +174,7 @@ module.exports = {
   },
   // Gets contextual help based on the current state of the game
   getContextualHelp: function(event, attributes, helpPrompt) {
-    resources = require('./resources')(locale);
+    resources = require('./resources')(event.request.locale);
     const game = attributes[attributes.currentGame];
     const state = module.exports.getState(attributes);
     let result = '';

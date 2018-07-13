@@ -2,7 +2,7 @@
 // Localized resources
 //
 
-const resources = {
+const common = {
   // From AddPlayer.js
   'ADD_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game.',
   'ADD_PLAYER_REPROMPT': 'Say the name of the player to add.',
@@ -16,10 +16,6 @@ const resources = {
   'ERROR_REPROMPT': 'What else can I help with?',
   // From BetAmount.js
   'BAD_BET_FORMAT': 'I can\'t place a bet for {0}',
-  'BET_AMOUNT_SET': 'Bet set to ${0}. ',
-  'BET_BELOW_MIN': 'A bet of ${0} is below the table minimum of ${1}. ',
-  'BET_ABOVE_BANKROLL': 'A bet of ${0} exceeds you bankroll of ${1}. ',
-  'BET_ABOVE_MAX': 'A bet of ${0} is above the table maximum of ${1}. ',
   'BET_ERROR_REPROMPT': 'Say an amount you would like to bet. ',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'I\'m sorry, I didn\'t catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?',
@@ -33,7 +29,6 @@ const resources = {
   'HIGHSCORE_NONAME': 'an unnamed player',
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   'HIGHSCORE_LEADERS': 'The top {0} peak bankrolls are {1}. ',
-  'HIGHSCORE_LEADER_FORMAT': '{0} at ${1}',
   // From Help.js
   'HELP_GENERIC_HELP': 'You can play a game by saying Deal <break time=\'200ms\'/> or you can say enable training mode if you would like me to prompt when your play differs from Basic Strategy. <break time=\'300ms\'/> Now, what can I help you with?',
   'HELP_CARD_TITLE': 'Blackjack Party Commands',
@@ -64,9 +59,6 @@ const resources = {
   'SUGGESTED_PLAY_REPROMPT': 'Would you like to {0}?',
   'REPORT_ERROR': 'There was an error: {0}',
   'INVALID_ACTION': 'I\'m sorry, {0} is not a valid action at this time. ',
-  'PLAYER_BET_TEXT': '{0} bet ${1} ',
-  'EVERYONE_BET_TEXT': 'Everyone bet ${0}. ',
-  'YOUR_BANKROLL_TEXT': 'You have ${0}. ',
   'READ_ABOUT_LEADER_BOARD': 'Say read high scores to hear the leader board. ',
   'HELP_TAKE_INSURANCE': 'You can say yes to take insurance or no to decline insurance.',
   'HELP_TAKE_INSURANCE_BLACKJACK': 'Since you have a blackjack, can you say yes to get paid your bet, or no in which case you push if I have blackjack.',
@@ -110,7 +102,6 @@ const resources = {
   'READHAND_DEALER_ACTIVE': 'I have {0} showing.',
   'READHAND_DEALER_DONE': 'I had {0} showing. ',
   'RULES_DECKS': '{0} deck game. ',
-  'RULES_BET_RANGE': 'Bet from ${0} to ${1}. ',
   'RULES_HIT_SOFT17': 'Dealer hits on soft 17. ',
   'RULES_STAND_SOFT17': 'Dealer stands on soft 17. ',
   'RULES_RESPLIT_ACES': 'Can resplit Aces. ',
@@ -129,12 +120,58 @@ const resources = {
   'GREAT_HIT_OPTIONS': 'Look at this, I have {0} giving you {1}. |It\'s {0} for a total of {1}! Nice hit! |Here\'s a beauty, {0} for a total of {1}. ',
 };
 
+const dollar = {
+  // From BetAmount.js
+  'BET_AMOUNT_SET': 'Bet set to ${0}. ',
+  'BET_BELOW_MIN': 'A bet of ${0} is below the table minimum of ${1}. ',
+  'BET_ABOVE_BANKROLL': 'A bet of ${0} exceeds you bankroll of ${1}. ',
+  'BET_ABOVE_MAX': 'A bet of ${0} is above the table maximum of ${1}. ',
+  // From HighScore.js
+  'HIGHSCORE_LEADER_FORMAT': '{0} at ${1}',
+  // From PlayGame.js
+  'PLAYER_BET_TEXT': '{0} bet ${1} ',
+  'EVERYONE_BET_TEXT': 'Everyone bet ${0}. ',
+  'YOUR_BANKROLL_TEXT': 'You have ${0}. ',
+  'RULES_BET_RANGE': 'Bet from ${0} to ${1}. ',
+};
+
+const pound = {
+  // From BetAmount.js
+  'BET_AMOUNT_SET': 'Bet set to £{0}. ',
+  'BET_BELOW_MIN': 'A bet of £{0} is below the table minimum of £{1}. ',
+  'BET_ABOVE_BANKROLL': 'A bet of £{0} exceeds you bankroll of £{1}. ',
+  'BET_ABOVE_MAX': 'A bet of £{0} is above the table maximum of £{1}. ',
+  // From HighScore.js
+  'HIGHSCORE_LEADER_FORMAT': '{0} at £{1}',
+  // From PlayGame.js
+  'PLAYER_BET_TEXT': '{0} bet £{1} ',
+  'EVERYONE_BET_TEXT': 'Everyone bet £{0}. ',
+  'YOUR_BANKROLL_TEXT': 'You have £{0}. ',
+  'RULES_BET_RANGE': 'Bet from £{0} to £{1}. ',
+};
+
+const resources = {
+  'en-US': {
+    'translation': Object.assign({}, common, dollar),
+  },
+  'en-GB': {
+    'translation': Object.assign({}, common, pound),
+  },
+};
+
 const utils = (locale) => {
+  let translation;
+  if (resources[locale]) {
+    translation = resources[locale].translation;
+  } else {
+    translation = resources['en-US'].translation;
+  }
+
   return {
-    strings: resources,
+    strings: translation,
     pickRandomOption: function(res) {
-      if (res && resources[res]) {
-        const options = resources[res].split('|');
+      if (res && translation[res]) {
+        const options = translation[res].split('|');
         return options[Math.floor(Math.random() * options.length)];
       } else {
         return undefined;
@@ -189,9 +226,17 @@ const utils = (locale) => {
       return actionMapping[action];
     },
     mapServerError: function(error) {
-      const errorMapping = {'bettoosmall': 'Your bet is below the minimum of $5',
-                          'bettoolarge': 'Your bet is above the maximum of $1000',
-                          'betoverbankroll': 'Your bet is more than your available bankroll'};
+      let errorMapping;
+
+      if (locale == 'en-GB') {
+        errorMapping = {'bettoosmall': 'Your bet is below the minimum of £5',
+                        'bettoolarge': 'Your bet is above the maximum of £1000',
+                        'betoverbankroll': 'Your bet is more than your available bankroll'};
+      } else {
+        errorMapping = {'bettoosmall': 'Your bet is below the minimum of $5',
+                        'bettoolarge': 'Your bet is above the maximum of $1000',
+                        'betoverbankroll': 'Your bet is more than your available bankroll'};
+      }
       return (errorMapping[error] ? errorMapping[error] : 'Internal error');
     },
     readCard: function(card, withArticle, readSuit) {
