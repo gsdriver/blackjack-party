@@ -100,8 +100,8 @@ module.exports = {
             // Special case - give a full read-out if this is a natural blackjack
             const playerBlackjack = (game.activePlayer == 'player') && gameService.isPlayerBlackjack(game);
 
-            // If this was the first hand, or they specified a value, tell them how much they bet
-            if ((action.action === 'deal') && (action.firsthand || (action.amount > 0))) {
+            // If this was the first hand, tell them how much they bet
+            if ((action.action === 'deal') && action.firsthand) {
               speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', game.startingBet);
             }
 

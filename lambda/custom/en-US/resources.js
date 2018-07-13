@@ -16,6 +16,10 @@ const resources = {
   // From BetAmount.js
   'BAD_BET_FORMAT': 'I can\'t place a bet for {0}',
   'BET_AMOUNT_SET': 'Bet set to ${0}. ',
+  'BET_BELOW_MIN': 'A bet of ${0} is below the table minimum of ${1}. ',
+  'BET_ABOVE_BANKROLL': 'A bet of ${0} exceeds you bankroll of ${1}. ',
+  'BET_ABOVE_MAX': 'A bet of ${0} is above the table maximum of ${1}. ',
+  'BET_ERROR_REPROMPT': 'Say an amount you would like to bet. ',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'I\'m sorry, I didn\'t catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'I\'m sorry, I don\'t understand how to {0}. Please provide an action like hit or stand. What else can I help with?',
