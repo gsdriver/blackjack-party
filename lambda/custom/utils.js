@@ -102,7 +102,40 @@ module.exports = {
 
             // If this was the first hand, tell them how much they bet
             if ((action.action === 'deal') && action.firsthand) {
-              speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', game.startingBet);
+              // Let's see who bet what
+              const betsForPlayers = {};
+              let bet;
+              let samebet = null;
+              let i;
+
+              for (i = 0; i < game.players.length; i++) {
+                const player = game.players[i];
+                bet = attributes.playerList[player].bet;
+                if (!betsForPlayers[bet]) {
+                  betsForPlayers[bet] = [];
+                  if (samebet === null) {
+                    samebet = bet;
+                  } else {
+                    samebet = undefined;
+                  }
+                }
+                betsForPlayers[bet].push(module.exports.readPlayerName(attributes, i));
+              }
+
+              if (samebet) {
+                speechQuestion += resources.strings.EVERYONE_BET_TEXT.replace('{0}', samebet);
+              } else {
+                const betSpeech = [];
+                for (bet in betsForPlayers) {
+                  if (bet) {
+                    betSpeech.push(resources.strings.PLAYER_BET_TEXT
+                      .replace('{0}', speechUtils.and(betsForPlayers[bet], {locale: locale}))
+                      .replace('{1}', bet));
+                  }
+                }
+
+                speechQuestion += speechUtils.and(betSpeech, {locale: locale, pause: '200ms'});
+              }
             }
 
             // Pose this as a question whether it's the player or dealer's turn
@@ -147,7 +180,7 @@ module.exports = {
     let result = '';
 
     // In some states, the choices are yes or no
-    if ((state == 'CONFIRMRESET') || (state == 'INSURANCEOFFERED')) {
+    if ((state == 'CONFIRMNAME') || (state == 'INSURANCEOFFERED')) {
       result = resources.strings.HELP_YOU_CAN_SAY_YESNO;
     } else if (game.possibleActions) {
       // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
@@ -184,7 +217,13 @@ module.exports = {
     const game = attributes[attributes.currentGame];
 
     // New game - ready to start a new game
-    if (game.possibleActions.indexOf('deal') >= 0) {
+    if (attributes.temp.addingName) {
+      return 'CONFIRMNAME';
+    } else if (attributes.temp.firsthand) {
+      return 'ADDINGPLAYERS';
+    } else if (attributes.temp.changingBets !== undefined) {
+      return 'CHANGINGBETS';
+    } else if (game.possibleActions.indexOf('deal') >= 0) {
       if (attributes.newUser) {
         return 'FIRSTTIMEPLAYER';
       }
@@ -200,6 +239,7 @@ module.exports = {
   addPlayer: function(attributes) {
     const game = attributes[attributes.currentGame];
     let id = attributes.temp.addingPlayer;
+    let newPlayer = false;
 
     // If there is a name, let's see if they are already on the list
     if (!attributes.playerList) {
@@ -223,10 +263,12 @@ module.exports = {
       attributes.playerList[id].bankroll = gameService.getStartingBankroll();
       attributes.playerList[id].high = gameService.getStartingBankroll();
       attributes.playerList[id].name = attributes.temp.addingName;
+      newPlayer = true;
     }
 
     attributes.temp.addingPlayer = undefined;
     attributes.temp.addingName = undefined;
+    return newPlayer;
   },
   readPlayerName: function(attributes, playerPos) {
     const game = attributes[attributes.currentGame];

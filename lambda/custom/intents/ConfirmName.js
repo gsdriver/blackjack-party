@@ -24,9 +24,15 @@ module.exports = {
 
     if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
       // Great, add the player
-      utils.addPlayer(attributes);
+      let speech = res.strings.CONFIRM_ADD_PLAYER;
+      const name = attributes.temp.addingName;
+
+      if (!utils.addPlayer(attributes)) {
+        speech = res.strings.CONFIRM_WELCOME_BACK.replace('{0}', name) + speech;
+      }
+
       handlerInput.responseBuilder
-        .speak(res.strings.CONFIRM_ADD_PLAYER)
+        .speak(speech)
         .reprompt(res.strings.CONFIRM_ADD_PLAYER);
     } else {
       // Nope, not the right name

@@ -11,6 +11,7 @@ const resources = {
   'PLAYER_GOTNAME_REPROMPT': 'Say yes if {0} is the name you want to add.',
   // From ConfirmName.js
   'CONFIRM_ADD_PLAYER': 'Say add a player to add more players, or deal to start the game.',
+  'CONFIRM_WELCOME_BACK': 'Welcome back {0}. ',
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'What else can I help with?',
   // From BetAmount.js
@@ -60,7 +61,8 @@ const resources = {
   'SUGGESTED_PLAY_REPROMPT': 'Would you like to {0}?',
   'REPORT_ERROR': 'There was an error: {0}',
   'INVALID_ACTION': 'I\'m sorry, {0} is not a valid action at this time. ',
-  'YOU_BET_TEXT': 'Everyone bet ${0}. ',
+  'PLAYER_BET_TEXT': '{0} bet ${1} ',
+  'EVERYONE_BET_TEXT': 'Everyone bet ${0}. ',
   'YOUR_BANKROLL_TEXT': 'You have ${0}. ',
   'READ_ABOUT_LEADER_BOARD': 'Say read high scores to hear the leader board. ',
   'HELP_TAKE_INSURANCE': 'You can say yes to take insurance or no to decline insurance.',
@@ -262,7 +264,9 @@ module.exports = {
   },
   buildUnhandledResponse: function(intent, state) {
     const stateMapping = {'SUGGESTION': 'during the middle of a hand',
-      'CONFIRMRESET': 'while I\'m waiting to hear if you want to reset the game',
+      'ADDINGPLAYERS': 'while you are adding players to the table',
+      'CHANGINGBETS': 'while you are changing player bets',
+      'CONFIRMNAME': 'while I\'m waiting for you to confirm a new player name',
       'NEWGAME': 'before the hand has started',
       'FIRSTTIMEPLAYER': 'before the hand has started',
       'INSURANCEOFFERED': 'while I\'m waiting to hear if you want insurance',
@@ -313,6 +317,9 @@ module.exports = {
       case 'DisableTrainingIntent':
         response += 'turn off training mode ';
         break;
+      case 'AddPlayerIntent':
+        // This can only be done at the start of the game
+        return 'To change the players at the table, you have to exit the skill. ';
 
       // These should be handled - so log an error
       case 'AMAZON.RepeatIntent':
