@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle(handlerInput) {
@@ -43,7 +43,7 @@ module.exports = {
       attributes.tookSuggestion.no = (attributes.tookSuggestion.no + 1) || 1;
     }
 
-    playgame.playBlackjackAction(attributes,
+    utils.playBlackjackAction(attributes,
       event.request.locale,
       actionObj, (error, response, speech, reprompt) => {
       if (!error) {

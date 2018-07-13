@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle(handlerInput) {
@@ -31,12 +31,12 @@ module.exports = {
 
     // First off, if they were in the midst of adding a player, add it
     if (attributes.temp.addingPlayer) {
-      playgame.addPlayer(attributes);
+      utils.addPlayer(attributes);
     }
 
     // Play for the default amount
     const action = {action: 'deal', amount: 0, firsthand: attributes.temp.firsthand};
-    playgame.playBlackjackAction(attributes, event.request.locale, action,
+    utils.playBlackjackAction(attributes, event.request.locale, action,
       (error, response, speech, reprompt) => {
       if (!error) {
         attributes.temp.firsthand = undefined;

@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle(handlerInput) {
@@ -72,12 +72,12 @@ module.exports = {
           // On to the next player
           attributes.temp.changingBets++;
           reprompt = res.strings.CHANGEBETS_REPROMPT;
-          speech += (playgame.readPlayerName(attributes, attributes.temp.changingBets) + reprompt);
+          speech += (utils.readPlayerName(attributes, attributes.temp.changingBets) + reprompt);
           handlerInput.responseBuilder.speak(speech).reprompt(reprompt);
         } else {
           // OK, all bets have been set - let's deal
           const action = {action: 'deal', amount: 0};
-          playgame.playBlackjackAction(attributes, event.request.locale, action,
+          utils.playBlackjackAction(attributes, event.request.locale, action,
             (error, response, dealSpeech, dealReprompt) => {
             if (!error) {
               attributes.temp.firsthand = undefined;

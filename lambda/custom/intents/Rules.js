@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -17,7 +17,7 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../' + event.request.locale + '/resources');
 
-    const output = playgame.readRules(attributes, event.request.locale);
+    const output = utils.readRules(attributes, event.request.locale);
     handlerInput.responseBuilder
       .speak(output.speech)
       .reprompt(output.reprompt)

@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -16,7 +16,7 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const output = playgame.readCurrentHand(attributes, event.request.locale, true);
+    const output = utils.readCurrentHand(attributes, event.request.locale, true);
 
     handlerInput.responseBuilder
       .speak(output.speech)

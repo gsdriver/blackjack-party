@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 const speechUtils = require('alexa-speech-utils')();
 
 module.exports = {
@@ -49,7 +49,7 @@ module.exports = {
       }
 
       // Figure out what the current game state is - give them option to reset
-      const output = playgame.readCurrentHand(attributes, event.request.locale);
+      const output = utils.readCurrentHand(attributes, event.request.locale);
       if (game.activePlayer === 'player') {
         // They are in the middle of a hand; remind them what they have
         launchSpeech += res.strings.LAUNCH_START_HAND_INPROGRESS;

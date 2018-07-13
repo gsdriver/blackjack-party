@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -30,7 +30,7 @@ module.exports = {
 
     // New player!  If there was a player already being added, add them
     if (attributes.temp.addingPlayer) {
-      playgame.addPlayer(attributes);
+      utils.addPlayer(attributes);
     }
 
     // Start adding a new player

@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -24,7 +24,7 @@ module.exports = {
 
     if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
       // Great, add the player
-      playgame.addPlayer(attributes);
+      utils.addPlayer(attributes);
       handlerInput.responseBuilder
         .speak(res.strings.CONFIRM_ADD_PLAYER)
         .reprompt(res.strings.CONFIRM_ADD_PLAYER);

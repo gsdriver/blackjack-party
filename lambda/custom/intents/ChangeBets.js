@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle(handlerInput) {
@@ -29,13 +29,13 @@ module.exports = {
 
     // First off, if they were in the midst of adding a player, add it
     if (attributes.temp.addingPlayer) {
-      playgame.addPlayer(attributes);
+      utils.addPlayer(attributes);
     }
 
     // Now, we'll loop through each player and prompt for a new amount to bet
     attributes.temp.changingBets = 0;
     const reprompt = res.strings.CHANGEBETS_REPROMPT;
-    const speech = playgame.readPlayerName(attributes, attributes.temp.changingBets) + reprompt;
+    const speech = utils.readPlayerName(attributes, attributes.temp.changingBets) + reprompt;
 
     handlerInput.responseBuilder
       .speak(speech)

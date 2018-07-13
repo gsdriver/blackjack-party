@@ -1,6 +1,6 @@
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle(handlerInput) {
@@ -62,7 +62,7 @@ module.exports = {
     }
 
     if (actionObj.action) {
-      playgame.playBlackjackAction(attributes, event.request.locale,
+      utils.playBlackjackAction(attributes, event.request.locale,
           actionObj, (error, response, speech, reprompt) => {
         if (!error) {
           handlerInput.responseBuilder

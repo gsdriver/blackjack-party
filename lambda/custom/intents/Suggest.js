@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const utils = require('../utils');
 
 module.exports = {
   canHandle(handlerInput) {
@@ -26,7 +26,7 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     attributes.suggestRequests = (attributes.suggestRequests + 1) || 1;
-    playgame.playBlackjackAction(attributes,
+    utils.playBlackjackAction(attributes,
       event.request.locale, {action: 'suggest'},
       (error, response, speech, reprompt) => {
       if (!error) {
