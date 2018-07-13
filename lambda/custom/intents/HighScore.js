@@ -20,7 +20,7 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../' + event.request.locale + '/resources');
+    const res = require('../resources')(event.request.locale);
 
     // OK, read the top 5 highest bankrolls
     let leaders = [];

@@ -33,7 +33,7 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../' + event.request.locale + '/resources');
+    const res = require('../resources')(event.request.locale);
     const game = attributes[attributes.currentGame];
     let exitSpeech = '';
     let byeText;

@@ -18,7 +18,7 @@ module.exports = {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const game = attributes[attributes.currentGame];
-    const res = require('../' + event.request.locale + '/resources');
+    const res = require('../resources')(event.request.locale);
 
     // If reset table is true, nuke the current table and start over
     if (attributes.temp.resetTable) {

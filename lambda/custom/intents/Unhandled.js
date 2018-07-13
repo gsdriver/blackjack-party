@@ -15,7 +15,7 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../' + event.request.locale + '/resources');
+    const res = require('../resources')(event.request.locale);
 
     // Echo back the action that we heard, why this isn't valid at this time,
     // and what the possible actions are for them to say

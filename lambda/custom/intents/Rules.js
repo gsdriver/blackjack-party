@@ -15,7 +15,7 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../' + event.request.locale + '/resources');
+    const res = require('../resources')(event.request.locale);
 
     const output = utils.readRules(attributes, event.request.locale);
     handlerInput.responseBuilder

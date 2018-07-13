@@ -26,7 +26,7 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../' + event.request.locale + '/resources');
+    const res = require('../resources')(event.request.locale);
     const game = attributes[attributes.currentGame];
 
     // First off, if they were in the midst of adding a player, add it

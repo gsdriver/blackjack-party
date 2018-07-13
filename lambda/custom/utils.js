@@ -13,7 +13,7 @@ module.exports = {
   // Plays a given action, returning either an error or a response string
   playBlackjackAction: function(attributes, locale, action, callback) {
     // Special case if this is suggest
-    resources = require('./' + locale + '/resources');
+    resources = require('./resources')(locale);
     const game = attributes[attributes.currentGame];
 
     if (action.action == 'suggest') {
@@ -151,7 +151,7 @@ module.exports = {
   },
   // Reads back the rules in play
   readRules: function(attributes, locale) {
-    resources = require('./' + locale + '/resources');
+    resources = require('./resources')(locale);
     const game = attributes[attributes.currentGame];
 
     const reprompt = listValidActions(game, locale, 'full');
@@ -161,7 +161,7 @@ module.exports = {
   },
   // Reads back the current hand and game state
   readCurrentHand: function(attributes, locale, readBankroll) {
-    resources = require('./' + locale + '/resources');
+    resources = require('./resources')(locale);
     const game = attributes[attributes.currentGame];
     const reprompt = listValidActions(game, locale, 'full');
 
@@ -174,7 +174,7 @@ module.exports = {
   },
   // Gets contextual help based on the current state of the game
   getContextualHelp: function(event, attributes, helpPrompt) {
-    const resources = require('./' + event.request.locale + '/resources');
+    resources = require('./resources')(locale);
     const game = attributes[attributes.currentGame];
     const state = module.exports.getState(attributes);
     let result = '';

@@ -20,7 +20,7 @@ module.exports = {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const game = attributes[attributes.currentGame];
-    const res = require('../' + event.request.locale + '/resources');
+    const res = require('../resources')(event.request.locale);
 
     if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
       // Great, add the player
