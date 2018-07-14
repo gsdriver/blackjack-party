@@ -5,6 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
+const gameService = require('../GameService');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -22,9 +23,7 @@ module.exports = {
 
     // If reset table is true, nuke the current table and start over
     if (attributes.temp.resetTable) {
-      game.players = [];
-      game.playerHands = {};
-      game.currentPlayer = undefined;
+      gameService.initializeGame('standard', attributes, event.session.user.userId);
       attributes.temp.resetTable = undefined;
     }
 
@@ -33,11 +32,20 @@ module.exports = {
       utils.addPlayer(attributes);
     }
 
-    // Start adding a new player
-    attributes.temp.addingPlayer = Date.now();
-
-    handlerInput.responseBuilder
-      .speak(res.strings.ADD_PLAYER.replace('{0}', (game.players.length + 1)))
-      .reprompt(res.strings.ADD_PLAYER_REPROMPT);
+    // If we have six players, you cannot add another player
+    if (game.players.length == 6) {
+      handlerInput.responseBuilder
+        .speak(res.strings.ADD_PLAYER_TABLE_FULL)
+        .reprompt(res.strings.ADD_PLAYER_TABLE_FULL_REPROMPT);
+    } else {
+      // Start adding a new player
+      attributes.temp.addingPlayer = Date.now();
+      const format = (game.players.length == 5)
+        ? res.strings.ADD_LAST_PLAYER
+        : res.strings.ADD_PLAYER;
+      handlerInput.responseBuilder
+        .speak(format.replace('{0}', (game.players.length + 1)))
+        .reprompt(res.strings.ADD_PLAYER_REPROMPT);
+    }
   },
 };

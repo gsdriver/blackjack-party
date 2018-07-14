@@ -70,19 +70,32 @@ const saveResponseInterceptor = {
   process(handlerInput) {
     return new Promise((resolve, reject) => {
       const response = handlerInput.responseBuilder.getResponse();
-      if (response && response.shouldEndSession) {
-        // We are meant to end the session
-        console.log('Saving attributes');
+
+      if (response) {
         const attributes = handlerInput.attributesManager.getSessionAttributes();
-        attributes.temp = undefined;
-        handlerInput.attributesManager.setPersistentAttributes(attributes);
-        handlerInput.attributesManager.savePersistentAttributes()
-        .then(() => {
+        if (response.shouldEndSession) {
+          // We are meant to end the session
+          console.log('Saving attributes');
+          attributes.temp = undefined;
+          handlerInput.attributesManager.setPersistentAttributes(attributes);
+          handlerInput.attributesManager.savePersistentAttributes()
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+        } else {
+          // Save the response and reprompt for repeat
+          if (response.outputSpeech && response.outputSpeech.ssml) {
+            attributes.temp.lastResponse = response.outputSpeech.ssml;
+          }
+          if (response.reprompt && response.reprompt.outputSpeech
+            && response.reprompt.outputSpeech.ssml) {
+            attributes.temp.lastReprompt = response.reprompt.outputSpeech.ssml;
+          }
           resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
+        }
       } else {
         resolve();
       }

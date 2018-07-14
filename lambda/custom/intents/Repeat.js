@@ -19,7 +19,7 @@ module.exports = {
     const output = utils.readCurrentHand(attributes, event.request.locale, true);
 
     handlerInput.responseBuilder
-      .speak(output.speech)
-      .reprompt(output.reprompt);
+      .speak(attributes.temp.lastResponse ? attributes.temp.lastResponse : output.speech)
+      .reprompt(attributes.temp.lastReprompt ? attributes.temp.lastReprompt : output.reprompt);
   },
 };

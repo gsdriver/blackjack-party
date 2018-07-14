@@ -38,6 +38,11 @@ module.exports = {
     if (availableGames[game]) {
       newGame = JSON.parse(JSON.stringify(availableGames[game]));
 
+      // If they had an existing table - preserve the timestamp
+      if (attributes.currentGame && attributes[attributes.currentGame]) {
+        newGame.timestamp = attributes[attributes.currentGame].timestamp;
+      }
+
       // Start by shuffling the deck
       // For now, stick with one player
       shuffleDeck(newGame, userId);
@@ -464,12 +469,12 @@ function setNextActions(attributes) {
     // we make you first reset the bankroll
     if (bankroll < game.rules.minBet) {
       game.possibleActions.push('resetbankroll');
-    } else if (game.deck.cards.length > 20) {
+    } else if (game.deck.cards.length > 10 * (game.players.length + 1)) {
       game.possibleActions.push('deal');
     }
 
     // Shuffle if there aren't enough cards to play
-    if (game.deck.cards.length <= 20) {
+    if (game.deck.cards.length <= 10 * (game.players.length + 1)) {
       game.possibleActions.push('shuffle');
     }
   }

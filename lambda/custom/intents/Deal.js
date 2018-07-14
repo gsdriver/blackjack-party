@@ -42,8 +42,10 @@ module.exports = {
         attributes.temp.firsthand = undefined;
 
         // Set each player's timestamp and hands played
+        const now = Date.now();
+        game.timestamp = now;
         game.players.forEach((player) => {
-          attributes.playerList[player].timestamp = Date.now();
+          attributes.playerList[player].timestamp = now;
           attributes.playerList[player].hands
             = (attributes.playerList[player].hands + 1) || 1;
         });

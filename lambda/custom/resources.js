@@ -5,11 +5,15 @@
 const common = {
   // From AddPlayer.js
   'ADD_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game.',
+  'ADD_LAST_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> or deal to start the game.',
   'ADD_PLAYER_REPROMPT': 'Say the name of the player to add.',
+  'ADD_PLAYER_TABLE_FULL': 'Sorry the table is full with six players. Say deal to start the game.',
+  'ADD_PLAYER_TABLE_FULL_REPROMPT': 'Say deal to start the game.',
   // From PlayerName.js
   'PLAYER_GOTNAME': 'I heard {0}, is that correct?',
   'PLAYER_GOTNAME_REPROMPT': 'Say yes if {0} is the name you want to add.',
   // From ConfirmName.js
+  'CONFIRM_MAX_PLAYERS': 'The table is full with six players. Say deal to start the game.',
   'CONFIRM_ADD_PLAYER': 'Say add a player to add more players, or deal to start the game.',
   'CONFIRM_WELCOME_BACK': 'Welcome back {0}. ',
   // From BlackjackUtils.js

@@ -1,0 +1,334 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "blackjack party",
+      "intents": [
+        {
+          "name": "BlackjackIntent",
+          "slots": [
+            {
+              "name": "Action",
+              "type": "LIST_OF_ACTIONS"
+            }
+          ],
+          "samples": [
+            "do {Action}",
+            "{Action}",
+            "take a {Action}",
+            "take an {Action}",
+            "{Action} me",
+            "{Action} this hand",
+            "{Action} on this hand",
+            "do {Action} this hand",
+            "do {Action} on this hand",
+            "take a {Action} this hand",
+            "take an {Action} this hand",
+            "take a {Action} on this hand",
+            "take an {Action} on this hand",
+            "{Action} this round",
+            "{Action} on this round",
+            "do {Action} this round",
+            "do {Action} on this round",
+            "take a {Action} this round",
+            "take an {Action} this round",
+            "take a {Action} on this round",
+            "take an {Action} on this round",
+            "{Action} this time",
+            "{Action} on this time",
+            "do {Action} this time",
+            "do {Action} on this time",
+            "take a {Action} this time",
+            "take an {Action} this time",
+            "take a {Action} on this time",
+            "take an {Action} on this time"
+          ]
+        },
+        {
+          "name": "ChangeBetsIntent",
+          "samples": [
+            "change the bet amounts",
+            "change the bets",
+            "change bets",
+            "bet different amounts",
+            "place different bets"
+          ]
+        },
+        {
+          "name": "BetAmountIntent",
+          "slots": [
+            {
+              "name": "Amount",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "bet {Amount}",
+            "bet for {Amount}",
+            "bet {Amount} pounds",
+            "bet for {Amount} pounds",
+            "{Amount} pounds",
+            "{Amount}"
+          ]
+        },
+        {
+          "name": "DealIntent",
+          "samples": [
+            "do deal",
+            "deal",
+            "play"
+          ]
+        },
+        {
+          "name": "HighScoreIntent",
+          "samples": [
+            "read high scores",
+            "tell me high scores",
+            "what are the high scores",
+            "what is the leader board",
+            "read leader board",
+            "say high scores",
+            "say leader board"
+          ]
+        },
+        {
+          "name": "RulesIntent",
+          "samples": [
+            "read rules",
+            "read the rules",
+            "what are the rules",
+            "tell me the rules",
+            "the rules",
+            "rules",
+            "read game rules",
+            "read the game rules",
+            "what are the game rules",
+            "tell me the game rules",
+            "the game rules",
+            "game rules",
+            "read rules of the game",
+            "read the rules of the game",
+            "what are the rules of the game",
+            "tell me the rules of the game",
+            "the rules of the game",
+            "rules of the game"
+          ]
+        },
+        {
+          "name": "SuggestIntent",
+          "samples": [
+            "what should I do",
+            "give suggestion",
+            "give me suggestion",
+            "give me a suggestion",
+            "for suggestion",
+            "for a suggestion",
+            "suggest action",
+            "suggest play",
+            "suggest move",
+            "suggest a move",
+            "suggest an action",
+            "suggest a play"
+          ]
+        },
+        {
+          "name": "AddPlayerIntent",
+          "samples": [
+            "add a player",
+            "add a new player",
+            "new player",
+            "additional player",
+            "add another player"
+          ]
+        },
+        {
+          "name": "PlayerNameIntent",
+          "slots": [
+            {
+              "name": "Name",
+              "type": "AMAZON.GB_FIRST_NAME"
+            }
+          ],
+          "samples": [
+            "{Name}"
+          ]
+        },
+        {
+          "name": "EnableTrainingIntent",
+          "samples": [
+            "turn on training mode",
+            "enter training mode",
+            "enable training mode",
+            "use training mode",
+            "turn on training",
+            "enter training",
+            "enable training",
+            "turn on suggestion mode",
+            "enter suggestion mode",
+            "use suggestion mode",
+            "enable suggestion mode",
+            "turn on suggestions",
+            "enter suggestions",
+            "enable suggestions"
+          ]
+        },
+        {
+          "name": "DisableTrainingIntent",
+          "samples": [
+            "turn off training mode",
+            "exit training mode",
+            "disable training mode",
+            "turn off training",
+            "exit training",
+            "disable training",
+            "turn off suggestion mode",
+            "exit suggestion mode",
+            "disable suggestion mode",
+            "turn off suggestions",
+            "exit suggestions",
+            "disable suggestions"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.RepeatIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.YesIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.MoreIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent",
+          "samples": []
+        }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "name": {
+                "value": "hit"
+              }
+            },
+            {
+              "name": {
+                "value": "take a hit"
+              }
+            },
+            {
+              "name": {
+                "value": "hit me"
+              }
+            },
+            {
+              "name": {
+                "value": "take one"
+              }
+            },
+            {
+              "name": {
+                "value": "stand"
+              }
+            },
+            {
+              "name": {
+                "value": "stay"
+              }
+            },
+            {
+              "name": {
+                "value": "done"
+              }
+            },
+            {
+              "name": {
+                "value": "surrender"
+              }
+            },
+            {
+              "name": {
+                "value": "give up"
+              }
+            },
+            {
+              "name": {
+                "value": "double"
+              }
+            },
+            {
+              "name": {
+                "value": "double down"
+              }
+            },
+            {
+              "name": {
+                "value": "split"
+              }
+            },
+            {
+              "name": {
+                "value": "deal"
+              }
+            }
+          ],
+          "name": "LIST_OF_ACTIONS"
+        }
+      ]
+    }
+  }
+}

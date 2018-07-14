@@ -24,9 +24,12 @@ module.exports = {
 
     if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
       // Great, add the player
-      let speech = res.strings.CONFIRM_ADD_PLAYER;
+      let speech;
       const name = attributes.temp.addingName;
 
+      speech = (game.players.length == 5)
+        ? res.strings.CONFIRM_MAX_PLAYERS
+        : res.strings.CONFIRM_ADD_PLAYER;
       if (!utils.addPlayer(attributes)) {
         speech = res.strings.CONFIRM_WELCOME_BACK.replace('{0}', name) + speech;
       }

@@ -16,7 +16,24 @@
           ],
           "name": "Blackjack Party",
           "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/27d0/b70f22efd0954f2cb13cc1667ba56149/APP_ICON?versionId=Y.0zpPGX5zZMzm83XEVp03AJMNtiif3I&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1531147427&Signature=dp7ljc3aCJQtbCAMquHcekdOSm0%3D",
-          "description": "Play blackjack with your friends on Alexa!  You and up to 5 friends can play against the dealer at the same table.  Each plaery's bankroll is saved and you can add and remove players from the table each time you play.  Players start with 5,000 dollars in credit and can vary bets from 5 to 1,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand!  This full-featured game has it all - hit, stand, split, double down, and even surrender.\n\nCompare your bankroll with other players by saying \"read high scores\" to hear the leader board for all players on your device. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
+          "description": "Play blackjack with your friends on Alexa!  You and up to 5 friends can play against the dealer at the same table.  Each player's bankroll is saved and you can change the group of players from the table each time you play.  Players start with 5,000 dollars in credit and can vary bets from 5 to 1,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand!  This full-featured game has it all - hit, stand, split, double down, and even surrender.\n\nCompare your peak bankroll with other players by saying \"read high scores\" to hear the leader board for all players on your device.\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/a194/9daa84cf5c8a43ae91485e94d26609eb/APP_ICON_LARGE?versionId=M3IFOd0N82Wrpp6tCs3Yiz3MGEPtWqWN&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1531147427&Signature=bP40Vy13HqN0OdeTSRdZf4bRDoY%3D"
+        },
+        "en-GB": {
+          "summary": "Play blackjack with your friends in this party version of Blackjack! Use training mode to learn as you play!",
+          "examplePhrases": [
+            "Alexa, tell blackjack party to deal",
+            "Add a player",
+            "Enter training mode"
+          ],
+          "keywords": [
+            "blackjack",
+            "party",
+            "game"
+          ],
+          "name": "Blackjack Party",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/27d0/b70f22efd0954f2cb13cc1667ba56149/APP_ICON?versionId=Y.0zpPGX5zZMzm83XEVp03AJMNtiif3I&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1531147427&Signature=dp7ljc3aCJQtbCAMquHcekdOSm0%3D",
+          "description": "Play blackjack with your friends on Alexa!  You and up to 5 friends can play against the dealer at the same table.  Each player's bankroll is saved and you can change the group of players from the table each time you play.  Players start with 5,000 pounds in credit and can vary bets from 5 to 1,000 pounds.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand!  This full-featured game has it all - hit, stand, split, double down, and even surrender.\n\nCompare your peak bankroll with other players by saying \"read high scores\" to hear the leader board for all players on your device.\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
           "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/a194/9daa84cf5c8a43ae91485e94d26609eb/APP_ICON_LARGE?versionId=M3IFOd0N82Wrpp6tCs3Yiz3MGEPtWqWN&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1531147427&Signature=bP40Vy13HqN0OdeTSRdZf4bRDoY%3D"
         }
       },
