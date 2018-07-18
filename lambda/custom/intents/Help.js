@@ -22,7 +22,6 @@ module.exports = {
     }
 
     let cardContent = '';
-    cardContent += res.strings.HELP_ACHIEVEMENT_CARD_TEXT;
     cardContent += res.strings.HELP_CARD_TEXT;
     handlerInput.responseBuilder
       .speak(speech)

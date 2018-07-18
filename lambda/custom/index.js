@@ -22,6 +22,7 @@ const PlayerName = require('./intents/PlayerName');
 const ConfirmName = require('./intents/ConfirmName');
 const Unhandled = require('./intents/Unhandled');
 const gameService = require('./GameService');
+const utils = require('./utils');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 
@@ -73,29 +74,31 @@ const saveResponseInterceptor = {
 
       if (response) {
         const attributes = handlerInput.attributesManager.getSessionAttributes();
-        if (response.shouldEndSession) {
-          // We are meant to end the session
-          console.log('Saving attributes');
-          attributes.temp = undefined;
-          handlerInput.attributesManager.setPersistentAttributes(attributes);
-          handlerInput.attributesManager.savePersistentAttributes()
-          .then(() => {
+        utils.drawTable(handlerInput, () => {
+          if (response.shouldEndSession) {
+            // We are meant to end the session
+            console.log('Saving attributes');
+            attributes.temp = undefined;
+            handlerInput.attributesManager.setPersistentAttributes(attributes);
+            handlerInput.attributesManager.savePersistentAttributes()
+            .then(() => {
+              resolve();
+            })
+            .catch((error) => {
+              reject(error);
+            });
+          } else {
+            // Save the response and reprompt for repeat
+            if (response.outputSpeech && response.outputSpeech.ssml) {
+              attributes.temp.lastResponse = response.outputSpeech.ssml;
+            }
+            if (response.reprompt && response.reprompt.outputSpeech
+              && response.reprompt.outputSpeech.ssml) {
+              attributes.temp.lastReprompt = response.reprompt.outputSpeech.ssml;
+            }
             resolve();
-          })
-          .catch((error) => {
-            reject(error);
-          });
-        } else {
-          // Save the response and reprompt for repeat
-          if (response.outputSpeech && response.outputSpeech.ssml) {
-            attributes.temp.lastResponse = response.outputSpeech.ssml;
           }
-          if (response.reprompt && response.reprompt.outputSpeech
-            && response.reprompt.outputSpeech.ssml) {
-            attributes.temp.lastReprompt = response.reprompt.outputSpeech.ssml;
-          }
-          resolve();
-        }
+        });
       } else {
         resolve();
       }

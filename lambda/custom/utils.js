@@ -6,6 +6,10 @@
 
 const gameService = require('./GameService');
 const speechUtils = require('alexa-speech-utils')();
+const Jimp = require('jimp');
+const AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
+const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
 let resources;
 
@@ -179,8 +183,11 @@ module.exports = {
     const state = module.exports.getState(attributes);
     let result = '';
 
-    // In some states, the choices are yes or no
-    if ((state == 'CONFIRMNAME') || (state == 'INSURANCEOFFERED')) {
+    // If they are managing players, tell them about player-related stuff
+    if (attributes.temp.addingName || attributes.temp.firsthand ||
+      (attributes.temp.changingBets !== undefined)) {
+      result = resources.strings.HELP_CHANGING_PLAYERS;
+    } else if (game.possibleActions.indexOf('noinsurance') >= 0) {
       result = resources.strings.HELP_YOU_CAN_SAY_YESNO;
     } else if (game.possibleActions) {
       // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
@@ -283,6 +290,41 @@ module.exports = {
     }
 
     return name;
+  },
+  drawTable: function(handlerInput, callback) {
+    const response = handlerInput.responseBuilder;
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if (event.context && event.context.System &&
+      event.context.System.device &&
+      event.context.System.device.supportedInterfaces &&
+      event.context.System.device.supportedInterfaces.Display) {
+      const game = attributes[attributes.currentGame];
+      const start = Date.now();
+      const currentPlayer = gameService.getCurrentPlayer(game);
+      const playerCards = (currentPlayer && currentPlayer.hands)
+        ? currentPlayer.hands.map((x) => x.cards) : [];
+      drawImage(playerCards,
+        game.dealerHand.cards, (game.activePlayer == 'none'),
+        (err, url) => {
+        const end = Date.now();
+        console.log('Drawing table took ' + (end - start) + ' ms');
+
+        if (!err) {
+          response.addRenderTemplateDirective({
+            type: 'BodyTemplate6',
+            backButton: 'HIDDEN',
+            backgroundImage: {sources: [{url: url, widthPixels: 0, heightPixels: 0}]},
+            title: '',
+          });
+        }
+        callback();
+      });
+    } else {
+      // Not a display device
+      callback();
+    }
   },
 };
 
@@ -827,4 +869,228 @@ function rulesToText(locale, rules, changeRules) {
   }
 
   return text;
+}
+
+//
+// Drawing images
+//
+
+// Pre-loaded images
+let cardImages;
+let blackjackTable;
+let imagesLoaded;
+
+// Image dimensions
+let cardWidth;
+let cardHeight;
+let tableWidth;
+let tableHeight;
+
+function drawImage(player, dealerCards, showHoleCard, callback) {
+  const dealer = JSON.parse(JSON.stringify(dealerCards));
+  if (!showHoleCard) {
+    dealer.shift();
+    dealer.unshift({rank: 1, suit: 'N'});
+  }
+
+  // First, check if the image already exists
+  const key = 'blackjackparty/' + imageName(player, dealer) + '.png';
+  const getParams = {Bucket: 'garrett-alexa-images', Key: key};
+  s3.headObject(getParams, (err, data) => {
+    if (!err) {
+      // Key exists - so we'll return that and log a cache hit
+      if (callback) {
+        callback(null, s3.getSignedUrl('getObject', getParams));
+      }
+
+      // Use the opportunity to load images asynchronously
+      initImages();
+      return;
+    }
+
+    // If images aren't loaded, we need to load them synchronously
+    if (!imagesLoaded) {
+      console.log('images not lazy loaded');
+      initImages((err) => {
+        if (err) {
+          callback(err);
+        } else {
+          loaded();
+        }
+      });
+    } else {
+      loaded();
+    }
+
+    function loaded() {
+      drawBlackjackTable(player, dealer, (err, url) => {
+        callback(err, url);
+      });
+    }
+  });
+}
+
+function drawBlackjackTable(player, dealer, callback) {
+  // First, check if the image already exists
+  const key = 'blackjackparty/' + imageName(player, dealer) + '.png';
+  const getParams = {Bucket: 'garrett-alexa-images', Key: key};
+  const image = blackjackTable.clone();
+  let url;
+
+  // Get bounding rects for player and dealer hands
+  // and try to fit in a 480x480 space for Echo Spot
+  const playerDim = boundingRect(player, true);
+  const dealerDim = boundingRect(dealer, false);
+  const totalHeight = Math.max(500, (playerDim.height + dealerDim.height + 30));
+
+  let left = Math.floor((tableWidth - playerDim.width) / 2);
+  let top = Math.floor((tableHeight + totalHeight) / 2) - cardHeight;
+  player.forEach((hand) => {
+    drawHand(image, hand, top, left);
+    left += (10 + Math.floor(cardWidth * (1 + 0.25 * (hand.length - 1))));
+  });
+
+  left = Math.floor((tableWidth - dealerDim.width) / 2);
+  top = Math.floor((tableHeight - totalHeight) / 2);
+  drawDealer(image, dealer, top, left);
+
+  // Now write to S3
+  image.getBuffer(Jimp.MIME_PNG, (err, data) => {
+    if (err) {
+      console.log(err, err.stack);
+      if (callback) {
+        callback(err);
+      }
+    } else {
+      s3.putObject({Body: data,
+           Bucket: 'garrett-alexa-images',
+           Key: key}, (err, data) => {
+        if (err) {
+          console.log(err, err.stack);
+        } else {
+          url = s3.getSignedUrl('getObject', getParams);
+        }
+        if (callback) {
+          callback(err, url);
+        }
+      });
+    }
+  });
+}
+
+function drawHand(table, hand, top, left) {
+  let leftOffset = left;
+  let topOffset = top;
+
+  hand.forEach((card) => {
+    drawOneCard(table, card.rank, card.suit, leftOffset, topOffset);
+    leftOffset += Math.floor(0.25 * cardWidth);
+    topOffset -= Math.floor(0.25 * cardHeight);
+  });
+}
+
+function drawDealer(table, hand, top, left) {
+  // Dealer goes on the top of the screen - cards not overlapping
+  let leftOffset = left;
+
+  hand.forEach((card) => {
+    drawOneCard(table, card.rank, card.suit, leftOffset, top);
+    leftOffset += (cardWidth + 10);
+  });
+}
+
+function drawOneCard(table, rank, suit, left, top) {
+  const suits = {'H': 0, 'D': 1, 'C': 2, 'S': 3, 'N': 4};
+  let srcLeft;
+  const srcTop = suits[suit] * cardHeight;
+
+  if (suit == 'N') {
+    srcLeft = 0;
+  } else if (rank == 1) {
+    srcLeft = cardWidth * 12;
+  } else {
+    srcLeft = (rank - 2) * cardWidth;
+  }
+
+  table.blit(cardImages, left, top, srcLeft, srcTop, cardWidth, cardHeight);
+}
+
+function boundingRect(cards, isPlayer) {
+  let width = 0;
+  let height = 0;
+
+  // Get the bounding dimensions for the hand
+  if (isPlayer) {
+    let maxCards = 0;
+    cards.forEach((hand) => {
+      // We space 10 pixels between hands
+      width += (10 + Math.floor(cardWidth * (1 + 0.25 * (hand.length - 1))));
+      if (hand.length > maxCards) {
+        maxCards = hand.length;
+      }
+    });
+    width -= 10;
+    height = Math.floor(cardHeight * (1 + 0.25 * (maxCards - 1)));
+  } else {
+    width = (cardWidth * cards.length) + (10 * (cards.length - 1));
+    height = cardHeight;
+  }
+
+  return {width: width, height: height};
+}
+
+function imageName(player, dealer) {
+  let name = '';
+  let i = 0;
+
+  name += 'p';
+  player.forEach((hand) => {
+    name += (i++ + '-');
+    hand.forEach((card) => {
+      name += (card.rank + card.suit);
+    });
+  });
+  name += 'd-';
+  dealer.forEach((card) => {
+    name += (card.rank + card.suit);
+  });
+
+  return name;
+}
+
+function initImages(callback) {
+  const imageDir = (process.env.TESTIMAGES) ? '../lambda/custom/' : '';
+
+  // If already loaded, just return
+  if (imagesLoaded) {
+    if (callback) {
+      callback();
+    }
+  } else {
+    Jimp.read(imageDir + 'cards.gif', (err, image) => {
+      if (err) {
+        console.log(err);
+        if (callback) {
+          callback(err);
+        }
+      } else {
+        cardImages = image;
+        cardWidth = Math.floor(cardImages.bitmap.width / 13);
+        cardHeight = Math.floor(cardImages.bitmap.height / 5);
+        Jimp.read(imageDir + 'blackjack-background.png', (err, image) => {
+          if (err) {
+            console.log(err);
+          } else {
+            blackjackTable = image;
+            tableWidth = blackjackTable.bitmap.width;
+            tableHeight = blackjackTable.bitmap.height;
+            imagesLoaded = true;
+          }
+          if (callback) {
+            callback(err);
+          }
+        });
+      }
+    });
+  }
 }

@@ -18,7 +18,6 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const game = attributes[attributes.currentGame];
     const res = require('../resources')(event.request.locale);
 
     // If reset table is true, nuke the current table and start over
@@ -26,6 +25,7 @@ module.exports = {
       gameService.initializeGame('standard', attributes, event.session.user.userId);
       attributes.temp.resetTable = undefined;
     }
+    const game = attributes[attributes.currentGame];
 
     // New player!  If there was a player already being added, add them
     if (attributes.temp.addingPlayer) {
