@@ -8,10 +8,13 @@
 
 module.exports = {
   check: function(event) {
-    const noSlotIntents = ['AddPlayerIntent', 'AMAZON.RepeatIntent', 'AMAZON.FallbackIntent',
-      'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent', 'AMAZON.StopIntent',
-      'AMAZON.CancelIntent', 'SuggestIntent', 'RulesIntent',
-      'EnableTrainingIntent', 'DisableTrainingIntent'];
+    const noSlotIntents = ['DealIntent', 'HighScoreIntent', 'RulesIntent', 'SuggestIntent',
+      'AddPlayerIntent', 'EnableTrainingIntent', 'DisableTrainingIntent', 'AMAZON.FallbackIntent',
+      'AMAZON.HelpIntent', 'AMAZON.StopIntent', 'AMAZON.CancelIntent',
+      'AMAZON.RepeatIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent', 'AMAZON.MoreIntent',
+      'AMAZON.NavigateHomeIntent', 'AMAZON.NavigateSettingsIntent', 'AMAZON.NextIntent',
+      'AMAZON.PageUpIntent', 'AMAZON.PageDownIntent', 'AMAZON.PreviousIntent', 'AMAZON.ScrollRightIntent',
+      'AMAZON.ScrollDownIntent', 'AMAZON.ScrollLeftIntent', 'AMAZON.ScrollUpIntent', 'ChangeBetsIntent'];
 
     // Default to a negative response
     const response = {
@@ -38,7 +41,7 @@ module.exports = {
           && event.request.intent.slots.Name.value) {
           valid = true;
         }
-      } else if (event.request.intent.name == 'BettingIntent') {
+      } else if (event.request.intent.name == 'BetAmountIntent') {
         let amount = 0;
 
         // Need to validate Amount

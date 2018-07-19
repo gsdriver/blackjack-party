@@ -26,8 +26,7 @@ module.exports = {
         .speak(res.strings.INTERNAL_ERROR)
         .reprompt(res.strings.ERROR_REPROMPT);
     } else {
-      let speech = res.buildUnhandledResponse(event.request.intent,
-          utils.getState(attributes));
+      let speech = res.buildUnhandledResponse(event.request.intent, attributes);
       const reprompt = utils.getContextualHelp(event, attributes);
 
       speech += reprompt;

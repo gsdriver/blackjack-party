@@ -180,7 +180,6 @@ module.exports = {
   getContextualHelp: function(event, attributes, helpPrompt) {
     resources = require('./resources')(event.request.locale);
     const game = attributes[attributes.currentGame];
-    const state = module.exports.getState(attributes);
     let result = '';
 
     // If they are managing players, tell them about player-related stuff
@@ -218,30 +217,6 @@ module.exports = {
     }
 
     return result;
-  },
-  // Figures out what state of the game we're in
-  getState: function(attributes) {
-    const game = attributes[attributes.currentGame];
-
-    // New game - ready to start a new game
-    if (attributes.temp.addingName) {
-      return 'CONFIRMNAME';
-    } else if (attributes.temp.firsthand) {
-      return 'ADDINGPLAYERS';
-    } else if (attributes.temp.changingBets !== undefined) {
-      return 'CHANGINGBETS';
-    } else if (game.possibleActions.indexOf('deal') >= 0) {
-      if (attributes.newUser) {
-        return 'FIRSTTIMEPLAYER';
-      }
-      return 'NEWGAME';
-    } else if (game.suggestion) {
-      return 'SUGGESTION';
-    } else if (game.possibleActions.indexOf('noinsurance') >= 0) {
-      return 'INSURANCEOFFERED';
-    } else {
-      return 'INGAME';
-    }
   },
   addPlayer: function(attributes) {
     const game = attributes[attributes.currentGame];

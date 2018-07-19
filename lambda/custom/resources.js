@@ -316,16 +316,8 @@ const utils = (locale) => {
                              '0': 'even money'};
       return blackjackPayout[rule];
     },
-    buildUnhandledResponse: function(intent, state) {
-      const stateMapping = {'SUGGESTION': 'during the middle of a hand',
-        'ADDINGPLAYERS': 'while you are adding players to the table',
-        'CHANGINGBETS': 'while you are changing player bets',
-        'CONFIRMNAME': 'while I\'m waiting for you to confirm a new player name',
-        'NEWGAME': 'before the hand has started',
-        'FIRSTTIMEPLAYER': 'before the hand has started',
-        'INSURANCEOFFERED': 'while I\'m waiting to hear if you want insurance',
-        'INGAME': 'during the middle of a hand',
-      };
+    buildUnhandledResponse: function(intent, attributes) {
+      const game = attributes[attributes.currentGame];
       let response = 'I can\'t ';
 
       // What are they trying to do?
@@ -387,9 +379,21 @@ const utils = (locale) => {
           break;
       }
 
-      // Get the state
-      if (stateMapping[state]) {
-        response += stateMapping[state];
+      // New game - ready to start a new game
+      if (attributes.temp.addingName) {
+        response += 'while I\'m waiting for you to confirm a new player name';
+      } else if (attributes.temp.firsthand) {
+        response += 'while you are adding players to the table';
+      } else if (attributes.temp.changingBets !== undefined) {
+        response += 'while you are changing player bets';
+      } else if (game && game.possibleActions && game.possibleActions.length) {
+        if (game.possibleActions.indexOf('deal') >= 0) {
+          response += 'before the hand has started';
+        } else if (game.possibleActions.indexOf('noinsurance') >= 0) {
+          response += 'while I\'m waiting to hear if you want insurance';
+        } else {
+          response += 'during the middle of a hand';
+        }
       } else {
         response += 'at this time';
       }
