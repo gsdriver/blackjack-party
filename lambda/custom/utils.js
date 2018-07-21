@@ -227,6 +227,18 @@ module.exports = {
     if (!attributes.playerList) {
       attributes.playerList = {};
     }
+
+    // If this is a named player and there's already a player with this name
+    // at the table, we will add them as an unnamed player instead
+    if (attributes.temp.addingName) {
+      game.players.forEach((player) => {
+        if (attributes.playerList[player] &&
+          (attributes.playerList[player].name === attributes.temp.addingName)) {
+          attributes.temp.addingName = undefined;
+        }
+      });
+    }
+
     if (attributes.temp.addingName) {
       let playerId;
       for (playerId in attributes.playerList) {
@@ -253,6 +265,7 @@ module.exports = {
     return newPlayer;
   },
   readPlayerName: function(attributes, playerPos) {
+    resources = require('./resources')(attributes.playerLocale);
     const game = attributes[attributes.currentGame];
     const currentPlayer = (playerPos === undefined) ? game.currentPlayer : playerPos;
     const id = game.players[currentPlayer];
@@ -487,7 +500,17 @@ function readDealerAction(game, locale) {
   result = resources.strings.DEALER_HOLE_CARD.replace('{0}', resources.readCard(game.dealerHand.cards[0], 'article', game.readSuit));
   if (game.dealerHand.cards.length > 2) {
     result += resources.strings.DEALER_DRAW;
-    result += speechUtils.and(game.dealerHand.cards.slice(2).map((x) => resources.strings.CARD_DEAL_SOUND + resources.readCard(x, 'article', game.readSuit)), {locale: locale});
+
+    // Note, we can only have five audio sounds in a result
+    // If the player drew (one sound), that means a dealer hand of more than 6 cards
+    // should NOT have additional audio.  Sorry to kill the suspense
+    let readCards;
+    if (game.dealerHand.cards.length <= 6) {
+      readCards = game.dealerHand.cards.slice(2).map((x) => resources.strings.CARD_DEAL_SOUND + resources.readCard(x, 'article', game.readSuit));
+    } else {
+      readCards = game.dealerHand.cards.slice(2).map((x) => resources.readCard(x, 'article', game.readSuit));
+    }
+    result += speechUtils.and(readCards, {locale: locale, pause: '300ms'});
   }
 
   if (game.dealerHand.total > 21) {

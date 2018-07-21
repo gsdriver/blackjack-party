@@ -16,6 +16,8 @@ const common = {
   'CONFIRM_MAX_PLAYERS': 'The table is full with six players. Say deal to start the game.',
   'CONFIRM_ADD_PLAYER': 'Say add a player to add more players, or deal to start the game.',
   'CONFIRM_WELCOME_BACK': 'Welcome back {0}. ',
+  'CONFIRM_DUPLICATE_PLAYER': 'Sorry {0} is already at this table and each player must have a unique name. <break time=\'200ms\'/> ',
+  'CONFIRM_DUPLICATE_REPROMPT': 'Say a different name <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game.',
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'What else can I help with?',
   // From BetAmount.js
@@ -374,7 +376,7 @@ const utils = (locale) => {
         case 'AMAZON.CancelIntent':
         case 'SessionEndedRequest':
         default:
-          console.log('Error - unhandled ' + intent.name + ' in state ' + state);
+          console.log('Error - unhandled ' + intent.name);
           response += 'do that ';
           break;
       }

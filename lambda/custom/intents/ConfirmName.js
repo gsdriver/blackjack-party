@@ -25,18 +25,37 @@ module.exports = {
     if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
       // Great, add the player
       let speech;
+      let newPlayer = true;
       const name = attributes.temp.addingName;
 
-      speech = (game.players.length == 5)
-        ? res.strings.CONFIRM_MAX_PLAYERS
-        : res.strings.CONFIRM_ADD_PLAYER;
-      if (!utils.addPlayer(attributes)) {
-        speech = res.strings.CONFIRM_WELCOME_BACK.replace('{0}', name) + speech;
+      // First, have we already added this player?
+      if (attributes.playerList) {
+        game.players.forEach((player) => {
+          if (attributes.playerList[player] && (attributes.playerList[player].name === name)) {
+            newPlayer = false;
+          }
+        });
       }
 
-      handlerInput.responseBuilder
-        .speak(speech)
-        .reprompt(res.strings.CONFIRM_ADD_PLAYER);
+      if (!newPlayer) {
+        // Sorry, this isn't a new player
+        speech = res.strings.CONFIRM_DUPLICATE_PLAYER.replace('{0}', name);
+        speech += res.strings.CONFIRM_DUPLICATE_REPROMPT;
+        handlerInput.responseBuilder
+          .speak(speech)
+          .reprompt(res.strings.CONFIRM_DUPLICATE_REPROMPT);
+      } else {
+        speech = (game.players.length == 5)
+          ? res.strings.CONFIRM_MAX_PLAYERS
+          : res.strings.CONFIRM_ADD_PLAYER;
+        if (!utils.addPlayer(attributes)) {
+          speech = res.strings.CONFIRM_WELCOME_BACK.replace('{0}', name) + speech;
+        }
+
+        handlerInput.responseBuilder
+          .speak(speech)
+          .reprompt(res.strings.CONFIRM_ADD_PLAYER);
+      }
     } else {
       // Nope, not the right name
       attributes.temp.addingName = undefined;
