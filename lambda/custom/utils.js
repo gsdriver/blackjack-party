@@ -405,6 +405,7 @@ function tellResult(attributes, locale, action, oldGame) {
       // or split Aces (which only draws one card) or did a double before we read this hand.
       if ((oldHand.total >= 21) ||
         (oldHand.bet > gameService.getCurrentHand(game).bet)) {
+        result += resources.strings.CARD_DEAL_SOUND;
         if (oldHand.total > 21) {
           result += resources.strings.RESULT_AFTER_HIT_BUST
             .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
@@ -423,7 +424,7 @@ function tellResult(attributes, locale, action, oldGame) {
   // Always say new player and read their hand if current player shifted
   if ((game.currentPlayer != oldGame.currentPlayer) && (game.players.length > 1)) {
     result += module.exports.readPlayerName(attributes);
-    result += readHand(attributes, game, attributes.playerLocale);
+    result += readHand(attributes, game, attributes.playerLocale, true);
   } else {
     // So what happened?
     switch (action) {
@@ -435,7 +436,7 @@ function tellResult(attributes, locale, action, oldGame) {
         break;
       case 'deal':
         // A new hand was dealt
-        result += readHand(attributes, game, locale);
+        result += readHand(attributes, game, locale, true);
         // If it is not the player's turn (could happen on dealer blackjack)
         // then read the game result here too
         if (game.activePlayer != 'player') {
@@ -486,7 +487,7 @@ function readDealerAction(game, locale) {
   result = resources.strings.DEALER_HOLE_CARD.replace('{0}', resources.readCard(game.dealerHand.cards[0], 'article', game.readSuit));
   if (game.dealerHand.cards.length > 2) {
     result += resources.strings.DEALER_DRAW;
-    result += speechUtils.and(game.dealerHand.cards.slice(2).map((x) => resources.readCard(x, 'article', game.readSuit)), {locale: locale});
+    result += speechUtils.and(game.dealerHand.cards.slice(2).map((x) => resources.strings.CARD_DEAL_SOUND + resources.readCard(x, 'article', game.readSuit)), {locale: locale});
   }
 
   if (game.dealerHand.total > 21) {
@@ -570,10 +571,10 @@ function readHit(attributes, locale) {
   const currentHand = gameService.getCurrentHand(game);
   const cardText = resources.readCard(currentHand.cards[currentHand.cards.length - 1], 'article', game.readSuit);
   const cardRank = currentHand.cards[currentHand.cards.length - 1].rank;
-  let result;
+  let result = resources.strings.CARD_DEAL_SOUND;
 
   if (currentHand.total > 21) {
-    result = resources.pickRandomOption('PLAYER_HIT_BUSTED').replace('{0}', cardText);
+    result += resources.pickRandomOption('PLAYER_HIT_BUSTED').replace('{0}', cardText);
   } else {
     let formatChoices;
 
@@ -597,7 +598,7 @@ function readHit(attributes, locale) {
       }
     }
 
-    result = resources.pickRandomOption(formatChoices).replace('{0}', cardText).replace('{1}', currentHand.total);
+    result += resources.pickRandomOption(formatChoices).replace('{0}', cardText).replace('{1}', currentHand.total);
     if (game.activePlayer === 'player') {
       result += resources.strings.DEALER_SHOWING.replace('{0}', resources.readCard(game.dealerHand.cards[1], 'article', game.readSuit));
     }
@@ -644,6 +645,7 @@ function readSplit(attributes, locale) {
   }
 
   // Now read the current hand
+  result += resources.strings.CARD_DEAL_SOUND;
   result += readHand(attributes, game, locale);
 
   return result;
@@ -703,7 +705,7 @@ function readInsurance(attributes, locale, readDealer) {
 /*
  * Reads the state of the hand - your cards and total, and the dealer up card
  */
-function readHand(attributes, game, locale) {
+function readHand(attributes, game, locale, initial) {
   let result = '';
   let resultFormat;
   const currentPlayer = gameService.getCurrentPlayer(game);
@@ -720,6 +722,9 @@ function readHand(attributes, game, locale) {
 
   // If they have more than one hand, then say the hand number
   result += readHandNumber(game, currentPlayer.currentPlayerHand);
+  if (initial) {
+    result += resources.strings.CARD_DEAL_SOUND;
+  }
   const readCards = speechUtils.and(currentHand.cards.map((x) => {
     return resources.readCard(x, false, game.readSuit);
   }), {locale: locale});

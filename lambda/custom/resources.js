@@ -40,7 +40,6 @@ const common = {
   'HELP_CARD_TEXT': 'When you start the skill, say DEAL to continue with an existing table or ADD A PLAYER to reset the players at the table. You can only change the players at the start of a round. If you want to change the bets for each player, say CHANGE BETS which will allow you to set an amount to bet for each player separately.\nYou can say DEAL to start the game. You can say READ HIGH SCORES to hear the peak bankrolls for each member of your party.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules of the game.',
   // From Launch.js
   'LAUNCH_WELCOME': '{"standard":"Thanks for joining Blackjack Party! "}',
-  'LAUNCH_INITIAL_WELCOME': '{"standard":""}',
   'LAUNCH_START_GAME': 'Say add a player to start a new table or deal to start a new game with this table',
   'LAUNCH_START_HAND_INPROGRESS': 'Say add a player to start a new table or pick up where you left off. ',
   'LAUNCH_ADD_PLAYER': 'This skill lets up to six people play at a Blackjack table. What is the name of the first player? ',
@@ -81,6 +80,7 @@ const common = {
   'ASK_WHAT_TO_DO': 'What would you like to do?',
   'ASK_PLAY_AGAIN': 'Would you like to play again?',
   'ASK_SAY_BET': 'Say bet to start the game.',
+  'CARD_DEAL_SOUND': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> ',
   'RESULT_AFTER_HIT_BUST': 'You got {0} and busted. ',
   'RESULT_AFTER_HIT_NOBUST': 'You got {0} for a total of {1}. ',
   'RESULT_BANKROLL_RESET': 'Bankroll reset',

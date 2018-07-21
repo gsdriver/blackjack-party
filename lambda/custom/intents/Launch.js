@@ -22,7 +22,8 @@ module.exports = {
 
     // Try to keep it simple
     const launchWelcome = JSON.parse(res.strings.LAUNCH_WELCOME);
-    launchSpeech = launchWelcome[attributes.currentGame];
+    launchSpeech = '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/casinowelcome.mp3\"/> '
+      + launchWelcome[attributes.currentGame];
 
     // Was there a table already played?  If so, remind - otherwise
     // go directly into add player mode
