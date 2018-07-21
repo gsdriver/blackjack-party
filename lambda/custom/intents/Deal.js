@@ -34,15 +34,6 @@ module.exports = {
       utils.addPlayer(attributes);
     }
 
-    // If this is the first hand, record the table for analytics purposes
-    if (attributes.temp.firsthand) {
-      if (!attributes.tables) {
-        attributes.tables = {};
-      }
-      const tableSize = attributes.currentGame + '-' + game.players.length;
-      attributes.tables[tableSize] = (attributes.tables[tableSize] + 1) || 1;
-    }
-
     // Play for the default amount
     const action = {action: 'deal', amount: 0, firsthand: attributes.temp.firsthand};
     utils.playBlackjackAction(attributes, event.request.locale, action,
@@ -53,6 +44,7 @@ module.exports = {
         // Set each player's timestamp and hands played
         const now = Date.now();
         game.timestamp = now;
+        attributes.temp.hands = (attributes.temp.hands + 1) || 1;
         game.players.forEach((player) => {
           attributes.playerList[player].timestamp = now;
           attributes.playerList[player].hands

@@ -275,14 +275,8 @@ module.exports = {
       event.context.System.device &&
       event.context.System.device.supportedInterfaces &&
       event.context.System.device.supportedInterfaces.Display) {
-      const game = attributes[attributes.currentGame];
       const start = Date.now();
-      const currentPlayer = gameService.getCurrentPlayer(game);
-      const playerCards = (currentPlayer && currentPlayer.hands)
-        ? currentPlayer.hands.map((x) => x.cards) : [];
-      drawImage(playerCards,
-        game.dealerHand.cards, (game.activePlayer == 'none'),
-        (err, url) => {
+      drawImage(attributes, (err, url) => {
         const end = Date.now();
         console.log('Drawing table took ' + (end - start) + ' ms');
 
@@ -861,8 +855,13 @@ let cardHeight;
 let tableWidth;
 let tableHeight;
 
-function drawImage(player, dealerCards, showHoleCard, callback) {
-  const dealer = JSON.parse(JSON.stringify(dealerCards));
+function drawImage(attributes, callback) {
+  const game = attributes[attributes.currentGame];
+  const currentPlayer = gameService.getCurrentPlayer(game);
+  const player = (currentPlayer && currentPlayer.hands)
+    ? currentPlayer.hands.map((x) => x.cards) : [];
+  const dealer = JSON.parse(JSON.stringify(game.dealerHand.cards));
+  const showHoleCard = (game.activePlayer == 'none');
   if (!showHoleCard) {
     dealer.shift();
     dealer.unshift({rank: 1, suit: 'N'});
@@ -886,10 +885,12 @@ function drawImage(player, dealerCards, showHoleCard, callback) {
     // If images aren't loaded, we need to load them synchronously
     if (!imagesLoaded) {
       console.log('images not lazy loaded');
+      const start = Date.now();
       initImages((err) => {
         if (err) {
           callback(err);
         } else {
+          console.log('loading images took ' + (Date.now() - start) + ' ms');
           loaded();
         }
       });
@@ -908,9 +909,9 @@ function drawImage(player, dealerCards, showHoleCard, callback) {
 function drawBlackjackTable(player, dealer, callback) {
   // First, check if the image already exists
   const key = 'blackjackparty/' + imageName(player, dealer) + '.png';
-  const getParams = {Bucket: 'garrett-alexa-images', Key: key};
   const image = blackjackTable.clone();
   let url;
+  let start = Date.now();
 
   // Get bounding rects for player and dealer hands
   // and try to fit in a 480x480 space for Echo Spot
@@ -928,6 +929,8 @@ function drawBlackjackTable(player, dealer, callback) {
   left = Math.floor((tableWidth - dealerDim.width) / 2);
   top = Math.floor((tableHeight - totalHeight) / 2);
   drawDealer(image, dealer, top, left);
+  console.log('image creation took ' + (Date.now() - start) + ' ms');
+  start = Date.now();
 
   // Now write to S3
   image.getBuffer(Jimp.MIME_PNG, (err, data) => {
@@ -938,12 +941,14 @@ function drawBlackjackTable(player, dealer, callback) {
       }
     } else {
       s3.putObject({Body: data,
-           Bucket: 'garrett-alexa-images',
-           Key: key}, (err, data) => {
+          ACL: 'public-read',
+          Bucket: 'garrett-alexa-images',
+          Key: key}, (err, data) => {
+        console.log('s3 save took ' + (Date.now() - start) + ' ms');
         if (err) {
           console.log(err, err.stack);
         } else {
-          url = s3.getSignedUrl('getObject', getParams);
+          url = 'https://s3.amazonaws.com/garrett-alexa-images/' + key;
         }
         if (callback) {
           callback(err, url);

@@ -77,10 +77,7 @@ const saveResponseInterceptor = {
         utils.drawTable(handlerInput, () => {
           if (response.shouldEndSession) {
             // We are meant to end the session
-            console.log('Saving attributes');
-            attributes.temp = undefined;
-            handlerInput.attributesManager.setPersistentAttributes(attributes);
-            handlerInput.attributesManager.savePersistentAttributes()
+            SessionEnd.handle(handlerInput)
             .then(() => {
               resolve();
             })
