@@ -9,6 +9,7 @@ const common = {
   'ADD_PLAYER_REPROMPT': 'Say the name of the player to add.',
   'ADD_PLAYER_TABLE_FULL': 'Sorry the table is full with six players. Say deal to start the game.',
   'ADD_PLAYER_TABLE_FULL_REPROMPT': 'Say deal to start the game.',
+  'ADD_PLAYER_UKNOWN': 'Sorry, I didn\'t get the name of a person to add. Try saying the name again. ',
   // From PlayerName.js
   'PLAYER_GOTNAME': 'I heard {0}, is that correct?',
   'PLAYER_GOTNAME_REPROMPT': 'Say yes if {0} is the name you want to add.',

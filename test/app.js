@@ -7,7 +7,7 @@ AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const USERID = 'not-amazon';
 const DEVICEID = 'not-amazon';
-const LOCALE = 'en-GB';
+const LOCALE = 'en-CA';
 
 function BuildEvent(argv)
 {
@@ -20,6 +20,7 @@ function BuildEvent(argv)
     var betIntent = {"name": "BetAmountIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
     var changeBetsIntent = {"name": "ChangeBetsIntent", "slots": {}};
     var dealIntent = {"name": "DealIntent", "slots": {}};
+    var fallbackIntent = {"name": "AMAZON.FallbackIntent", "slots": {}};
     var yesIntent = {"name": "AMAZON.YesIntent", "slots": {}};
     var noIntent = {"name": "AMAZON.NoIntent", "slots": {}};
     var stopIntent = {"name": "AMAZON.StopIntent", "slots": {}};
@@ -255,6 +256,10 @@ function BuildEvent(argv)
     else if (argv[2] == "reset")
     {
         lambda.request.intent = resetIntent;
+    }
+    else if (argv[2] == "fallback")
+    {
+        lambda.request.intent = fallbackIntent;
     }
     else if (argv[2] == "yes")
     {

@@ -12,13 +12,22 @@ module.exports = {
     const request = handlerInput.requestEnvelope.request;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     return ((request.type === 'IntentRequest')
-      && (request.intent.name === 'AddPlayerIntent')
-      && attributes.temp.firsthand);
+      && ((request.intent.name === 'AddPlayerIntent') || (request.intent.name == 'AMAZON.FallbackIntent'))
+      && attributes.temp.firsthand
+      && !attributes.temp.addingName);
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../resources')(event.request.locale);
+
+    // If this is fallback, let them know we didn't hear the name
+    if (handlerInput.requestEnvelope.request.intent.name == 'AMAZON.FallbackIntent') {
+      handlerInput.responseBuilder
+        .speak(res.strings.ADD_PLAYER_UKNOWN)
+        .reprompt(res.strings.ADD_PLAYER_REPROMPT);
+      return;
+    }
 
     // If reset table is true, nuke the current table and start over
     if (attributes.temp.resetTable) {

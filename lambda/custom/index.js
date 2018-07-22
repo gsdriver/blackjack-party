@@ -139,7 +139,6 @@ function runGame(event, context, callback) {
       ConfirmName,
       Exit,
       Help,
-      Repeat,
       Rules,
       Training,
       HighScore,
@@ -153,6 +152,7 @@ function runGame(event, context, callback) {
       Insurance,
       BetAmount,
       SessionEnd,
+      Repeat,
       Unhandled
     )
     .addErrorHandlers(ErrorHandler)

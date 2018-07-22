@@ -271,7 +271,7 @@ module.exports = {
     const id = game.players[currentPlayer];
     let name;
 
-    if (attributes.playerList[id] && attributes.playerList[id].name) {
+    if (attributes.playerList && attributes.playerList[id] && attributes.playerList[id].name) {
       name = attributes.playerList[id].name + ' <break time=\'200ms\'/> ';
     } else {
       name = resources.strings.CURRENT_PLAYER.replace('{0}', currentPlayer + 1);
