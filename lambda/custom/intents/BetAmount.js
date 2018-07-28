@@ -5,6 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
+const buttons = require('../buttons');
 
 module.exports = {
   canHandle(handlerInput) {
@@ -12,7 +13,7 @@ module.exports = {
 
     if ((request.type === 'IntentRequest') &&
         (request.intent.name === 'BetAmountIntent')) {
-      // You ned to be actively changing bet amounts
+      // You need to be actively changing bet amounts
       const attributes = handlerInput.attributesManager.getSessionAttributes();
       if (attributes.temp.changingBets !== undefined) {
         return true;
@@ -74,6 +75,14 @@ module.exports = {
           reprompt = res.strings.CHANGEBETS_REPROMPT;
           speech += (utils.readPlayerName(attributes, attributes.temp.changingBets) + reprompt);
           handlerInput.responseBuilder.speak(speech).reprompt(reprompt);
+
+          // Color this player if they have a button associated
+          buttons.disableButtons(handlerInput);
+          if (attributes.temp.buttons &&
+            attributes.temp.buttons[game.players[attributes.temp.changingBets]]) {
+            const button = attributes.temp.buttons[game.players[attributes.temp.changingBets]];
+            buttons.colorButton(handlerInput, button.id, button.color);
+          }
         } else {
           // OK, all bets have been set - let's deal
           const action = {action: 'deal', amount: 0};
@@ -81,6 +90,7 @@ module.exports = {
             (error, response, dealSpeech, dealReprompt) => {
             if (!error) {
               attributes.temp.firsthand = undefined;
+              attributes.temp.firstplay = undefined;
 
               // Set each player's timestamp and hands played
               game.players.forEach((player) => {

@@ -6,6 +6,7 @@
 
 const utils = require('../utils');
 const gameService = require('../GameService');
+const buttons = require('../buttons');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -13,14 +14,19 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     if (request.type === 'GameEngine.InputHandlerEvent') {
-      return (utils.getPressedButton(request, attributes)
-        && attributes.temp.firsthand);
+      return (buttons.getPressedButton(request, attributes)
+        && attributes.temp.firstplay);
     }
 
-    return ((request.type === 'IntentRequest')
+    if ((request.type === 'IntentRequest')
       && ((request.intent.name === 'AddPlayerIntent') || (request.intent.name == 'AMAZON.FallbackIntent'))
-      && attributes.temp.firsthand
-      && !attributes.temp.addingName);
+      && attributes.temp.firstplay
+      && !attributes.temp.addingName) {
+      attributes.temp.buttonId = undefined;
+      return true;
+    }
+
+    return false;
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
@@ -44,7 +50,10 @@ module.exports = {
     const game = attributes[attributes.currentGame];
 
     // New player!  If there was a player already being added, add them
-    if (attributes.temp.addingPlayer) {
+    // UNLESS this is the first player and they pressed the button
+    // because that means they want to tie this player to this button
+    if (attributes.temp.addingPlayer &&
+      !(!game.players.length && !attributes.temp.addingButton && attributes.temp.buttonId)) {
       utils.addPlayer(handlerInput);
     }
 
@@ -57,15 +66,24 @@ module.exports = {
       // Start adding a new player
       attributes.temp.addingPlayer = Date.now();
       attributes.temp.addingButton = attributes.temp.buttonId;
-      const format = (game.players.length == 3)
-        ? res.strings.ADD_LAST_PLAYER
-        : res.strings.ADD_PLAYER;
+      if (attributes.temp.buttonId) {
+        buttons.colorButton(handlerInput, attributes.temp.buttonId,
+            buttons.getPlayerColor(game.players.length));
+      }
+      let format;
+      if (game.players.length === 3) {
+        format = res.strings.ADD_LAST_PLAYER;
+      } else if (attributes.temp.buttonId) {
+        format = res.strings.ADD_PLAYER_BUTTON;
+      } else {
+        format = res.strings.ADD_PLAYER;
+      }
       handlerInput.responseBuilder
         .speak(format.replace('{0}', (game.players.length + 1)))
         .reprompt(res.strings.ADD_PLAYER_REPROMPT);
 
       if (event.request.type === 'GameEngine.InputHandlerEvent') {
-        utils.startInputHandler(handlerInput);
+        buttons.startInputHandler(handlerInput);
       }
     }
   },

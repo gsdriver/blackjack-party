@@ -69,6 +69,7 @@ module.exports = {
             .speak(speech)
             .reprompt(reprompt);
         } else {
+          attributes.temp.firstplay = undefined;
           handlerInput.responseBuilder
             .speak(error)
             .reprompt(res.strings.ERROR_REPROMPT);

@@ -5,6 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
+const buttons = require('../buttons');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -55,7 +56,7 @@ module.exports = {
 
         if ((event.request.type === 'GameEngine.InputHandlerEvent') &&
           (game.players.length < 4)) {
-          utils.startInputHandler(handlerInput);
+          buttons.startInputHandler(handlerInput);
         }
 
         handlerInput.responseBuilder

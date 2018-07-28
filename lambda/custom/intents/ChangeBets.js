@@ -5,6 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
+const buttons = require('../buttons');
 
 module.exports = {
   canHandle(handlerInput) {
@@ -26,6 +27,7 @@ module.exports = {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../resources')(event.request.locale);
+    const game = attributes[attributes.currentGame];
 
     // First off, if they were in the midst of adding a player, add it
     if (attributes.temp.addingPlayer) {
@@ -37,6 +39,13 @@ module.exports = {
     const reprompt = res.strings.CHANGEBETS_REPROMPT;
     const speech = utils.readPlayerName(attributes, attributes.temp.changingBets) + reprompt;
 
+    // Color this player if they have a button associated
+    buttons.disableButtons(handlerInput);
+    if (attributes.temp.buttons &&
+      attributes.temp.buttons[game.players[attributes.temp.changingBets]]) {
+      const button = attributes.temp.buttons[game.players[attributes.temp.changingBets]];
+      buttons.colorButton(handlerInput, button.id, button.color);
+    }
     handlerInput.responseBuilder
       .speak(speech)
       .reprompt(reprompt);

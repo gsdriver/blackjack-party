@@ -51,6 +51,7 @@ const requestInterceptor = {
             // round of the session - set the temp attributes
             attributes.temp = {};
             attributes.temp.firsthand = true;
+            attributes.temp.firstplay = true;
             attributes.sessions = (attributes.sessions + 1) || 1;
             attributesManager.setSessionAttributes(attributes);
             responseBuilder = handlerInput.responseBuilder;

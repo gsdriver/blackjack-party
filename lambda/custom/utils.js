@@ -5,6 +5,7 @@
 'use strict';
 
 const gameService = require('./GameService');
+const buttons = require('./buttons');
 const speechUtils = require('alexa-speech-utils')();
 const Jimp = require('jimp');
 const AWS = require('aws-sdk');
@@ -254,11 +255,17 @@ module.exports = {
     // Add to the table
     game.players.push(id);
     game.playerHands[id] = {};
-    if (attributes.temp.buttonId) {
-      const colors = ['00FE10', 'FF0000', '0000FF', 'FFFF00'];
-      game.playerHands[id].buttonId = attributes.temp.addingButton;
-      game.playerHands[id].buttonColor = colors[game.players.length - 1];
-      colorButton(handlerInput, game.playerHands[id]);
+    if (attributes.temp.addingButton) {
+      // Save this button id
+      if (!attributes.temp.buttons) {
+        attributes.temp.buttons = {};
+      }
+      attributes.temp.buttons[id] = {
+        id: attributes.temp.addingButton,
+        color: buttons.getPlayerColor(game.players.length - 1),
+      };
+      buttons.colorButton(handlerInput, attributes.temp.buttons[id].id,
+          attributes.temp.buttons[id].color);
       attributes.temp.addingButton = undefined;
     }
     if (!attributes.playerList[id]) {
@@ -287,48 +294,6 @@ module.exports = {
     }
 
     return name;
-  },
-  getPressedButton: function(request, attributes) {
-    const gameEngineEvents = request.events || [];
-
-    gameEngineEvents.forEach((engineEvent) => {
-      // in this request type, we'll see one or more incoming events
-      // corresponding to the StartInputHandler we sent above
-      if (engineEvent.name === 'timeout') {
-        console.log('Timed out waiting for button');
-      } else if (engineEvent.name === 'button_down_event') {
-        // save id of the button that triggered event
-        console.log('Received button down request');
-        attributes.usedButton = true;
-        attributes.temp.buttonId = engineEvent.inputEvents[0].gadgetId;
-      }
-    });
-
-    return (attributes.temp.buttonId);
-  },
-  startInputHandler: function(handlerInput) {
-    // We'll allow them to press the button again
-    handlerInput.responseBuilder.addDirective({
-      'type': 'GameEngine.StartInputHandler',
-      'timeout': 30000,
-      'recognizers': {
-        'button_down_recognizer': {
-          'type': 'match',
-          'fuzzy': false,
-          'anchor': 'end',
-          'pattern': [{
-            'action': 'down',
-          }],
-        },
-      },
-      'events': {
-        'button_down_event': {
-          'meets': ['button_down_recognizer'],
-          'reports': 'matches',
-          'shouldEndInputHandler': true,
-        },
-      },
-    });
   },
   drawTable: function(handlerInput, callback) {
     const response = handlerInput.responseBuilder;
@@ -490,8 +455,11 @@ function tellResult(handlerInput, locale, action, oldGame) {
   if ((game.currentPlayer != oldGame.currentPlayer) && (game.players.length > 1)) {
     result += module.exports.readPlayerName(attributes);
     result += readHand(attributes, game, attributes.playerLocale, true);
-    if (game.playerHands[game.players[game.currentPlayer]].buttonId) {
-      colorButton(handlerInput, game.playerHands[game.players[game.currentPlayer]], true);
+
+    buttons.disableButtons(handlerInput);
+    if (attributes.temp.buttons && attributes.temp.buttons[game.players[game.currentPlayer]]) {
+      const button = attributes.temp.buttons[game.players[game.currentPlayer]];
+      buttons.colorButton(handlerInput, button.id, button.color);
     }
   } else {
     // So what happened?
@@ -537,10 +505,11 @@ function tellResult(handlerInput, locale, action, oldGame) {
 
   if ((oldGame.activePlayer == 'player') && (game.activePlayer != 'player')) {
     // OK, game over - is this a new high bankroll?
-    const bankroll = gameService.getBankroll(attributes);
-    if (bankroll > attributes.playerList[game.players[game.currentPlayer]].high) {
-      attributes.playerList[game.players[game.currentPlayer]].high = bankroll;
-    }
+    game.players.forEach((player) => {
+      if (attributes.playerList[player].bankroll > attributes.playerList[player].high) {
+        attributes.playerList[player].high = attributes.playerList[player].bankroll;
+      }
+    });
   }
 
   return result;
@@ -921,82 +890,6 @@ function rulesToText(locale, rules, changeRules) {
   }
 
   return text;
-}
-
-function colorButton(handlerInput, player, steadyState) {
-  // Pulse the button so they know it's their turn
-  // Followed by keeping the button lit their color
-  const buttonIdleDirective = {
-    'type': 'GadgetController.SetLight',
-    'version': 1,
-    'targetGadgets': [player.buttonId],
-    'parameters': {
-      'animations': [{
-        'repeat': 1,
-        'targetLights': ['1'],
-        'sequence': [
-          {
-            'durationMs': 400,
-            'color': player.buttonColor,
-            'blend': true,
-          },
-          {
-            'durationMs': 300,
-            'color': '000000',
-            'blend': true,
-          },
-          {
-            'durationMs': 400,
-            'color': player.buttonColor,
-            'blend': true,
-          },
-          {
-            'durationMs': 300,
-            'color': '000000',
-            'blend': true,
-          },
-        ],
-      }],
-      'triggerEvent': 'none',
-      'triggerEventTimeMs': 0,
-    },
-  };
-
-  if (steadyState) {
-    buttonIdleDirective.parameters.animations[0].sequence.push({
-      'durationMs': 30000,
-      'color': player.buttonColor,
-      'blend': false,
-    });
-
-    // And turn off the other buttons
-    const disableButtonDirective = {
-      'type': 'GadgetController.SetLight',
-      'version': 1,
-      'targetGadgets': [],
-      'parameters': {
-        'animations': [{
-          'repeat': 1,
-          'targetLights': ['1'],
-          'sequence': [
-            {
-              'durationMs': 400,
-              'color': '000000',
-              'blend': false,
-            },
-          ],
-        }],
-        'triggerEvent': 'none',
-        'triggerEventTimeMs': 0,
-      },
-    };
-
-    handlerInput.responseBuilder
-      .addDirective(disableButtonDirective);
-  }
-
-  handlerInput.responseBuilder
-    .addDirective(buttonIdleDirective);
 }
 
 //

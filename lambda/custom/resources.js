@@ -5,6 +5,7 @@
 const common = {
   // From AddPlayer.js
   'ADD_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game. ',
+  'ADD_PLAYER_BUTTON': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player or press another Echo button to leave this player unnamed <break time=\'200ms\'/> or deal to start the game. ',
   'ADD_LAST_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> or deal to start the game.',
   'ADD_PLAYER_REPROMPT': 'Say the name of the player to add.',
   'ADD_PLAYER_TABLE_FULL': 'Sorry the table is full with four players. Say deal to start the game.',
@@ -43,10 +44,11 @@ const common = {
   'HELP_CARD_TEXT': 'When you start the skill, say DEAL to continue with an existing table or ADD A PLAYER to reset the players at the table. You can only change the players at the start of a round. If you want to change the bets for each player, say CHANGE BETS which will allow you to set an amount to bet for each player separately.\nYou can say DEAL to start the game. You can say READ HIGH SCORES to hear the peak bankrolls for each member of your party.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules of the game.',
   // From Launch.js
   'LAUNCH_WELCOME': '{"standard":"Thanks for joining Blackjack Party! "}',
-  'LAUNCH_START_GAME': 'Say add a player to start a new table or deal to start a new game with this table',
+  'LAUNCH_START_GAME': 'Say add a player to start a new table or deal to start a new game with this table. ',
   'LAUNCH_START_HAND_INPROGRESS': 'Say add a player to start a new table or pick up where you left off. ',
+  'LAUNCH_START_BUTTON': 'If you have an Echo Button, you can also press the button to start a new table.',
   'LAUNCH_ADD_PLAYER': 'This skill lets up to four people play at a Blackjack table. What is the name of the first player? ',
-  'LAUNCH_ADD_PLAYER_BUTTON': 'If you have an Echo button, you can also press the button to join as an unnamed player.',
+  'LAUNCH_ADD_PLAYER_BUTTON': 'If you have an Echo button, you can also press the button to tie it to this player.',
   'LAUNCH_TABLE_INPROGRESS': 'You have a table in progress ',
   'LAUNCH_TABLE_NAMES': 'with {0} players including {1}. ',
   'LAUNCH_TABLE_PLAYERS': 'with {0} players. ',

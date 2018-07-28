@@ -40,6 +40,7 @@ module.exports = {
       (error, response, speech, reprompt) => {
       if (!error) {
         attributes.temp.firsthand = undefined;
+        attributes.temp.firstplay = undefined;
 
         // Set each player's timestamp and hands played
         const now = Date.now();
