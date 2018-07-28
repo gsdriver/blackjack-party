@@ -26,7 +26,7 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     attributes.suggestRequests = (attributes.suggestRequests + 1) || 1;
-    utils.playBlackjackAction(attributes,
+    utils.playBlackjackAction(handlerInput,
       event.request.locale, {action: 'suggest'},
       (error, response, speech, reprompt) => {
       if (!error) {

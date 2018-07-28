@@ -298,14 +298,17 @@ function deal(attributes) {
 
   // Clear out the hands
   game.dealerHand.cards = [];
-  game.playerHands = {};
 
   // Now deal the cards - first two to each player
   game.players.forEach((player) => {
+    const buttonId = game.playerHands[player].buttonId;
+    const buttonColor = game.playerHands[player].buttonColor;
+
     hand = JSON.parse(JSON.stringify(newHand));
     hand.cards.push(game.deck.cards.shift());
     hand.cards.push(game.deck.cards.shift());
-    game.playerHands[player] = {hands: [], currentPlayerHand: 0};
+    game.playerHands[player] = {hands: [], currentPlayerHand: 0,
+      buttonId: buttonId, buttonColor: buttonColor};
     game.playerHands[player].hands.push(hand);
     game.playerHands[player].specialState = null;
     hand.bet = Number(attributes.playerList[player].bet);

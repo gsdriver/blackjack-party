@@ -22,14 +22,15 @@ module.exports = {
     const game = attributes[attributes.currentGame];
     const res = require('../resources')(event.request.locale);
 
-    if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
+    if ((handlerInput.requestEnvelope.request.type === 'GameEngine.InputHandlerEvent') ||
+      (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent')) {
       // Great, add the player
       let speech;
       let newPlayer = true;
       const name = attributes.temp.addingName;
 
       // First, have we already added this player?
-      if (attributes.playerList) {
+      if (attributes.playerList && name) {
         game.players.forEach((player) => {
           if (attributes.playerList[player] && (attributes.playerList[player].name === name)) {
             newPlayer = false;
@@ -45,11 +46,16 @@ module.exports = {
           .speak(speech)
           .reprompt(res.strings.CONFIRM_DUPLICATE_REPROMPT);
       } else {
-        speech = (game.players.length == 5)
+        speech = (game.players.length == 3)
           ? res.strings.CONFIRM_MAX_PLAYERS
           : res.strings.CONFIRM_ADD_PLAYER;
-        if (!utils.addPlayer(attributes)) {
+        if (!utils.addPlayer(handlerInput)) {
           speech = res.strings.CONFIRM_WELCOME_BACK.replace('{0}', name) + speech;
+        }
+
+        if ((event.request.type === 'GameEngine.InputHandlerEvent') &&
+          (game.players.length < 4)) {
+          utils.startInputHandler(handlerInput);
         }
 
         handlerInput.responseBuilder

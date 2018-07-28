@@ -62,7 +62,7 @@ module.exports = {
     }
 
     if (actionObj.action) {
-      utils.playBlackjackAction(attributes, event.request.locale,
+      utils.playBlackjackAction(handlerInput, event.request.locale,
           actionObj, (error, response, speech, reprompt) => {
         if (!error) {
           handlerInput.responseBuilder

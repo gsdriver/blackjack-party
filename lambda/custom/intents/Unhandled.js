@@ -19,7 +19,10 @@ module.exports = {
 
     // Echo back the action that we heard, why this isn't valid at this time,
     // and what the possible actions are for them to say
-    if (!event.request.intent) {
+    if (event.request.type === 'GameEngine.InputHandlerEvent') {
+      // Probably a timeout - fail silently
+      console.log('Unhandled button event: ' + JSON.stringify(event.request.events));
+    } else if (!event.request.intent) {
       // Something we really don't handle
       console.log('Error - Unhandled didn\'t get an intent');
       handlerInput.responseBuilder

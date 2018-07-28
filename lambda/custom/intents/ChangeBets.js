@@ -29,7 +29,7 @@ module.exports = {
 
     // First off, if they were in the midst of adding a player, add it
     if (attributes.temp.addingPlayer) {
-      utils.addPlayer(attributes);
+      utils.addPlayer(handlerInput);
     }
 
     // Now, we'll loop through each player and prompt for a new amount to bet

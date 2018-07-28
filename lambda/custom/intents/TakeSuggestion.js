@@ -43,7 +43,7 @@ module.exports = {
       attributes.tookSuggestion.no = (attributes.tookSuggestion.no + 1) || 1;
     }
 
-    utils.playBlackjackAction(attributes,
+    utils.playBlackjackAction(handlerInput,
       event.request.locale,
       actionObj, (error, response, speech, reprompt) => {
       if (!error) {

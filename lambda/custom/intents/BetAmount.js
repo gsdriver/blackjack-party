@@ -77,7 +77,7 @@ module.exports = {
         } else {
           // OK, all bets have been set - let's deal
           const action = {action: 'deal', amount: 0};
-          utils.playBlackjackAction(attributes, event.request.locale, action,
+          utils.playBlackjackAction(handlerInput, event.request.locale, action,
             (error, response, dealSpeech, dealReprompt) => {
             if (!error) {
               attributes.temp.firsthand = undefined;

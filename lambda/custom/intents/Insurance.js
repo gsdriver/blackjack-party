@@ -30,7 +30,6 @@ module.exports = {
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const actionObj = {};
 
     if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
@@ -39,7 +38,7 @@ module.exports = {
       actionObj.action = 'noinsurance';
     }
 
-    utils.playBlackjackAction(attributes, event.request.locale, actionObj,
+    utils.playBlackjackAction(handlerInput, event.request.locale, actionObj,
       (error, response, speech, reprompt) => {
       if (!error) {
         handlerInput.responseBuilder

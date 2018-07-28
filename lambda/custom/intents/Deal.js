@@ -31,12 +31,12 @@ module.exports = {
 
     // First off, if they were in the midst of adding a player, add it
     if (attributes.temp.addingPlayer) {
-      utils.addPlayer(attributes);
+      utils.addPlayer(handlerInput);
     }
 
     // Play for the default amount
     const action = {action: 'deal', amount: 0, firsthand: attributes.temp.firsthand};
-    utils.playBlackjackAction(attributes, event.request.locale, action,
+    utils.playBlackjackAction(handlerInput, event.request.locale, action,
       (error, response, speech, reprompt) => {
       if (!error) {
         attributes.temp.firsthand = undefined;

@@ -4,17 +4,17 @@
 
 const common = {
   // From AddPlayer.js
-  'ADD_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game.',
+  'ADD_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game. ',
   'ADD_LAST_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> or deal to start the game.',
   'ADD_PLAYER_REPROMPT': 'Say the name of the player to add.',
-  'ADD_PLAYER_TABLE_FULL': 'Sorry the table is full with six players. Say deal to start the game.',
+  'ADD_PLAYER_TABLE_FULL': 'Sorry the table is full with four players. Say deal to start the game.',
   'ADD_PLAYER_TABLE_FULL_REPROMPT': 'Say deal to start the game.',
   'ADD_PLAYER_UKNOWN': 'Sorry, I didn\'t get the name of a person to add. Try saying the name again. ',
   // From PlayerName.js
   'PLAYER_GOTNAME': 'I heard {0}, is that correct?',
   'PLAYER_GOTNAME_REPROMPT': 'Say yes if {0} is the name you want to add.',
   // From ConfirmName.js
-  'CONFIRM_MAX_PLAYERS': 'The table is full with six players. Say deal to start the game.',
+  'CONFIRM_MAX_PLAYERS': 'The table is full with four players. Say deal to start the game.',
   'CONFIRM_ADD_PLAYER': 'Say add a player to add more players, or deal to start the game.',
   'CONFIRM_WELCOME_BACK': 'Welcome back {0}. ',
   'CONFIRM_DUPLICATE_PLAYER': 'Sorry {0} is already at this table and each player must have a unique name. <break time=\'200ms\'/> ',
@@ -45,7 +45,8 @@ const common = {
   'LAUNCH_WELCOME': '{"standard":"Thanks for joining Blackjack Party! "}',
   'LAUNCH_START_GAME': 'Say add a player to start a new table or deal to start a new game with this table',
   'LAUNCH_START_HAND_INPROGRESS': 'Say add a player to start a new table or pick up where you left off. ',
-  'LAUNCH_ADD_PLAYER': 'This skill lets up to six people play at a Blackjack table. What is the name of the first player? ',
+  'LAUNCH_ADD_PLAYER': 'This skill lets up to four people play at a Blackjack table. What is the name of the first player? ',
+  'LAUNCH_ADD_PLAYER_BUTTON': 'If you have an Echo button, you can also press the button to join as an unnamed player.',
   'LAUNCH_TABLE_INPROGRESS': 'You have a table in progress ',
   'LAUNCH_TABLE_NAMES': 'with {0} players including {1}. ',
   'LAUNCH_TABLE_PLAYERS': 'with {0} players. ',
