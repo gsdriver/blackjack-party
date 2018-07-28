@@ -27,6 +27,7 @@ module.exports = {
     let id;
     let name;
 
+    // Active players
     for (id in attributes.playerList) {
       if (attributes.playerList[id].high) {
         if (attributes.playerList[id] && attributes.playerList[id].name) {
@@ -39,6 +40,17 @@ module.exports = {
           hands: attributes.playerList[id].hands,
           high: attributes.playerList[id].high});
       }
+    }
+
+    // And saved off unnamed players
+    if (attributes.oldPlayers && attributes.oldPlayers.scores) {
+      attributes.oldPlayers.scores.forEach((player) => {
+        leaders.push({
+          name: res.strings.HIGHSCORE_NONAME,
+          hands: player.hands,
+          high: player.high,
+        });
+      });
     }
 
     leaders.sort((a, b) => (a.high == b.high) ? (b.hands - a.hands) : (b.high - a.high));
