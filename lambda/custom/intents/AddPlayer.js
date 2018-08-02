@@ -19,7 +19,9 @@ module.exports = {
     }
 
     if ((request.type === 'IntentRequest')
-      && ((request.intent.name === 'AddPlayerIntent') || (request.intent.name == 'AMAZON.FallbackIntent'))
+      && ((request.intent.name === 'AddPlayerIntent') ||
+        (request.intent.name === 'AMAZON.NextIntent') ||
+        (request.intent.name === 'AMAZON.FallbackIntent'))
       && attributes.temp.firstplay
       && !attributes.temp.addingName) {
       attributes.temp.buttonId = undefined;

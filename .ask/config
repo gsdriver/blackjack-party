@@ -14,7 +14,20 @@
           }
         }
       },
-      "in_skill_products": []
+      "in_skill_products": [],
+      "resources": {
+        "lambda": [
+          {
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty",
+            "awsRegion": "us-east-1",
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "revisionId": "f777562f-ba6b-424a-b106-44182116235f"
+          }
+        ]
+      }
     }
   }
 }

@@ -11,8 +11,7 @@ const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 module.exports = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
-    return ((request.type === 'IntentRequest') &&
-      (request.intent.name === 'SessionEndedRequest'));
+    return (request.type === 'SessionEndedRequest');
   },
   handle: function(handlerInput) {
     console.log('End session - saving attributes');
