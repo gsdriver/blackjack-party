@@ -7,7 +7,7 @@ AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const USERID = 'not-amazon';
 const DEVICEID = 'not-amazon';
-const LOCALE = 'en-CA';
+const LOCALE = 'en-AU';
 
 function BuildEvent(argv)
 {
@@ -146,11 +146,11 @@ function BuildEvent(argv)
        "type":"CanFulfillIntentRequest",
        "requestId":"EdwRequestId.12",
        "intent":{
-         "name":"ChangeRulesIntent",
+         "name":"PlayerNameIntent",
          "slots":{
-           "Change":{
-             "name":"Change",
-             "value":"decks"
+           "Name":{
+             "name":"Name",
+             "value":"John"
            },
            "ChangeOption":{
              "name":"ChangeOption",

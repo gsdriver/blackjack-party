@@ -36,7 +36,7 @@ const common = {
   // From HighScore.js
   'HIGHSCORE_NONAME': 'an unnamed player',
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
-  'HIGHSCORE_LEADERS': 'The top {0} peak bankrolls are {1}. ',
+  'HIGHSCORE_LEADERS': 'The top {0} peak bankrolls are {1}. What else can I help you with?',
   // From Help.js
   'HELP_CHANGING_PLAYERS': 'At the start of the game, set your table by saying add a player. You can then give each player a name, saying deal when you are ready to play. To change each player\'s bet, say change bets and then the amount you want each person to bet. ',
   'HELP_GENERIC_HELP': 'You can play a game by saying Deal <break time=\'200ms\'/> or you can say enable training mode if you would like me to prompt when your play differs from Basic Strategy. <break time=\'300ms\'/> Now, what can I help you with?',
