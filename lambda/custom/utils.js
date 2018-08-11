@@ -185,7 +185,9 @@ module.exports = {
     let result = '';
 
     // If they are managing players, tell them about player-related stuff
-    if (attributes.temp.addingName || attributes.temp.firsthand ||
+    if (attributes.temp.addingName) {
+      result = resources.strings.HELP_CONFIRMING_NAME.replace('{0}', attributes.temp.addingName);
+    } else if (attributes.temp.firsthand ||
       (attributes.temp.changingBets !== undefined)) {
       result = resources.strings.HELP_CHANGING_PLAYERS;
     } else if (game.possibleActions.indexOf('noinsurance') >= 0) {

@@ -20,7 +20,8 @@ module.exports = {
       const event = handlerInput.requestEnvelope;
       const game = attributes[attributes.currentGame];
 
-      if (game.players && (game.players.length > 0) && attributes.temp.hands) {
+      if (game.players && (game.players.length > 0) && attributes.temp.hands
+          && !process.env.NOSAVETABLE) {
         // Get named players and button players
         const buttons = (attributes.temp.buttons) ? Object.keys(attributes.temp.buttons).length : 0;
         let named = 0;

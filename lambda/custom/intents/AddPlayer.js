@@ -14,7 +14,7 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     if (request.type === 'GameEngine.InputHandlerEvent') {
-      return (buttons.getPressedButton(request, attributes)
+      return ((buttons.getPressedButton(request, attributes) === 'new')
         && attributes.temp.firstplay);
     }
 

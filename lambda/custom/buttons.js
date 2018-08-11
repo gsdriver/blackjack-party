@@ -7,6 +7,7 @@
 module.exports = {
   getPressedButton: function(request, attributes) {
     const gameEngineEvents = request.events || [];
+    let result;
 
     gameEngineEvents.forEach((engineEvent) => {
       // in this request type, we'll see one or more incoming events
@@ -15,13 +16,28 @@ module.exports = {
         console.log('Timed out waiting for button');
       } else if (engineEvent.name === 'button_down_event') {
         // save id of the button that triggered event
+        // unless they only want a new (unseen) button
+        const buttonId = engineEvent.inputEvents[0].gadgetId;
         console.log('Received button down request');
         attributes.usedButton = true;
-        attributes.temp.buttonId = engineEvent.inputEvents[0].gadgetId;
+        result = 'new';
+
+        // Is this a new button?
+        if (buttonId === attributes.temp.buttonId) {
+          result = 'last';
+        } else if (attributes.temp.buttons) {
+          let button;
+          for (button in attributes.temp.buttons) {
+            if (button && (attributes.temp.buttons[button].id === buttonId)) {
+              result = 'existing';
+            }
+          }
+        }
+        attributes.temp.buttonId = buttonId;
       }
     });
 
-    return (attributes.temp.buttonId);
+    return result;
   },
   getPlayerColor: function(player) {
     const colors = ['00FE10', 'FF0000', '0000FF', 'FFFF00'];
@@ -46,7 +62,12 @@ module.exports = {
         'button_down_event': {
           'meets': ['button_down_recognizer'],
           'reports': 'matches',
-          'shouldEndInputHandler': true,
+          'shouldEndInputHandler': false,
+        },
+        'timeout': {
+          'meets': ['timed out'],
+          'reports': 'history',
+          'shouldEndInputHandler': false,
         },
       },
     });

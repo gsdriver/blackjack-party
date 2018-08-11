@@ -18,6 +18,7 @@ const Exit = require('./intents/Exit');
 const SessionEnd = require('./intents/SessionEnd');
 const Training = require('./intents/Training');
 const AddPlayer = require('./intents/AddPlayer');
+const RemovePlayer = require('./intents/RemovePlayer');
 const PlayerName = require('./intents/PlayerName');
 const ConfirmName = require('./intents/ConfirmName');
 const Unhandled = require('./intents/Unhandled');
@@ -137,7 +138,9 @@ function runGame(event, context, callback) {
 
   const skillFunction = skillBuilder.addRequestHandlers(
       Launch,
+      AddPlayer,
       ConfirmName,
+      RemovePlayer,
       Exit,
       Help,
       Rules,
@@ -145,7 +148,6 @@ function runGame(event, context, callback) {
       HighScore,
       Deal,
       ChangeBets,
-      AddPlayer,
       PlayerName,
       Blackjack,
       Suggest,

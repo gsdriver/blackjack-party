@@ -38,6 +38,7 @@ const common = {
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   'HIGHSCORE_LEADERS': 'The top {0} peak bankrolls are {1}. What else can I help you with?',
   // From Help.js
+  'HELP_CONFIRMING_NAME': 'Say yes or no to confirm if {0} is the correct name.',
   'HELP_CHANGING_PLAYERS': 'At the start of the game, set your table by saying add a player. You can then give each player a name, saying deal when you are ready to play. To change each player\'s bet, say change bets and then the amount you want each person to bet. ',
   'HELP_GENERIC_HELP': 'You can play a game by saying Deal <break time=\'200ms\'/> or you can say enable training mode if you would like me to prompt when your play differs from Basic Strategy. <break time=\'300ms\'/> Now, what can I help you with?',
   'HELP_CARD_TITLE': 'Blackjack Party Commands',
@@ -52,6 +53,9 @@ const common = {
   'LAUNCH_TABLE_INPROGRESS': 'You have a table in progress ',
   'LAUNCH_TABLE_NAMES': 'with {0} players including {1}. ',
   'LAUNCH_TABLE_PLAYERS': 'with {0} players. ',
+  // From RemovePlayer.js
+  'REMOVE_PLAYER_REMOVED': '{0} removed. Say add a player to add more players, or deal to start the game.',
+  'REMOVE_PLAYER_REPROMPT': 'Say add a player or deal',
   // From Rules.js
   'RULES_CARD_TITLE': 'Blackjack Rules',
   // From Training.js
@@ -371,7 +375,10 @@ const utils = (locale) => {
           break;
         case 'AddPlayerIntent':
           // This can only be done at the start of the game
-          return 'To change the players at the table, you have to exit the skill. ';
+          // and not while you are confirming a name
+          return (attributes.temp.addingName)
+            ? 'You first have to confirm the player name. '
+            : 'To change the players at the table, you have to exit the skill. ';
 
         // These should be handled - so log an error
         case 'AMAZON.RepeatIntent':

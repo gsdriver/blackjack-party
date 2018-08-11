@@ -12,10 +12,19 @@ module.exports = {
     const request = handlerInput.requestEnvelope.request;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
+    if (!attributes.temp.addingName) {
+      return false;
+    }
+
+    if (request.type === 'GameEngine.InputHandlerEvent') {
+      return ((buttons.getPressedButton(request, attributes) !== 'existing')
+        && attributes.temp.firstplay);
+    }
+
     return ((request.type === 'IntentRequest')
-      && attributes.temp.addingName
-      && ((request.intent.name === 'AMAZON.YesIntent') ||
-          (request.intent.name === 'AMAZON.NoIntent')));
+        && ((request.intent.name === 'AMAZON.YesIntent') ||
+          (request.intent.name === 'AMAZON.NoIntent') ||
+          (request.intent.name === 'AMAZON.CancelIntent')));
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
