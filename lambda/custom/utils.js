@@ -435,8 +435,8 @@ function tellResult(handlerInput, locale, action, oldGame) {
 
       // I don't want to re-read this hand if they just stood, so let's make sure they busted
       // or split Aces (which only draws one card) or did a double before we read this hand.
-      if ((oldHand.total >= 21) ||
-        (oldHand.bet > gameService.getCurrentHand(game).bet)) {
+      if ((oldHand.total > 21) ||
+        ((oldHand.cards.length > 2) && ((oldHand.total == 21) || (action == 'double')))) {
         result += resources.strings.CARD_DEAL_SOUND;
         if (oldHand.total > 21) {
           result += resources.strings.RESULT_AFTER_HIT_BUST

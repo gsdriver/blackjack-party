@@ -14,6 +14,7 @@ const common = {
   // From PlayerName.js
   'PLAYER_GOTNAME': 'I heard {0}, is that correct?',
   'PLAYER_GOTNAME_REPROMPT': 'Say yes if {0} is the name you want to add.',
+  'PLAYER_ADDPLAYER': 'I heard {0} for the <say-as interpret-as="ordinal">{1}</say-as> player, is that correct?',
   // From ConfirmName.js
   'CONFIRM_MAX_PLAYERS': 'The table is full with four players. Say deal to start the game.',
   'CONFIRM_ADD_PLAYER': 'Say add a player to add more players, or deal to start the game.',
