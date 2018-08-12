@@ -9,21 +9,23 @@ module.exports = {
     if (request.type === 'IntentRequest') {
       const attributes = handlerInput.attributesManager.getSessionAttributes();
       const game = attributes[attributes.currentGame];
-      if (request.intent.name === 'BlackjackIntent') {
-        // Valid if we are in game
-        if (game && (game.suggestion ||
-          ((game.possibleActions.indexOf('deal') == -1) &&
-           (game.possibleActions.indexOf('noinsurance') == -1)))) {
-          return true;
-        }
-      } else if (request.intent.name === 'AMAZON.YesIntent') {
+
+      if (request.intent.name === 'AMAZON.YesIntent') {
         // Valid if we are in game (no suggestion) AND there is
         // only one possible action we can take
-        if (game && !game.suggestion && game.possibleActions &&
+        return (game && !game.suggestion && game.possibleActions &&
           (game.possibleActions.length == 1) &&
           (game.possibleActions[0] !== 'deal') &&
-          (game.possibleActions[0] !== 'noinsurance')) {
+          (game.possibleActions[0] !== 'noinsurance'));
+      } else if (game && (game.suggestion ||
+        ((game.possibleActions.indexOf('deal') == -1) &&
+        (game.possibleActions.indexOf('noinsurance') == -1)))) {
+        // We are in a game
+        if (request.intent.name === 'BlackjackIntent') {
           return true;
+        } else if (request.intent.name === 'PlayerNameIntent') {
+          const res = require('../resources')(request.locale);
+          return res.getBlackjackAction(request.intent.slots.Name);
         }
       }
     }
@@ -41,7 +43,9 @@ module.exports = {
       actionObj.action = game.possibleActions[0];
     } else {
       // First make sure we have an action
-      const actionSlot = event.request.intent.slots.Action;
+      const actionSlot = (handlerInput.requestEnvelope.request.intent.name === 'PlayerNameIntent')
+        ? event.request.intent.slots.Name
+        : event.request.intent.slots.Action;
       if (!actionSlot) {
         handlerInput.responseBuilder
           .speak(res.strings.BLACKJACKINTENT_NO_ACTION)
