@@ -33,8 +33,6 @@ module.exports = {
     if (noSlotIntents.indexOf(event.request.intent.name) > -1) {
       valid = true;
     } else {
-      const res = require('../resources')(event.request.locale);
-
       if (event.request.intent.name == 'PlayerNameIntent') {
         // Need a name - any name
         if (event.request.intent.slots && event.request.intent.slots.Name
@@ -57,6 +55,7 @@ module.exports = {
       } else if (event.request.intent.name == 'BlackjackIntent') {
         if (event.request.intent.slots && event.request.intent.slots.Action
           && event.request.intent.slots.Action.value) {
+          const res = require('../resources')(event.request.locale);
           valid = res.getBlackjackAction(event.request.intent.slots.Action);
         }
       }

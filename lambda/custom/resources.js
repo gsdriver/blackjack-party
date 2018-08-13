@@ -350,7 +350,14 @@ const utils = (locale) => {
           response += 'give a suggestion ';
           break;
         case 'ChangeBetsIntent':
+          response += 'change bets ';
+          break;
         case 'BetAmountIntent':
+          // Let them know they have to say change bet first
+          if (game && game.possibleActions && game.possibleActions.length
+            && (game.possibleActions.indexOf('deal') >= 0)) {
+            return 'To change the amount bet, please say change bets. ';
+          }
           response += 'change bets ';
           break;
         case 'ResetIntent':

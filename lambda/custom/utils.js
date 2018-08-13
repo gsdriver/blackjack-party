@@ -277,6 +277,9 @@ module.exports = {
       attributes.playerList[id].name = attributes.temp.addingName;
       newPlayer = true;
     }
+    if (attributes.temp.addingBet) {
+      attributes.playerList[id].bet = attributes.temp.addingBet;
+    }
 
     attributes.temp.addingPlayer = undefined;
     attributes.temp.addingName = undefined;

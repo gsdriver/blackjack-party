@@ -13,9 +13,22 @@ module.exports = {
 
     if ((request.type === 'IntentRequest') &&
         (request.intent.name === 'BetAmountIntent')) {
-      // You need to be actively changing bet amounts
+      // You can place a bet if you are actively changing bet amounts
       const attributes = handlerInput.attributesManager.getSessionAttributes();
       if (attributes.temp.changingBets !== undefined) {
+        return true;
+      }
+
+      // If you're in the midst of adding a player, you can set a bet
+      if (attributes.temp.addingPlayer) {
+        return true;
+      }
+
+      // If it's the end of the hand and there is only one player,
+      // you can also change the bet
+      const game = attributes[attributes.currentGame];
+      if (game && (game.players.length === 1) &&
+        (game.possibleActions.indexOf('deal') >= 0)) {
         return true;
       }
     }
@@ -43,17 +56,25 @@ module.exports = {
     } else {
       let speech;
       let reprompt;
+      let bankroll;
+
+      if (attributes.temp.addingPlayer) {
+        bankroll = 5000;
+      } else if (attributes.temp.changingBets !== undefined) {
+        bankroll = attributes.playerList[game.players[attributes.temp.changingBets]].bankroll;
+      } else {
+        bankroll = attributes.playerList[game.players[0]].bankroll;
+      }
 
       // Verify this bet against table min, max, and bankroll
       if (amount < game.rules.minBet) {
         speech = res.strings.BET_BELOW_MIN
           .replace('{0}', amount)
           .replace('{1}', game.rules.minBet);
-      } else if (amount >
-        attributes.playerList[game.players[attributes.temp.changingBets]].bankroll) {
+      } else if (amount > bankroll) {
         speech = res.strings.BET_ABOVE_BANKROLL
           .replace('{0}', amount)
-          .replace('{1}', attributes.playerList[game.players[attributes.temp.changingBets]].bankroll);
+          .replace('{1}', bankroll);
       } else if (amount > game.rules.maxBet) {
         speech = res.strings.BET_ABOVE_MAX
           .replace('{0}', amount)
@@ -66,10 +87,17 @@ module.exports = {
           .reprompt(res.strings.BET_ERROR_REPROMPT);
       } else {
         // OK, change this player's bet
-        attributes.playerList[game.players[attributes.temp.changingBets]].bet = amount;
+        if (attributes.temp.addingPlayer) {
+          attributes.temp.addingBet = amount;
+        } else if (attributes.temp.changingBets !== undefined) {
+          attributes.playerList[game.players[attributes.temp.changingBets]].bet = amount;
+        } else {
+          attributes.playerList[game.players[0]].bet = amount;
+        }
         speech = res.strings.BET_AMOUNT_SET.replace('{0}', amount);
 
-        if (attributes.temp.changingBets < (game.players.length - 1)) {
+        if ((attributes.temp.changingBets !== undefined)
+          && (attributes.temp.changingBets < (game.players.length - 1))) {
           // On to the next player
           attributes.temp.changingBets++;
           reprompt = res.strings.CHANGEBETS_REPROMPT;
@@ -83,8 +111,12 @@ module.exports = {
             const button = attributes.temp.buttons[game.players[attributes.temp.changingBets]];
             buttons.colorButton(handlerInput, button.id, button.color);
           }
+        } else if (attributes.temp.addingPlayer) {
+          handlerInput.responseBuilder
+            .speak(speech)
+            .reprompt(res.strings.ERROR_REPROMPT);
         } else {
-          // OK, all bets have been set - let's deal
+          // OK, all bets have been set
           const action = {action: 'deal', amount: 0};
           utils.playBlackjackAction(handlerInput, event.request.locale, action,
             (error, response, dealSpeech, dealReprompt) => {
