@@ -196,7 +196,9 @@ const utils = (locale) => {
     },
     getBlackjackAction: function(actionSlot) {
       const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit', 'take 1': 'hit',
+        'draw': 'hit', 'drew': 'hit',
         'stand': 'stand', 'stay': 'stand', 'done': 'stand', 'dan': 'stand', 'stick': 'stand', 'don': 'stand',
+        'hold': 'stand', 'stan': 'stand',
         'surrender': 'surrender', 'give up': 'surrender',
         'double': 'double', 'double down': 'double',
         'split': 'split',

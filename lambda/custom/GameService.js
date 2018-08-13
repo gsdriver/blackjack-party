@@ -236,8 +236,8 @@ module.exports = {
   isPlayerBlackjack: function(game, player) {
     const check = (player ? player : game.players[0]);
     return ((game.playerHands[check].hands.length == 1) &&
-      (handTotal(game.playerHands[check].hands[0].cards) == 21) &&
-      (game.playerHands[check].hands[0].length == 2));
+      (handTotal(game.playerHands[check].hands[0].cards).total == 21) &&
+      (game.playerHands[check].hands[0].cards.length == 2));
   },
   getCurrentHand: function(game) {
     const player = module.exports.getCurrentPlayer(game);
@@ -493,7 +493,6 @@ function nextHand(game) {
         allPlayerBlackjack = false;
       }
     });
-
     if (allPlayerBlackjack) {
       game.activePlayer = (game.dealerHand.cards[1].rank == 1) ? 'player' : 'dealer';
     } else if ((handTotal(game.dealerHand.cards).total == 21)

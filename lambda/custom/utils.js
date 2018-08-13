@@ -421,87 +421,99 @@ function tellResult(handlerInput, locale, action, oldGame) {
     result += readSurrender(attributes, locale, true);
   }
 
-  if (oldGame.activePlayer == 'player') {
-    // It's possible they did something other than stand on the previous hand if this is a split
-    // If so, read that off first (but try to avoid it if they just stood on the prior hand)
-    const newCurrentHand = game.playerHands[game.players[game.currentPlayer]]
-      .currentPlayerHand;
-    const oldCurrentHand = oldGame.playerHands[oldGame.players[oldGame.currentPlayer]]
-      .currentPlayerHand;
+  // If you just dealt and the dealer had a blackjack (game over), read all hands
+  if ((action == 'deal') && (game.dealerHand.outcome == 'dealerblackjack')) {
+    // Start by reading the dealer hand (so they know the round is over)
+    // Then read everyone's hand and whether they won or pushed
+    // (if they happened to have blackjack too)
+    const dealerCardText = resources.readCard(game.dealerHand.cards[1], 'article', game.readSuit);
+    result += resources.strings.READHAND_DEALER_DONE.replace('{0}', dealerCardText);
+    result += readDealerAction(game, locale);
+    result += ' ';
+    result += readGameResult(attributes, true);
+  } else {
+    if (oldGame.activePlayer == 'player') {
+      // It's possible they did something other than stand on the previous hand if this is a split
+      // If so, read that off first (but try to avoid it if they just stood on the prior hand)
+      const newCurrentHand = game.playerHands[game.players[game.currentPlayer]]
+        .currentPlayerHand;
+      const oldCurrentHand = oldGame.playerHands[oldGame.players[oldGame.currentPlayer]]
+        .currentPlayerHand;
 
-    if ((game.currentPlayer != oldGame.currentPlayer) || (newCurrentHand != oldCurrentHand)) {
-      const oldHand = game.playerHands[oldGame.players[oldGame.currentPlayer]]
-        .hands[oldCurrentHand];
+      if ((game.currentPlayer != oldGame.currentPlayer) || (newCurrentHand != oldCurrentHand)) {
+        const oldHand = game.playerHands[oldGame.players[oldGame.currentPlayer]]
+          .hands[oldCurrentHand];
 
-      // I don't want to re-read this hand if they just stood, so let's make sure they busted
-      // or split Aces (which only draws one card) or did a double before we read this hand.
-      if ((oldHand.total > 21) ||
-        ((oldHand.cards.length > 2) && ((oldHand.total == 21) || (action == 'double')))) {
-        result += resources.strings.CARD_DEAL_SOUND;
-        if (oldHand.total > 21) {
-          result += resources.strings.RESULT_AFTER_HIT_BUST
-            .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
-        } else {
-          result += resources.strings.RESULT_AFTER_HIT_NOBUST
-            .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit))
-            .replace('{1}', oldHand.total);
+        // I don't want to re-read this hand if they just stood, so let's make sure they busted
+        // or split Aces (which only draws one card) or did a double before we read this hand.
+        if ((oldHand.total > 21) ||
+          ((oldHand.cards.length > 2) && ((oldHand.total == 21) || (action == 'double')))) {
+          result += resources.strings.CARD_DEAL_SOUND;
+          if (oldHand.total > 21) {
+            result += resources.strings.RESULT_AFTER_HIT_BUST
+              .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
+          } else {
+            result += resources.strings.RESULT_AFTER_HIT_NOBUST
+              .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit))
+              .replace('{1}', oldHand.total);
+          }
+
+          // And now preface with the next hand before we tell them what happened
+          result += readHandNumber(game,
+              game.playerHands[game.players[game.currentPlayer]].currentPlayerHand);
         }
-
-        // And now preface with the next hand before we tell them what happened
-        result += readHandNumber(game,
-            game.playerHands[game.players[game.currentPlayer]].currentPlayerHand);
       }
     }
-  }
-  // Always say new player and read their hand if current player shifted
-  if ((game.currentPlayer != oldGame.currentPlayer) && (game.players.length > 1)) {
-    result += module.exports.readPlayerName(attributes);
-    result += readHand(attributes, game, attributes.playerLocale, true);
+    // Always say new player and read their hand if current player shifted
+    if ((game.currentPlayer != oldGame.currentPlayer) && (game.players.length > 1)) {
+      result += module.exports.readPlayerName(attributes);
+      result += readHand(attributes, game, attributes.playerLocale, true);
 
-    buttons.disableButtons(handlerInput);
-    if (attributes.temp.buttons && attributes.temp.buttons[game.players[game.currentPlayer]]) {
-      const button = attributes.temp.buttons[game.players[game.currentPlayer]];
-      buttons.colorButton(handlerInput, button.id, button.color);
-    }
-  } else {
-    // So what happened?
-    switch (action) {
-      case 'resetbankroll':
-        result += resources.strings.RESULT_BANKROLL_RESET;
-        break;
-      case 'shuffle':
-        result += resources.strings.RESULT_DECK_SHUFFLED;
-        break;
-      case 'deal':
-        // A new hand was dealt
-        result += readHand(attributes, game, locale, true);
-        // If it is not the player's turn (could happen on dealer blackjack)
-        // then read the game result here too
-        if (game.activePlayer != 'player') {
-          result += ' ' + readGameResult(attributes);
-        }
-        break;
-      case 'hit':
-      case 'double':
-        // Tell them the new card, the total, and the dealer up card (or what they did)
-        result += readHit(attributes, locale);
-        break;
-      case 'stand':
-        // OK, let's read what the dealer had, what they drew, and what happened
-        result += readStand(attributes, locale);
-        break;
-      case 'insurance':
-      case 'noinsurance':
-        // Say whether the dealer had blackjack, and what the next thing is to do
-        result += readInsurance(attributes, locale);
-        break;
-      case 'split':
-        // OK, now you have multiple hands - makes reading the game state more interesting
-        result += readSplit(attributes, locale);
-        break;
-      case 'surrender':
-        result += readSurrender(attributes, locale);
-        break;
+      buttons.disableButtons(handlerInput);
+      if (attributes.temp.buttons && attributes.temp.buttons[game.players[game.currentPlayer]]) {
+        const button = attributes.temp.buttons[game.players[game.currentPlayer]];
+        buttons.colorButton(handlerInput, button.id, button.color);
+      }
+    } else {
+      // So what happened?
+      switch (action) {
+        case 'resetbankroll':
+          result += resources.strings.RESULT_BANKROLL_RESET;
+          break;
+        case 'shuffle':
+          result += resources.strings.RESULT_DECK_SHUFFLED;
+          break;
+        case 'deal':
+          // A new hand was dealt
+          result += readHand(attributes, game, locale, true);
+          // If it is not the player's turn (could happen on dealer blackjack)
+          // then read the game result here too
+          if (game.activePlayer != 'player') {
+            result += ' ' + readGameResult(attributes);
+          }
+          break;
+        case 'hit':
+        case 'double':
+          // Tell them the new card, the total, and the dealer up card (or what they did)
+          result += readHit(attributes, locale);
+          break;
+        case 'stand':
+          // OK, let's read what the dealer had, what they drew, and what happened
+          result += readStand(attributes, locale);
+          break;
+        case 'insurance':
+        case 'noinsurance':
+          // Say whether the dealer had blackjack, and what the next thing is to do
+          result += readInsurance(attributes, locale);
+          break;
+        case 'split':
+          // OK, now you have multiple hands - makes reading the game state more interesting
+          result += readSplit(attributes, locale);
+          break;
+        case 'surrender':
+          result += readSurrender(attributes, locale);
+          break;
+      }
     }
   }
 
@@ -553,13 +565,14 @@ function readDealerAction(game, locale) {
 //
 // Read the result of the game
 //
-function readGameResult(attributes) {
+function readGameResult(attributes, fullHand) {
   // Read the result for each player
   let outcome = '';
   const game = attributes[attributes.currentGame];
   let i;
+
   for (i = 0; i < game.players.length; i++) {
-    outcome += readPlayerResult(attributes, i);
+    outcome += readPlayerResult(attributes, i, fullHand);
   }
 
   // They are no longer a new user
@@ -573,13 +586,29 @@ function readGameResult(attributes) {
 //
 // Read the result of the game
 //
-function readPlayerResult(attributes, playerPos) {
+function readPlayerResult(attributes, playerPos, fullHand) {
   let i;
   let outcome = '';
   const game = attributes[attributes.currentGame];
   const currentPlayer = game.playerHands[game.players[playerPos]];
 
   outcome = module.exports.readPlayerName(attributes, playerPos);
+
+  if (fullHand) {
+    const currentHand = currentPlayer.hands[0];
+    const readCards = speechUtils.and(currentHand.cards.map((x) => {
+      return resources.readCard(x, false, game.readSuit);
+    }));
+    if ((currentPlayer.hands.length == 1) && (currentHand.cards.length == 2)
+      && (currentHand.total == 21)) {
+      outcome += resources.strings.READHAND_PLAYER_TOTAL_END_BLACKJACK.replace('{0}', readCards);
+    } else {
+      const resultFormat = (currentHand.soft) ? resources.strings.READHAND_PLAYER_TOTAL_END_SOFT
+                  : resources.strings.READHAND_PLAYER_TOTAL_END;
+      outcome += resultFormat.replace('{0}', readCards).replace('{1}', currentHand.total);
+    }
+  }
+
   if (currentPlayer.hands.length > 1) {
     // If more than one hand and the outcome is the same, say all hands
     let allSame = true;
