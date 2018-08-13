@@ -52,8 +52,9 @@ const common = {
   'LAUNCH_ADD_PLAYER': 'This skill lets up to four people play at a Blackjack table. What is the name of the first player? ',
   'LAUNCH_ADD_PLAYER_BUTTON': 'If you have an Echo button, you can also press the button to tie it to this player.',
   'LAUNCH_TABLE_INPROGRESS': 'You have a table in progress ',
-  'LAUNCH_TABLE_NAMES': 'with {0} players including {1}. ',
-  'LAUNCH_TABLE_PLAYERS': 'with {0} players. ',
+  'LAUNCH_TABLE_NAMES': 'with {0}. ',
+  'LAUNCH_ONE_UNNAMED': 'an unnamed player',
+  'LAUNCH_MULTIPLE_UNNAMED': '{0} unnamed players',
   // From RemovePlayer.js
   'REMOVE_PLAYER_REMOVED': '{0} removed. Say add a player to add more players, or deal to start the game.',
   'REMOVE_PLAYER_REPROMPT': 'Say add a player or deal',

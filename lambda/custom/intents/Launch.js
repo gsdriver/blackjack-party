@@ -40,20 +40,24 @@ module.exports = {
     } else {
       // See if they want to continue with this table
       const names = [];
+      let unnamed = 0;
 
       game.players.forEach((player) => {
         if (attributes.playerList[player].name) {
           names.push(attributes.playerList[player].name);
+        } else {
+          unnamed++;
         }
       });
-      launchSpeech += res.strings.LAUNCH_TABLE_INPROGRESS;
-      if (names.length) {
-        launchSpeech += res.strings.LAUNCH_TABLE_NAMES
-          .replace('{0}', game.players.length)
-          .replace('{1}', speechUtils.and(names, {locale: event.request.locale}));
-      } else {
-        launchSpeech += res.strings.LAUNCH_TABLE_PLAYERS.replace('{0}', game.players.length);
+      if (unnamed === 1) {
+        names.push(res.strings.LAUNCH_ONE_UNNAMED);
+      } else if (unnamed > 1) {
+        names.push(res.strings.LAUNCH_MULTIPLE_UNNAMED.replace('{0}', unnamed));
       }
+
+      launchSpeech += res.strings.LAUNCH_TABLE_INPROGRESS;
+      launchSpeech += res.strings.LAUNCH_TABLE_NAMES
+        .replace('{0}', speechUtils.and(names, {locale: event.request.locale}));
 
       // Figure out what the current game state is - give them option to reset
       const output = utils.readCurrentHand(attributes, event.request.locale);
