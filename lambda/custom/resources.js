@@ -2,6 +2,8 @@
 // Localized resources
 //
 
+const fuzz = require('fuzzball');
+
 const common = {
   // From AddPlayer.js
   'ADD_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game. ',
@@ -195,20 +197,34 @@ const utils = (locale) => {
       }
     },
     getBlackjackAction: function(actionSlot) {
-      const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit', 'take 1': 'hit',
-        'draw': 'hit', 'drew': 'hit',
-        'stand': 'stand', 'stay': 'stand', 'done': 'stand', 'dan': 'stand', 'stick': 'stand', 'don': 'stand',
-        'hold': 'stand', 'stan': 'stand',
+      const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit', 'draw': 'hit',
+        'stand': 'stand', 'stay': 'stand', 'done': 'stand', 'stick': 'stand', 'hold': 'stand',
         'surrender': 'surrender', 'give up': 'surrender',
         'double': 'double', 'double down': 'double',
         'split': 'split',
         'shuffle': 'shuffle', 'shuffle deck': 'shuffle',
         'reset': 'resetbankroll', 'reset bankroll': 'resetbankroll',
         'bet': 'deal', 'deal': 'deal'};
-      const action = actionMapping[actionSlot.value.toLowerCase()];
+      const action = actionSlot.value.toLowerCase();
+      let map;
+      let ratio;
+      let bestMapping;
+      let bestRatio = 0;
 
-      // Look it up in lowercase
-      return (action == undefined) ? null : action;
+      for (map in actionMapping) {
+        if (map) {
+          ratio = fuzz.ratio(action, map);
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestMapping = map;
+          }
+        }
+      }
+
+      if (bestRatio < 90) {
+        console.log('Near match: ' + bestMapping + ', ' + bestRatio);
+      }
+      return ((bestMapping && (bestRatio > 60)) ? actionMapping[bestMapping] : null);
     },
     mapChangeValue: function(value) {
       const valueMapping = {'on': true, 'off': false, 'enable': true, 'disable': false, 'enabled': true, 'disabled': false,
