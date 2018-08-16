@@ -2,7 +2,7 @@
 // Localized resources
 //
 
-const fuzz = require('fuzzball');
+const leven = require('leven');
 
 const common = {
   // From AddPlayer.js
@@ -206,6 +206,7 @@ const utils = (locale) => {
         'reset': 'resetbankroll', 'reset bankroll': 'resetbankroll',
         'bet': 'deal', 'deal': 'deal'};
       const action = actionSlot.value.toLowerCase();
+      const actionLen = action.length;
       let map;
       let ratio;
       let bestMapping;
@@ -213,7 +214,8 @@ const utils = (locale) => {
 
       for (map in actionMapping) {
         if (map) {
-          ratio = fuzz.ratio(action, map);
+          const lensum = map.length + actionLen;
+          ratio = Math.round(100 * ((lensum - leven(action, map)) / lensum));
           if (ratio > bestRatio) {
             bestRatio = ratio;
             bestMapping = map;
