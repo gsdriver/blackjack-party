@@ -76,8 +76,9 @@ module.exports = {
       attributes.temp.resetTable = true;
     }
 
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(launchSpeech)
-      .reprompt(reprompt);
+      .reprompt(reprompt)
+      .getResponse();
   },
 };

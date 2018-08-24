@@ -23,9 +23,10 @@ module.exports = {
 
     let cardContent = '';
     cardContent += res.strings.HELP_CARD_TEXT;
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(speech)
       .reprompt(speech)
-      .withSimpleCard(res.strings.HELP_CARD_TITLE, cardContent);
+      .withSimpleCard(res.strings.HELP_CARD_TITLE, cardContent)
+      .getResponse();
   },
 };

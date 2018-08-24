@@ -38,10 +38,10 @@ module.exports = {
     // If this is fallback, let them know we didn't hear the name
     if (handlerInput.requestEnvelope.request.intent
       && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.FallbackIntent')) {
-      handlerInput.responseBuilder
+      return handlerInput.responseBuilder
         .speak(res.strings.ADD_PLAYER_UKNOWN)
-        .reprompt(res.strings.ADD_PLAYER_REPROMPT);
-      return;
+        .reprompt(res.strings.ADD_PLAYER_REPROMPT)
+        .getResponse();
     }
 
     // If reset table is true, nuke the current table and start over
@@ -61,9 +61,10 @@ module.exports = {
 
     // If we have four players, you cannot add another player
     if (game.players.length == 4) {
-      handlerInput.responseBuilder
+      return handlerInput.responseBuilder
         .speak(res.strings.ADD_PLAYER_TABLE_FULL)
-        .reprompt(res.strings.ADD_PLAYER_TABLE_FULL_REPROMPT);
+        .reprompt(res.strings.ADD_PLAYER_TABLE_FULL_REPROMPT)
+        .getResponse();
     } else {
       // Start adding a new player
       attributes.temp.addingPlayer = Date.now();
@@ -80,13 +81,14 @@ module.exports = {
       } else {
         format = res.strings.ADD_PLAYER;
       }
-      handlerInput.responseBuilder
-        .speak(format.replace('{0}', (game.players.length + 1)))
-        .reprompt(res.strings.ADD_PLAYER_REPROMPT);
 
       if (event.request.type === 'GameEngine.InputHandlerEvent') {
         buttons.startInputHandler(handlerInput);
       }
+      return handlerInput.responseBuilder
+        .speak(format.replace('{0}', (game.players.length + 1)))
+        .reprompt(res.strings.ADD_PLAYER_REPROMPT)
+        .getResponse();
     }
   },
 };

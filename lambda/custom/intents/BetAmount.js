@@ -50,9 +50,10 @@ module.exports = {
     // If the bet is non-numeric, refuse it
     if (isNaN(amount)) {
       const betError = res.strings.BAD_BET_FORMAT.replace('{0}', amount);
-      handlerInput.responseBuilder
+      return handlerInput.responseBuilder
         .speak(betError)
-        .reprompt(res.strings.ERROR_REPROMPT);
+        .reprompt(res.strings.ERROR_REPROMPT)
+        .getResponse();
     } else {
       let speech;
       let reprompt;
@@ -82,9 +83,10 @@ module.exports = {
       }
 
       if (speech) {
-        handlerInput.responseBuilder
+        return handlerInput.responseBuilder
           .speak(speech)
-          .reprompt(res.strings.BET_ERROR_REPROMPT);
+          .reprompt(res.strings.BET_ERROR_REPROMPT)
+          .getResponse();
       } else {
         // OK, change this player's bet
         if (attributes.temp.addingPlayer) {
@@ -102,7 +104,6 @@ module.exports = {
           attributes.temp.changingBets++;
           reprompt = res.strings.CHANGEBETS_REPROMPT;
           speech += (utils.readPlayerName(attributes, attributes.temp.changingBets) + reprompt);
-          handlerInput.responseBuilder.speak(speech).reprompt(reprompt);
 
           // Color this player if they have a button associated
           buttons.disableButtons(handlerInput);
@@ -111,34 +112,46 @@ module.exports = {
             const button = attributes.temp.buttons[game.players[attributes.temp.changingBets]];
             buttons.colorButton(handlerInput, button.id, button.color);
           }
-        } else if (attributes.temp.addingPlayer) {
-          handlerInput.responseBuilder
+
+          return handlerInput.responseBuilder
             .speak(speech)
-            .reprompt(res.strings.ERROR_REPROMPT);
+            .reprompt(reprompt)
+            .getResponse();
+        } else if (attributes.temp.addingPlayer) {
+          return handlerInput.responseBuilder
+            .speak(speech)
+            .reprompt(res.strings.ERROR_REPROMPT)
+            .getResponse();
         } else {
           // OK, all bets have been set
-          const action = {action: 'deal', amount: 0};
-          utils.playBlackjackAction(handlerInput, event.request.locale, action,
-            (error, response, dealSpeech, dealReprompt) => {
-            if (!error) {
-              attributes.temp.firsthand = undefined;
-              attributes.temp.firstplay = undefined;
+          return new Promise((resolve, reject) => {
+            let response;
+            const action = {action: 'deal', amount: 0};
+            utils.playBlackjackAction(handlerInput, event.request.locale, action,
+              (error, resp, dealSpeech, dealReprompt) => {
+              if (!error) {
+                attributes.temp.firsthand = undefined;
+                attributes.temp.firstplay = undefined;
 
-              // Set each player's timestamp and hands played
-              game.players.forEach((player) => {
-                attributes.playerList[player].timestamp = Date.now();
-                attributes.playerList[player].hands
-                  = (attributes.playerList[player].hands + 1) || 1;
-              });
+                // Set each player's timestamp and hands played
+                game.players.forEach((player) => {
+                  attributes.playerList[player].timestamp = Date.now();
+                  attributes.playerList[player].hands
+                    = (attributes.playerList[player].hands + 1) || 1;
+                });
 
-              handlerInput.responseBuilder
-                .speak(speech + dealSpeech)
-                .reprompt(dealReprompt);
-            } else {
-              handlerInput.responseBuilder
-                .speak(error)
-                .reprompt(res.strings.ERROR_REPROMPT);
-            }
+                response = handlerInput.responseBuilder
+                  .speak(speech + dealSpeech)
+                  .reprompt(dealReprompt)
+                  .getResponse();
+              } else {
+                response = handlerInput.responseBuilder
+                  .speak(error)
+                  .reprompt(res.strings.ERROR_REPROMPT)
+                  .getResponse();
+              }
+            });
+            resolve(response);
           });
         }
       }

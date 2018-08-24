@@ -52,9 +52,10 @@ module.exports = {
         // Sorry, this isn't a new player
         speech = res.strings.CONFIRM_DUPLICATE_PLAYER.replace('{0}', name);
         speech += res.strings.CONFIRM_DUPLICATE_REPROMPT;
-        handlerInput.responseBuilder
+        return handlerInput.responseBuilder
           .speak(speech)
-          .reprompt(res.strings.CONFIRM_DUPLICATE_REPROMPT);
+          .reprompt(res.strings.CONFIRM_DUPLICATE_REPROMPT)
+          .getResponse();
       } else {
         speech = (game.players.length == 3)
           ? res.strings.CONFIRM_MAX_PLAYERS
@@ -68,16 +69,18 @@ module.exports = {
           buttons.startInputHandler(handlerInput);
         }
 
-        handlerInput.responseBuilder
+        return handlerInput.responseBuilder
           .speak(speech)
-          .reprompt(res.strings.CONFIRM_ADD_PLAYER);
+          .reprompt(res.strings.CONFIRM_ADD_PLAYER)
+          .getResponse();
       }
     } else {
       // Nope, not the right name
       attributes.temp.addingName = undefined;
-      handlerInput.responseBuilder
+      return handlerInput.responseBuilder
         .speak(res.strings.ADD_PLAYER.replace('{0}', (game.players.length + 1)))
-        .reprompt(res.strings.ADD_PLAYER_REPROMPT);
+        .reprompt(res.strings.ADD_PLAYER_REPROMPT)
+        .getResponse();
     }
   },
 };

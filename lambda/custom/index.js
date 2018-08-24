@@ -27,8 +27,6 @@ const utils = require('./utils');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 
-let responseBuilder;
-
 const requestInterceptor = {
   process(handlerInput) {
     return new Promise((resolve, reject) => {
@@ -55,14 +53,12 @@ const requestInterceptor = {
             attributes.temp.firstplay = true;
             attributes.sessions = (attributes.sessions + 1) || 1;
             attributesManager.setSessionAttributes(attributes);
-            responseBuilder = handlerInput.responseBuilder;
             resolve();
           })
           .catch((error) => {
             reject(error);
           });
       } else {
-        responseBuilder = handlerInput.responseBuilder;
         resolve();
       }
     });
@@ -166,9 +162,6 @@ function runGame(event, context, callback) {
     .withSkillId('amzn1.ask.skill.de5b4501-ea8b-4fd8-8f2c-307706576bcf')
     .lambda();
   skillFunction(event, context, (err, response) => {
-    if (response) {
-      response.response = responseBuilder.getResponse();
-    }
     callback(err, response);
   });
 }

@@ -56,15 +56,16 @@ module.exports = {
     }
 
     if (attributes.bot) {
-      handlerInput.responseBuilder.speak(byeText);
+      return handlerInput.responseBuilder.speak(byeText).getResponse();
     } else {
       return new Promise((resolve, reject) => {
         ads.getAd(attributes, 'blackjack-party', event.request.locale, (adText) => {
           exitSpeech += (adText + ' ' + byeText);
-          handlerInput.responseBuilder
+          const response = handlerInput.responseBuilder
             .speak(exitSpeech)
-            .withShouldEndSession(true);
-          resolve();
+            .withShouldEndSession(true)
+            .getResponse();
+          resolve(response);
         });
       });
     }

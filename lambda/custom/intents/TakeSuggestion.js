@@ -43,18 +43,24 @@ module.exports = {
       attributes.tookSuggestion.no = (attributes.tookSuggestion.no + 1) || 1;
     }
 
-    utils.playBlackjackAction(handlerInput,
-      event.request.locale,
-      actionObj, (error, response, speech, reprompt) => {
-      if (!error) {
-        handlerInput.responseBuilder
-          .speak(speech)
-          .reprompt(reprompt);
-      } else {
-        handlerInput.responseBuilder
-          .speak(error)
-          .reprompt(res.strings.ERROR_REPROMPT);
-      }
+    return new Promise((resolve, reject) => {
+      utils.playBlackjackAction(handlerInput,
+        event.request.locale,
+        actionObj, (error, resp, speech, reprompt) => {
+        let response;
+        if (!error) {
+          response = handlerInput.responseBuilder
+            .speak(speech)
+            .reprompt(reprompt)
+            .getResponse();
+        } else {
+          response = handlerInput.responseBuilder
+            .speak(error)
+            .reprompt(res.strings.ERROR_REPROMPT)
+            .getResponse();
+        }
+        resolve(response);
+      });
     });
   },
 };

@@ -47,13 +47,15 @@ module.exports = {
         ? event.request.intent.slots.Name
         : event.request.intent.slots.Action;
       if (!actionSlot) {
-        handlerInput.responseBuilder
+        return handlerInput.responseBuilder
           .speak(res.strings.BLACKJACKINTENT_NO_ACTION)
-          .reprompt(res.strings.ERROR_REPROMPT);
+          .reprompt(res.strings.ERROR_REPROMPT)
+          .getResponse();
       } else if (!actionSlot.value) {
-        handlerInput.responseBuilder
+        return handlerInput.responseBuilder
           .speak(res.strings.BLACKJACKINTENT_UNKNOWN_ACTION.replace('{0}', actionSlot.value))
-          .reprompt(res.strings.ERROR_REPROMPT);
+          .reprompt(res.strings.ERROR_REPROMPT)
+          .getResponse();
       } else {
         // Let's play this action
         actionObj.action = res.getBlackjackAction(actionSlot);
@@ -66,18 +68,24 @@ module.exports = {
     }
 
     if (actionObj.action) {
-      utils.playBlackjackAction(handlerInput, event.request.locale,
-          actionObj, (error, response, speech, reprompt) => {
-        if (!error) {
-          handlerInput.responseBuilder
-            .speak(speech)
-            .reprompt(reprompt);
-        } else {
-          attributes.temp.firstplay = undefined;
-          handlerInput.responseBuilder
-            .speak(error)
-            .reprompt(res.strings.ERROR_REPROMPT);
-        }
+      return new Promise((resolve, reject) => {
+        utils.playBlackjackAction(handlerInput, event.request.locale,
+            actionObj, (error, resp, speech, reprompt) => {
+          let response;
+          if (!error) {
+            response = handlerInput.responseBuilder
+              .speak(speech)
+              .reprompt(reprompt)
+              .getResponse();
+          } else {
+            attributes.temp.firstplay = undefined;
+            response = handlerInput.responseBuilder
+              .speak(error)
+              .reprompt(res.strings.ERROR_REPROMPT)
+              .getResponse();
+          }
+          resolve(response);
+        });
       });
     }
   },

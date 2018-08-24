@@ -44,19 +44,25 @@ module.exports = {
       buttons.startInputHandler(handlerInput);
     }
 
-    attributes.suggestRequests = (attributes.suggestRequests + 1) || 1;
-    utils.playBlackjackAction(handlerInput,
-      event.request.locale, {action: 'suggest'},
-      (error, response, speech, reprompt) => {
-      if (!error) {
-        handlerInput.responseBuilder
-          .speak(speech)
-          .reprompt(reprompt);
-      } else {
-        handlerInput.responseBuilder
-          .speak(error)
-          .reprompt(res.strings.ERROR_REPROMPT);
-      }
+    return new Promise((resolve, reject) => {
+      attributes.suggestRequests = (attributes.suggestRequests + 1) || 1;
+      utils.playBlackjackAction(handlerInput,
+        event.request.locale, {action: 'suggest'},
+        (error, resp, speech, reprompt) => {
+        let response;
+        if (!error) {
+          response = handlerInput.responseBuilder
+            .speak(speech)
+            .reprompt(reprompt)
+            .getResponse();
+        } else {
+          response = handlerInput.responseBuilder
+            .speak(error)
+            .reprompt(res.strings.ERROR_REPROMPT)
+            .getResponse();
+        }
+        resolve(response);
+      });
     });
   },
 };

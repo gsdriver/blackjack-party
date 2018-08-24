@@ -18,8 +18,9 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const output = utils.readCurrentHand(attributes, event.request.locale, true);
 
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(attributes.temp.lastResponse ? attributes.temp.lastResponse : output.speech)
-      .reprompt(attributes.temp.lastReprompt ? attributes.temp.lastReprompt : output.reprompt);
+      .reprompt(attributes.temp.lastReprompt ? attributes.temp.lastReprompt : output.reprompt)
+      .getResponse();
   },
 };

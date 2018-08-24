@@ -25,17 +25,19 @@ module.exports = {
     } else if (!event.request.intent) {
       // Something we really don't handle
       console.log('Error - Unhandled didn\'t get an intent');
-      handlerInput.responseBuilder
+      return handlerInput.responseBuilder
         .speak(res.strings.INTERNAL_ERROR)
-        .reprompt(res.strings.ERROR_REPROMPT);
+        .reprompt(res.strings.ERROR_REPROMPT)
+        .getResponse();
     } else {
       let speech = res.buildUnhandledResponse(event.request.intent, attributes);
       const reprompt = utils.getContextualHelp(event, attributes);
 
       speech += reprompt;
-      handlerInput.responseBuilder
+      return handlerInput.responseBuilder
         .speak(speech)
-        .reprompt(reprompt);
+        .reprompt(reprompt)
+        .getResponse();
     }
   },
 };

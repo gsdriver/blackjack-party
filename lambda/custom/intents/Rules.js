@@ -18,9 +18,10 @@ module.exports = {
     const res = require('../resources')(event.request.locale);
 
     const output = utils.readRules(attributes, event.request.locale);
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(output.speech)
       .reprompt(output.reprompt)
-      .withSimpleCard(res.strings.RULES_CARD_TITLE, output.speech);
+      .withSimpleCard(res.strings.RULES_CARD_TITLE, output.speech)
+      .getResponse();
   },
 };

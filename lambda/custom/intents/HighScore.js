@@ -62,10 +62,11 @@ module.exports = {
         .replace('{1}', leader.high));
     });
 
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(res.strings.HIGHSCORE_LEADERS
         .replace('{0}', leaderText.length)
         .replace('{1}', speechUtils.and(leaderText, {locale: event.request.locale, pause: '200ms'})))
-      .reprompt(res.strings.HIGHSCORE_LEADER_REPROMPT);
+      .reprompt(res.strings.HIGHSCORE_LEADER_REPROMPT)
+      .getResponse();
   },
 };

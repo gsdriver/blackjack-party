@@ -24,8 +24,9 @@ module.exports = {
     const speech = (enable ? res.strings.TRAINING_ON : res.strings.TRAINING_OFF) + reprompt;
 
     game.training = (enable ? true : undefined);
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(speech)
-      .reprompt(reprompt);
+      .reprompt(reprompt)
+      .getResponse();
   },
 };

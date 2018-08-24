@@ -47,8 +47,9 @@ module.exports = {
       attributes.temp.addingPlayer = Date.now();
     }
 
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(res.strings.REMOVE_PLAYER_REMOVED.replace('{0}', name))
-      .reprompt(res.strings.REMOVE_PLAYER_REPROMPT);
+      .reprompt(res.strings.REMOVE_PLAYER_REPROMPT)
+      .getResponse();
   },
 };

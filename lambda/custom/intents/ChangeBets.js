@@ -46,8 +46,9 @@ module.exports = {
       const button = attributes.temp.buttons[game.players[attributes.temp.changingBets]];
       buttons.colorButton(handlerInput, button.id, button.color);
     }
-    handlerInput.responseBuilder
+    return handlerInput.responseBuilder
       .speak(speech)
-      .reprompt(reprompt);
+      .reprompt(reprompt)
+      .getResponse();
   },
 };

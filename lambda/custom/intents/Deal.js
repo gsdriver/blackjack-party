@@ -36,30 +36,36 @@ module.exports = {
 
     // Play for the default amount
     const action = {action: 'deal', amount: 0, firsthand: attributes.temp.firsthand};
-    utils.playBlackjackAction(handlerInput, event.request.locale, action,
-      (error, response, speech, reprompt) => {
-      if (!error) {
-        attributes.temp.firsthand = undefined;
-        attributes.temp.firstplay = undefined;
+    return new Promise((resolve, reject) => {
+      let response;
+      utils.playBlackjackAction(handlerInput, event.request.locale, action,
+        (error, resp, speech, reprompt) => {
+        if (!error) {
+          attributes.temp.firsthand = undefined;
+          attributes.temp.firstplay = undefined;
 
-        // Set each player's timestamp and hands played
-        const now = Date.now();
-        game.timestamp = now;
-        attributes.temp.hands = (attributes.temp.hands + 1) || 1;
-        game.players.forEach((player) => {
-          attributes.playerList[player].timestamp = now;
-          attributes.playerList[player].hands
-            = (attributes.playerList[player].hands + 1) || 1;
-        });
+          // Set each player's timestamp and hands played
+          const now = Date.now();
+          game.timestamp = now;
+          attributes.temp.hands = (attributes.temp.hands + 1) || 1;
+          game.players.forEach((player) => {
+            attributes.playerList[player].timestamp = now;
+            attributes.playerList[player].hands
+              = (attributes.playerList[player].hands + 1) || 1;
+          });
 
-        handlerInput.responseBuilder
-          .speak(speech)
-          .reprompt(reprompt);
-      } else {
-        handlerInput.responseBuilder
-          .speak(error)
-          .reprompt(res.strings.ERROR_REPROMPT);
-      }
+          response = handlerInput.responseBuilder
+            .speak(speech)
+            .reprompt(reprompt)
+            .getResponse();
+        } else {
+          resonse = handlerInput.responseBuilder
+            .speak(error)
+            .reprompt(res.strings.ERROR_REPROMPT)
+            .getResponse();
+        }
+        resolve(response);
+      });
     });
   },
 };

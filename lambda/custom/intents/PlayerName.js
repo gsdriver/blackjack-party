@@ -28,24 +28,27 @@ module.exports = {
     // Great, I heard a player name - let's confirm though
     if (attributes.temp.addingPlayer) {
       attributes.temp.addingName = name;
-      handlerInput.responseBuilder
+      return handlerInput.responseBuilder
         .speak(res.strings.PLAYER_GOTNAME.replace('{0}', name))
-        .reprompt(res.strings.PLAYER_GOTNAME_REPROMPT.replace('{0}', name));
+        .reprompt(res.strings.PLAYER_GOTNAME_REPROMPT.replace('{0}', name))
+        .getResponse();
     } else {
       // We'll add a new player and prompt if this is the right name
       // First make sure the table isn't full
       if (game.players.length == 4) {
-        handlerInput.responseBuilder
+        return handlerInput.responseBuilder
           .speak(res.strings.ADD_PLAYER_TABLE_FULL)
-          .reprompt(res.strings.ADD_PLAYER_TABLE_FULL_REPROMPT);
+          .reprompt(res.strings.ADD_PLAYER_TABLE_FULL_REPROMPT)
+          .getResponse();
       } else {
         attributes.temp.addingPlayer = Date.now();
         attributes.temp.addingName = name;
-        handlerInput.responseBuilder
+        return handlerInput.responseBuilder
           .speak(res.strings.PLAYER_ADDPLAYER
             .replace('{0}', name)
             .replace('{1}', game.players.length + 1))
-        .reprompt(res.strings.PLAYER_GOTNAME_REPROMPT.replace('{0}', name));
+          .reprompt(res.strings.PLAYER_GOTNAME_REPROMPT.replace('{0}', name))
+          .getResponse();
       }
     }
   },
