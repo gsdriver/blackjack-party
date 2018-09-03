@@ -946,7 +946,8 @@ function drawImage(attributes, callback) {
   const currentPlayer = gameService.getCurrentPlayer(game);
   const player = (currentPlayer && currentPlayer.hands)
     ? currentPlayer.hands.map((x) => x.cards) : [];
-  const dealer = JSON.parse(JSON.stringify(game.dealerHand.cards));
+  const dealer = (game.dealerHand) ?
+    JSON.parse(JSON.stringify(game.dealerHand.cards)) : [];
   const showHoleCard = (game.activePlayer == 'none');
   if (!showHoleCard) {
     dealer.shift();
