@@ -5,6 +5,15 @@
 'use strict';
 
 module.exports = {
+  supportButtons: function(handlerInput) {
+    const localeList = ['en-US', 'en-CA', 'en-IN', 'en-GB'];
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const locale = handlerInput.requestEnvelope.request.locale;
+
+    return (!process.env.NOBUTTONS &&
+      (localeList.indexOf(locale) >= 0) &&
+      (attributes.platform !== 'google') && !attributes.bot);
+  },
   getPressedButton: function(request, attributes) {
     const gameEngineEvents = request.events || [];
     let result;
@@ -44,149 +53,157 @@ module.exports = {
     return ((player >= 0) && (player < colors.length)) ? colors[player] : 'FFFFFF';
   },
   startInputHandler: function(handlerInput) {
-    // We'll allow them to press the button again
-    handlerInput.responseBuilder.addDirective({
-      'type': 'GameEngine.StartInputHandler',
-      'timeout': 30000,
-      'recognizers': {
-        'button_down_recognizer': {
-          'type': 'match',
-          'fuzzy': false,
-          'anchor': 'end',
-          'pattern': [{
-            'action': 'down',
-          }],
+    if (module.exports.supportButtons(handlerInput)) {
+      // We'll allow them to press the button again
+      handlerInput.responseBuilder.addDirective({
+        'type': 'GameEngine.StartInputHandler',
+        'timeout': 30000,
+        'recognizers': {
+          'button_down_recognizer': {
+            'type': 'match',
+            'fuzzy': false,
+            'anchor': 'end',
+            'pattern': [{
+              'action': 'down',
+            }],
+          },
         },
-      },
-      'events': {
-        'button_down_event': {
-          'meets': ['button_down_recognizer'],
-          'reports': 'matches',
-          'shouldEndInputHandler': false,
+        'events': {
+          'button_down_event': {
+            'meets': ['button_down_recognizer'],
+            'reports': 'matches',
+            'shouldEndInputHandler': false,
+          },
+          'timeout': {
+            'meets': ['timed out'],
+            'reports': 'history',
+            'shouldEndInputHandler': false,
+          },
         },
-        'timeout': {
-          'meets': ['timed out'],
-          'reports': 'history',
-          'shouldEndInputHandler': false,
-        },
-      },
-    });
+      });
+    }
   },
   colorButton: function(handlerInput, buttonId, buttonColor) {
-    // Pulse the button so they know it's their turn
-    // Followed by keeping the button lit their color
-    const buttonIdleDirective = {
-      'type': 'GadgetController.SetLight',
-      'version': 1,
-      'targetGadgets': [buttonId],
-      'parameters': {
-        'animations': [{
-          'repeat': 1,
-          'targetLights': ['1'],
-          'sequence': [
-            {
-              'durationMs': 400,
-              'color': buttonColor,
-              'blend': true,
-            },
-            {
-              'durationMs': 300,
-              'color': '000000',
-              'blend': true,
-            },
-            {
-              'durationMs': 400,
-              'color': buttonColor,
-              'blend': true,
-            },
-            {
-              'durationMs': 300,
-              'color': '000000',
-              'blend': true,
-            },
-            {
-              'durationMs': 30000,
-              'color': buttonColor,
-              'blend': false,
-            },
-          ],
-        }],
-        'triggerEvent': 'none',
-        'triggerEventTimeMs': 0,
-      },
-    };
+    if (module.exports.supportButtons(handlerInput)) {
+      // Pulse the button so they know it's their turn
+      // Followed by keeping the button lit their color
+      const buttonIdleDirective = {
+        'type': 'GadgetController.SetLight',
+        'version': 1,
+        'targetGadgets': [buttonId],
+        'parameters': {
+          'animations': [{
+            'repeat': 1,
+            'targetLights': ['1'],
+            'sequence': [
+              {
+                'durationMs': 400,
+                'color': buttonColor,
+                'blend': true,
+              },
+              {
+                'durationMs': 300,
+                'color': '000000',
+                'blend': true,
+              },
+              {
+                'durationMs': 400,
+                'color': buttonColor,
+                'blend': true,
+              },
+              {
+                'durationMs': 300,
+                'color': '000000',
+                'blend': true,
+              },
+              {
+                'durationMs': 30000,
+                'color': buttonColor,
+                'blend': false,
+              },
+            ],
+          }],
+          'triggerEvent': 'none',
+          'triggerEventTimeMs': 0,
+        },
+      };
 
-    handlerInput.responseBuilder
-      .addDirective(buttonIdleDirective);
+      handlerInput.responseBuilder
+        .addDirective(buttonIdleDirective);
+    }
   },
   disableButtons: function(handlerInput) {
-    const disableButtonDirective = {
-      'type': 'GadgetController.SetLight',
-      'version': 1,
-      'targetGadgets': [],
-      'parameters': {
-        'animations': [{
-          'repeat': 1,
-          'targetLights': ['1'],
-          'sequence': [
-            {
-              'durationMs': 400,
-              'color': '000000',
-              'blend': false,
-            },
-          ],
-        }],
-        'triggerEvent': 'none',
-        'triggerEventTimeMs': 0,
-      },
-    };
+    if (module.exports.supportButtons(handlerInput)) {
+      const disableButtonDirective = {
+        'type': 'GadgetController.SetLight',
+        'version': 1,
+        'targetGadgets': [],
+        'parameters': {
+          'animations': [{
+            'repeat': 1,
+            'targetLights': ['1'],
+            'sequence': [
+              {
+                'durationMs': 400,
+                'color': '000000',
+                'blend': false,
+              },
+            ],
+          }],
+          'triggerEvent': 'none',
+          'triggerEventTimeMs': 0,
+        },
+      };
 
-    handlerInput.responseBuilder
-      .addDirective(disableButtonDirective);
+      handlerInput.responseBuilder
+        .addDirective(disableButtonDirective);
+    }
   },
   addButtons: function(handlerInput) {
-    // Build idle breathing animation that will play immediately
-    // and button down animation for when the button is pressed
-    module.exports.startInputHandler(handlerInput);
-    const breathAnimation = buildBreathAnimation('000000', 'FFFFFF', 30, 1200);
-    const idleDirective = {
-      'type': 'GadgetController.SetLight',
-      'version': 1,
-      'targetGadgets': [],
-      'parameters': {
-        'animations': [{
-          'repeat': 100,
-          'targetLights': ['1'],
-          'sequence': breathAnimation,
-        }],
-        'triggerEvent': 'none',
-        'triggerEventTimeMs': 0,
-      },
-    };
-
-    const buttonDownDirective = {
-      'type': 'GadgetController.SetLight',
-      'version': 1,
-      'targetGadgets': [],
-      'parameters': {
-        'animations': [{
-          'repeat': 1,
-          'targetLights': ['1'],
-          'sequence': [{
-            'durationMs': 500,
-            'color': 'FFFF00',
-            'intensity': 255,
-            'blend': false,
+    if (module.exports.supportButtons(handlerInput)) {
+      // Build idle breathing animation that will play immediately
+      // and button down animation for when the button is pressed
+      module.exports.startInputHandler(handlerInput);
+      const breathAnimation = buildBreathAnimation('000000', 'FFFFFF', 30, 1200);
+      const idleDirective = {
+        'type': 'GadgetController.SetLight',
+        'version': 1,
+        'targetGadgets': [],
+        'parameters': {
+          'animations': [{
+            'repeat': 100,
+            'targetLights': ['1'],
+            'sequence': breathAnimation,
           }],
-        }],
-        'triggerEvent': 'buttonDown',
-        'triggerEventTimeMs': 0,
-      },
-    };
+          'triggerEvent': 'none',
+          'triggerEventTimeMs': 0,
+        },
+      };
 
-    handlerInput.responseBuilder
-      .addDirective(idleDirective)
-      .addDirective(buttonDownDirective);
+      const buttonDownDirective = {
+        'type': 'GadgetController.SetLight',
+        'version': 1,
+        'targetGadgets': [],
+        'parameters': {
+          'animations': [{
+            'repeat': 1,
+            'targetLights': ['1'],
+            'sequence': [{
+              'durationMs': 500,
+              'color': 'FFFF00',
+              'intensity': 255,
+              'blend': false,
+            }],
+          }],
+          'triggerEvent': 'buttonDown',
+          'triggerEventTimeMs': 0,
+        },
+      };
+
+      handlerInput.responseBuilder
+        .addDirective(idleDirective)
+        .addDirective(buttonDownDirective);
+    }
   },
 };
 

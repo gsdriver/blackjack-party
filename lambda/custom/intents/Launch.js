@@ -32,7 +32,7 @@ module.exports = {
     if (!game.players.length) {
       attributes.temp.addingPlayer = Date.now();
       launchSpeech += res.strings.LAUNCH_ADD_PLAYER;
-      if (!attributes.prompts.useButton) {
+      if (!attributes.prompts.useButton && buttons.supportButtons(handlerInput)) {
         launchSpeech += res.strings.LAUNCH_ADD_PLAYER_BUTTON;
         attributes.prompts.useButton = true;
       }
@@ -68,7 +68,7 @@ module.exports = {
       } else {
         launchSpeech += res.strings.LAUNCH_START_GAME;
       }
-      if (!attributes.prompts.resetButton) {
+      if (!attributes.prompts.resetButton && buttons.supportButtons(handlerInput)) {
         launchSpeech += res.strings.LAUNCH_START_BUTTON;
         attributes.prompts.resetButton = true;
       }

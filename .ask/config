@@ -8,7 +8,7 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty_Test"
+                "uri": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty"
               }
             }
           }
@@ -18,15 +18,32 @@
       "resources": {
         "lambda": [
           {
-            "arn": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty_Test",
-            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty_Test",
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty",
             "awsRegion": "us-east-1",
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "dfe26876-271b-4b6f-90c3-6346e103f8ab"
+            "revisionId": "6000923a-1669-4926-8ed9-2f2ac67e862a"
           }
-        ]
+        ],
+        "manifest": {
+          "eTag": "bd33b7004a1abad23419cb2e90825435"
+        },
+        "interactionModel": {
+          "en-AU": {
+            "eTag": "2475da10c33e37fc30e9de7a1b78c04d"
+          },
+          "en-GB": {
+            "eTag": "1d33e7d552cb1e0cc6f4fad6305b14d9"
+          },
+          "en-CA": {
+            "eTag": "2475da10c33e37fc30e9de7a1b78c04d"
+          },
+          "en-US": {
+            "eTag": "d8e5ba3d0b7feea8b0be68fb769cb93d"
+          }
+        }
       }
     }
   }
