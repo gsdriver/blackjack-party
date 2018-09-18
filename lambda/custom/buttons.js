@@ -6,7 +6,7 @@
 
 module.exports = {
   supportButtons: function(handlerInput) {
-    const localeList = ['en-US', 'en-CA', 'en-IN', 'en-GB'];
+    const localeList = ['en-US', 'en-GB', 'de-DE'];
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const locale = handlerInput.requestEnvelope.request.locale;
 
@@ -57,7 +57,7 @@ module.exports = {
       // We'll allow them to press the button again
       handlerInput.responseBuilder.addDirective({
         'type': 'GameEngine.StartInputHandler',
-        'timeout': 30000,
+        'timeout': 90000,
         'recognizers': {
           'button_down_recognizer': {
             'type': 'match',
@@ -72,11 +72,6 @@ module.exports = {
           'button_down_event': {
             'meets': ['button_down_recognizer'],
             'reports': 'matches',
-            'shouldEndInputHandler': false,
-          },
-          'timeout': {
-            'meets': ['timed out'],
-            'reports': 'history',
             'shouldEndInputHandler': false,
           },
         },

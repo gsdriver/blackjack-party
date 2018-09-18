@@ -85,6 +85,11 @@ const saveResponseInterceptor = {
           } else {
             // Save the response and reprompt for repeat
             if (response.outputSpeech && response.outputSpeech.ssml) {
+              // Splice in some sound effects before the game starts
+              if (attributes.temp.firstplay) {
+                response.outputSpeech.ssml = response.outputSpeech.ssml
+                  .replace('</speak>', '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/ambiance/ambiance1.mp3\"/> </speak>');
+              }
               attributes.temp.lastResponse = response.outputSpeech.ssml;
             }
             if (response.reprompt && response.reprompt.outputSpeech
