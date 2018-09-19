@@ -47,6 +47,9 @@ const common = {
   'HELP_CARD_TITLE': 'Blackjack Party Commands',
   'HELP_CARD_TEXT': 'When you start the skill, say DEAL to continue with an existing table or ADD A PLAYER to reset the players at the table. You can only change the players at the start of a round. If you want to change the bets for each player, say CHANGE BETS which will allow you to set an amount to bet for each player separately.\nYou can say DEAL to start the game. You can say READ HIGH SCORES to hear the peak bankrolls for each member of your party.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules of the game.',
   // From Launch.js
+  'LAUNCH_GOOD_MORNING': 'Good morning <break time=\"200ms\"/> ',
+  'LAUNCH_GOOD_AFTERNOON': 'Good afternoon <break time=\"200ms\"/> ',
+  'LAUNCH_GOOD_EVENING': 'Good evening <break time=\"200ms\"/> ',
   'LAUNCH_WELCOME': '{"standard":"Thanks for joining Blackjack Party! "}',
   'LAUNCH_START_GAME': 'Say add a player to start a new table or deal to start a new game with this table. ',
   'LAUNCH_START_HAND_INPROGRESS': 'Say add a player to start a new table or pick up where you left off. ',
