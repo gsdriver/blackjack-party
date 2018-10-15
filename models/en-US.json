@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "blackjack party",
+      "invocationName": "blackjack game",
       "intents": [
         {
           "name": "BlackjackIntent",
@@ -44,17 +44,7 @@
           ]
         },
         {
-          "name": "ChangeBetsIntent",
-          "samples": [
-            "change the bet amounts",
-            "change the bets",
-            "change bets",
-            "bet different amounts",
-            "place different bets"
-          ]
-        },
-        {
-          "name": "BetAmountIntent",
+          "name": "BettingIntent",
           "slots": [
             {
               "name": "Amount",
@@ -63,31 +53,61 @@
           ],
           "samples": [
             "bet {Amount}",
+            "play {Amount}",
             "bet for {Amount}",
+            "play for {Amount}",
             "bet {Amount} dollars",
+            "play {Amount} dollars",
             "bet for {Amount} dollars",
-            "{Amount} dollars",
-            "{Amount}"
-          ]
-        },
-        {
-          "name": "DealIntent",
-          "samples": [
+            "play for {Amount} dollars",
+            "bet {Amount} dollar",
+            "play {Amount} dollar",
+            "bet for {Amount} dollar",
+            "play for {Amount} dollar",
+            "do bet",
             "do deal",
             "deal",
-            "play"
+            "bet"
           ]
         },
         {
-          "name": "HighScoreIntent",
+          "name": "PlaceSideBetIntent",
           "samples": [
-            "read high scores",
-            "tell me high scores",
-            "what are the high scores",
-            "what is the leader board",
-            "read leader board",
-            "say high scores",
-            "say leader board"
+            "place side bet",
+            "place a side bet",
+            "make side bet",
+            "make a side bet",
+            "do side bet",
+            "place progressive bet",
+            "place a progressive bet",
+            "make progressive bet",
+            "make a progressive bet",
+            "do progressive bet",
+            "place progressive side bet",
+            "place a progressive side bet",
+            "make progressive side bet",
+            "make a progressive side bet",
+            "do progressive side bet"
+          ]
+        },
+        {
+          "name": "RemoveSideBetIntent",
+          "samples": [
+            "remove side bet",
+            "remove a side bet",
+            "take down side bet",
+            "take down a side bet",
+            "end side bet",
+            "remove progressive bet",
+            "remove a progressive bet",
+            "take down progressive bet",
+            "take down a progressive bet",
+            "end progressive bet",
+            "remove progressive side bet",
+            "remove a progressive side bet",
+            "take down progressive side bet",
+            "take down a progressive side bet",
+            "end progressive side bet"
           ]
         },
         {
@@ -114,6 +134,43 @@
           ]
         },
         {
+          "name": "ResetIntent",
+          "samples": [
+            "reset game",
+            "reset bankroll",
+            "reset the game",
+            "reset rules",
+            "reset my game",
+            "reset my bankroll",
+            "reset rules",
+            "reset the rules",
+            "reset my rules"
+          ]
+        },
+        {
+          "name": "ChangeRulesIntent",
+          "slots": [
+            {
+              "name": "Change",
+              "type": "LIST_OF_RULE_OPTIONS"
+            },
+            {
+              "name": "ChangeOption",
+              "type": "LIST_OF_RULE_VALUES"
+            }
+          ],
+          "samples": [
+            "change {Change} to {ChangeOption}",
+            "make {Change} to {ChangeOption}",
+            "turn {Change} to {ChangeOption}",
+            "change {Change} {ChangeOption}",
+            "make {Change} {ChangeOption}",
+            "turn {Change} {ChangeOption}",
+            "turn {ChangeOption} {Change}",
+            "{ChangeOption} {Change}"
+          ]
+        },
+        {
           "name": "SuggestIntent",
           "samples": [
             "what should I do",
@@ -128,28 +185,6 @@
             "suggest a move",
             "suggest an action",
             "suggest a play"
-          ]
-        },
-        {
-          "name": "AddPlayerIntent",
-          "samples": [
-            "add a player",
-            "add a new player",
-            "new player",
-            "additional player",
-            "add another player"
-          ]
-        },
-        {
-          "name": "PlayerNameIntent",
-          "slots": [
-            {
-              "name": "Name",
-              "type": "AMAZON.US_FIRST_NAME"
-            }
-          ],
-          "samples": [
-            "{Name}"
           ]
         },
         {
@@ -186,6 +221,73 @@
             "turn off suggestions",
             "exit suggestions",
             "disable suggestions"
+          ]
+        },
+        {
+          "name": "SelectIntent",
+          "slots": [],
+          "samples": [
+            "pick a different game",
+            "pick a new game",
+            "pick another game",
+            "change to a different game",
+            "change to a new game",
+            "change to another game",
+            "select a different game",
+            "select a new game",
+            "select another game",
+            "choose a different game",
+            "choose a new game",
+            "choose another game",
+            "switch to a different game",
+            "switch to a new game",
+            "switch to another game"
+          ]
+        },
+        {
+          "name": "PurchaseIntent",
+          "slots": [
+            {
+              "name": "Product",
+              "type": "LIST_OF_PRODUCTS"
+            }
+          ],
+          "samples": [
+            "what can I buy",
+            "what can I shop for",
+            "tell me what I can buy",
+            "what can I pay for",
+            "tell what what I can pay for",
+            "I want to buy {Product}",
+            "I want {Product}",
+            "give me {Product}",
+            "buy {Product}",
+            "pay for {Product}"
+          ]
+        },
+        {
+          "name": "RefundIntent",
+          "slots": [
+            {
+              "name": "Product",
+              "type": "LIST_OF_PRODUCTS"
+            }
+          ],
+          "samples": [
+            "return {Product}",
+            "refund {Product}"
+          ]
+        },
+        {
+          "name": "HighScoreIntent",
+          "samples": [
+            "read high scores",
+            "tell me high scores",
+            "what are the high scores",
+            "what is the leader board",
+            "read leader board",
+            "say high scores",
+            "say leader board"
           ]
         },
         {
@@ -331,6 +433,256 @@
             }
           ],
           "name": "LIST_OF_ACTIONS"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "spanish 21"
+              }
+            },
+            {
+              "name": {
+                "value": "spanish"
+              }
+            }
+          ],
+          "name": "LIST_OF_PRODUCTS"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "hit soft seventeen"
+              }
+            },
+            {
+              "name": {
+                "value": "hit seventeen"
+              }
+            },
+            {
+              "name": {
+                "value": "hits seventeen"
+              }
+            },
+            {
+              "name": {
+                "value": "soft seventeen"
+              }
+            },
+            {
+              "name": {
+                "value": "dealer hits seventeen"
+              }
+            },
+            {
+              "name": {
+                "value": "dealer hit seventeen"
+              }
+            },
+            {
+              "name": {
+                "value": "dealer hits soft seventeen"
+              }
+            },
+            {
+              "name": {
+                "value": "dealer hit soft seventeen"
+              }
+            },
+            {
+              "name": {
+                "value": "surrender"
+              }
+            },
+            {
+              "name": {
+                "value": "double"
+              }
+            },
+            {
+              "name": {
+                "value": "double down"
+              }
+            },
+            {
+              "name": {
+                "value": "double after split"
+              }
+            },
+            {
+              "name": {
+                "value": "resplit aces"
+              }
+            },
+            {
+              "name": {
+                "value": "blackjack pays"
+              }
+            },
+            {
+              "name": {
+                "value": "blackjack bonus"
+              }
+            },
+            {
+              "name": {
+                "value": "number of decks"
+              }
+            },
+            {
+              "name": {
+                "value": "decks"
+              }
+            },
+            {
+              "name": {
+                "value": "deck count"
+              }
+            },
+            {
+              "name": {
+                "value": "number of splits"
+              }
+            },
+            {
+              "name": {
+                "value": "number of split hands"
+              }
+            },
+            {
+              "name": {
+                "value": "split hands"
+              }
+            }
+          ],
+          "name": "LIST_OF_RULE_OPTIONS"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "on"
+              }
+            },
+            {
+              "name": {
+                "value": "off"
+              }
+            },
+            {
+              "name": {
+                "value": "enable"
+              }
+            },
+            {
+              "name": {
+                "value": "disable"
+              }
+            },
+            {
+              "name": {
+                "value": "enabled"
+              }
+            },
+            {
+              "name": {
+                "value": "disabled"
+              }
+            },
+            {
+              "name": {
+                "value": "three to two"
+              }
+            },
+            {
+              "name": {
+                "value": "six to five"
+              }
+            },
+            {
+              "name": {
+                "value": "even money"
+              }
+            },
+            {
+              "name": {
+                "value": "even"
+              }
+            },
+            {
+              "name": {
+                "value": "one deck"
+              }
+            },
+            {
+              "name": {
+                "value": "one"
+              }
+            },
+            {
+              "name": {
+                "value": "two deck"
+              }
+            },
+            {
+              "name": {
+                "value": "two decks"
+              }
+            },
+            {
+              "name": {
+                "value": "two"
+              }
+            },
+            {
+              "name": {
+                "value": "four deck"
+              }
+            },
+            {
+              "name": {
+                "value": "four decks"
+              }
+            },
+            {
+              "name": {
+                "value": "four"
+              }
+            },
+            {
+              "name": {
+                "value": "six deck"
+              }
+            },
+            {
+              "name": {
+                "value": "six decks"
+              }
+            },
+            {
+              "name": {
+                "value": "six"
+              }
+            },
+            {
+              "name": {
+                "value": "eight deck"
+              }
+            },
+            {
+              "name": {
+                "value": "eight decks"
+              }
+            },
+            {
+              "name": {
+                "value": "eight"
+              }
+            }
+          ],
+          "name": "LIST_OF_RULE_VALUES"
         }
       ]
     }
