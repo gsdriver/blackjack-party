@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "blackjack game",
+      "invocationName": "blackjack party",
       "intents": [
         {
           "name": "BlackjackIntent",
@@ -44,6 +44,16 @@
           ]
         },
         {
+          "name": "ChangeBetsIntent",
+          "samples": [
+            "change the bet amounts",
+            "change the bets",
+            "change bets",
+            "bet different amounts",
+            "place different bets"
+          ]
+        },
+        {
           "name": "BettingIntent",
           "slots": [
             {
@@ -68,6 +78,31 @@
             "do deal",
             "deal",
             "bet"
+          ]
+        },
+        {
+          "name": "BetAmountIntent",
+          "slots": [
+            {
+              "name": "Amount",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "bet {Amount}",
+            "bet for {Amount}",
+            "bet {Amount} dollars",
+            "bet for {Amount} dollars",
+            "{Amount} dollars",
+            "{Amount}"
+          ]
+        },
+        {
+          "name": "DealIntent",
+          "samples": [
+            "do deal",
+            "deal",
+            "play"
           ]
         },
         {
@@ -131,6 +166,28 @@
             "tell me the rules of the game",
             "the rules of the game",
             "rules of the game"
+          ]
+        },
+        {
+          "name": "AddPlayerIntent",
+          "samples": [
+            "add a player",
+            "add a new player",
+            "new player",
+            "additional player",
+            "add another player"
+          ]
+        },
+        {
+          "name": "PlayerNameIntent",
+          "slots": [
+            {
+              "name": "Name",
+              "type": "AMAZON.US_FIRST_NAME"
+            }
+          ],
+          "samples": [
+            "{Name}"
           ]
         },
         {
