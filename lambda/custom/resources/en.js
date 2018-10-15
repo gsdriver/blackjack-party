@@ -3,6 +3,84 @@
 //
 
 const common = {
+  // BlackjackParty specific
+  // From AddPlayer.js
+  'ADD_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game. ',
+  'ADD_PLAYER_BUTTON': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player or press another Echo button to leave this player unnamed <break time=\'200ms\'/> or deal to start the game. ',
+  'ADD_LAST_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> or deal to start the game.',
+  'ADD_PLAYER_REPROMPT': 'Say the name of the player to add.',
+  'ADD_PLAYER_TABLE_FULL': 'Sorry the table is full with four players. Say deal to start the game.',
+  'ADD_PLAYER_TABLE_FULL_REPROMPT': 'Say deal to start the game.',
+  'ADD_PLAYER_UKNOWN': 'Sorry, I didn\'t get the name of a person to add. Try saying the name again. ',
+  // From PlayerName.js
+  'PLAYER_GOTNAME': 'I heard {0}, is that correct?',
+  'PLAYER_GOTNAME_REPROMPT': 'Say yes if {0} is the name you want to add.',
+  'PLAYER_ADDPLAYER': 'I heard {0} for the <say-as interpret-as="ordinal">{1}</say-as> player, is that correct?',
+  // From ConfirmName.js
+  'CONFIRM_MAX_PLAYERS': 'The table is full with four players. Say deal to start the game.',
+  'CONFIRM_ADD_PLAYER': 'Say add a player to add more players, or deal to start the game.',
+  'CONFIRM_WELCOME_BACK': 'Welcome back {0}. ',
+  'CONFIRM_DUPLICATE_PLAYER': 'Sorry {0} is already at this table and each player must have a unique name. <break time=\'200ms\'/> ',
+  'CONFIRM_DUPLICATE_REPROMPT': 'Say a different name <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game.',
+  // From BetAmount.js
+  'BAD_BET_FORMAT': 'I can\'t place a bet for {0}',
+  'BET_ERROR_REPROMPT': 'Say an amount you would like to bet. ',
+  // From ChangeBets.js
+  'CHANGEBETS_REPROMPT': 'Say the amount you would like to bet. ',
+  // From Exit.js
+  'EXIT_GOODBYE_NAMES': 'Goodbye {0}.',
+  // From HighScore.js
+  'HIGHSCORE_NONAME': 'an unnamed player',
+  'HIGHSCORE_LEADERS': 'The top {0} peak bankrolls are {1}. What else can I help you with?',
+  // From Help.js
+  'HELP_CONFIRMING_NAME': 'Say yes or no to confirm if {0} is the correct name.',
+  'HELP_CHANGING_PLAYERS': 'At the start of the game, set your table by saying add a player. You can then give each player a name, saying deal when you are ready to play. To change each player\'s bet, say change bets and then the amount you want each person to bet. ',
+  'HELP_CARD_TITLE': 'Blackjack Party Commands',
+  'HELP_CARD_TEXT': 'When you start the skill, say DEAL to continue with an existing table or ADD A PLAYER to reset the players at the table. You can only change the players at the start of a round. If you want to change the bets for each player, say CHANGE BETS which will allow you to set an amount to bet for each player separately.\nYou can say DEAL to start the game. You can say READ HIGH SCORES to hear the peak bankrolls for each member of your party.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules of the game.',
+  // From Launch.js
+  'LAUNCH_GOOD_MORNING': 'Good morning <break time=\"200ms\"/> ',
+  'LAUNCH_GOOD_AFTERNOON': 'Good afternoon <break time=\"200ms\"/> ',
+  'LAUNCH_GOOD_EVENING': 'Good evening <break time=\"200ms\"/> ',
+  'LAUNCH_WELCOME': '{"standard":"Thanks for joining Blackjack Party! "}',
+  'LAUNCH_START_GAME': 'Say add a player to start a new table or deal to start a new game with this table. ',
+  'LAUNCH_START_HAND_INPROGRESS': 'Say add a player to start a new table or pick up where you left off. ',
+  'LAUNCH_START_BUTTON': 'If you have an Echo Button, you can also press the button to start a new table.',
+  'LAUNCH_ADD_PLAYER': 'This skill lets up to four people play at a Blackjack table. What is the name of the first player? ',
+  'LAUNCH_ADD_PLAYER_BUTTON': 'If you have an Echo button, you can also press the button to tie it to this player.',
+  'LAUNCH_TABLE_INPROGRESS': 'You have a table in progress ',
+  'LAUNCH_TABLE_NAMES': 'with {0}. ',
+  'LAUNCH_ONE_UNNAMED': 'an unnamed player',
+  'LAUNCH_MULTIPLE_UNNAMED': '{0} unnamed players',
+  // From RemovePlayer.js
+  'REMOVE_PLAYER_REMOVED': '{0} removed. Say add a player to add more players, or deal to start the game.',
+  'REMOVE_PLAYER_REPROMPT': 'Say add a player or deal',
+  // From PlayGame.js
+  'CURRENT_PLAYER': '<say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> ',
+  'SUGGESTED_PLAY': 'I would recommend you {0}. |The book would tell you to {0}. |Basic Strategy would suggest you {0}. |Maybe you should {0} instead. ',
+  'HELP_TAKE_INSURANCE_BLACKJACK': 'Since you have a blackjack, can you say yes to get paid your bet, or no in which case you push if I have blackjack.',
+  'CARD_DEAL_SOUND': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/dealcard.mp3\"/> ',
+  'DEALER_HOLE_CARD': 'I have {0} down',
+  'DEALER_BLACKJACK': ' and have Blackjack.',
+  'DEALER_DRAW': '. I drew ',
+  'DEALER_SHOWING': ' I am showing {0}.',
+  'DEALER_HAD_BLACKJACK': 'I had a blackjack. ',
+  'DEALER_NO_BLACKJACK': 'I didn\'t have a blackjack. ',
+  'READHAND_DEALER_ACTIVE': 'I have {0} showing.',
+  'READHAND_DEALER_DONE': 'I had {0} showing. ',
+
+  // From BlackjackParty - dollars
+  // From BetAmount.js
+  'BET_AMOUNT_SET': 'Bet set to ${0}. ',
+  'BET_BELOW_MIN': 'A bet of ${0} is below the table minimum of ${1}. ',
+  'BET_ABOVE_BANKROLL': 'A bet of ${0} exceeds you bankroll of ${1}. ',
+  'BET_ABOVE_MAX': 'A bet of ${0} is above the table maximum of ${1}. ',
+  // From HighScore.js
+  'HIGHSCORE_LEADER_FORMAT': '{0} at ${1}',
+  // From PlayGame.js
+  'PLAYER_BET_TEXT': '{0} bet ${1} ',
+  'EVERYONE_BET_TEXT': 'Everyone bet ${0}. ',
+
+  // Shared and/or Play Blackjack specific
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'What else can I help with?',
   'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
@@ -473,6 +551,17 @@ const utils = (locale) => {
         case 'SuggestIntent':
           response += 'give a suggestion ';
           break;
+        case 'ChangeBetsIntent':
+          response += 'change bets ';
+          break;
+        case 'BetAmountIntent':
+          // Let them know they have to say change bet first
+          if (game && game.possibleActions && game.possibleActions.length
+            && (game.possibleActions.indexOf('deal') >= 0)) {
+            return 'To change the amount bet, please say change bets. ';
+          }
+          response += 'change bets ';
+          break;
         case 'ResetIntent':
           response += 'reset the game ';
           break;
@@ -485,6 +574,8 @@ const utils = (locale) => {
         case 'AMAZON.NoIntent':
           response = 'No doesn\'t make sense ';
           break;
+        case 'DealIntent':
+          response += 'deal a new game ';
         case 'BettingIntent':
           response += 'place a new bet ';
           break;
@@ -506,6 +597,12 @@ const utils = (locale) => {
         case 'DisableTrainingIntent':
           response += 'turn off training mode ';
           break;
+        case 'AddPlayerIntent':
+          // This can only be done at the start of the game
+          // and not while you are confirming a name
+          return (attributes.temp.addingName)
+            ? 'You first have to confirm the player name. '
+            : 'To change the players at the table, you have to exit the skill. ';
         case 'SelectIntent':
           response += 'select a new game ';
           break;
@@ -520,6 +617,23 @@ const utils = (locale) => {
           console.log('Error - unhandled ' + intent.name + ' in state ' + state);
           response += 'do that ';
           break;
+      }
+
+      // New game - ready to start a new game
+      if (attributes.temp.addingName) {
+        response += 'while I\'m waiting for you to confirm a new player name';
+      } else if (attributes.temp.firsthand) {
+        response += 'while you are adding players to the table';
+      } else if (attributes.temp.changingBets !== undefined) {
+        response += 'while you are changing player bets';
+      } else if (game && game.possibleActions && game.possibleActions.length) {
+        if (game.possibleActions.indexOf('deal') >= 0) {
+          response += 'before the hand has started';
+        } else if (game.possibleActions.indexOf('noinsurance') >= 0) {
+          response += 'while I\'m waiting to hear if you want insurance';
+        } else {
+          response += 'during the middle of a hand';
+        }
       }
 
       // Get the state
