@@ -27,6 +27,21 @@ const utils = require('./utils');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 
+const persistenceAdapter = {
+  getAttributes (requestEnvelope) {
+    // get attributes from data store
+    return new Promise((resolve, reject) => {
+      console.log(requestEnvelope.session.user.userId);
+      resolve(att);
+    });
+  },
+  saveAttributes (requestEnvelope, attributes) {
+    // save attributes to data store
+    console.log('save');
+    console.log(attributes);
+  }
+};
+
 const requestInterceptor = {
   process(handlerInput) {
     return new Promise((resolve, reject) => {
@@ -120,7 +135,7 @@ if (process.env.DASHBOTKEY) {
 }
 
 function runGame(event, context, callback) {
-  const skillBuilder = Alexa.SkillBuilders.standard();
+  const skillBuilder = Alexa.SkillBuilders.custom();
 
   if (!process.env.NOLOG) {
     console.log(JSON.stringify(event));
@@ -157,8 +172,7 @@ function runGame(event, context, callback) {
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(requestInterceptor)
     .addResponseInterceptors(saveResponseInterceptor)
-    .withTableName('BlackjackParty')
-    .withAutoCreateTable(true)
+    .withPersistenceAdapter(persistenceAdapter)
     .withSkillId('amzn1.ask.skill.de5b4501-ea8b-4fd8-8f2c-307706576bcf')
     .lambda();
   skillFunction(event, context, (err, response) => {
