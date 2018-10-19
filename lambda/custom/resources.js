@@ -2,8 +2,6 @@
 // Localized resources
 //
 
-const leven = require('leven');
-
 const common = {
   // From AddPlayer.js
   'ADD_PLAYER': 'Say the name of the <say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game. ',
@@ -23,8 +21,78 @@ const common = {
   'CONFIRM_WELCOME_BACK': 'Welcome back {0}. ',
   'CONFIRM_DUPLICATE_PLAYER': 'Sorry {0} is already at this table and each player must have a unique name. <break time=\'200ms\'/> ',
   'CONFIRM_DUPLICATE_REPROMPT': 'Say a different name <break time=\'200ms\'/> add a player to leave this player unnamed <break time=\'200ms\'/> or deal to start the game.',
-  // From BlackjackUtils.js
+  // From utils.js
   'ERROR_REPROMPT': 'What else can I help with?',
+  'BLACKJACK_ACTION_HIT': 'hit|take a hit|hit me|take one|draw',
+  'BLACKJACK_ACTION_STAND': 'stand|stay|done|stick|hold',
+  'BLACKJACK_ACTION_SURRENDER': 'surrender|give up',
+  'BLACKJACK_ACTION_DOUBLE': 'double|double down',
+  'BLACKJACK_ACTION_SPLIT': 'split',
+  'BLACKJACK_ACTION_SHUFFLE': 'shuffle|shuffle deck',
+  'BLACKJACK_ACTION_RESETBANKROLL': 'reset|reset bankroll',
+  'BLACKJACK_ACTION_DEAL': 'bet|deal',
+  'HAND_NUMBER': '<say-as interpret-as="ordinal">{Hand}</say-as> hand ',
+  'PLAYOPTION_RESET': 'reset game',
+  'PLAYOPTION_SHUFFLE': 'shuffle',
+  'PLAYOPTION_DEAL': 'deal',
+  'PLAYOPTION_HIT': 'hit',
+  'PLAYOPTION_STAND': 'stand',
+  'PLAYOPTION_DOUBLE': 'double down',
+  'PLAYOPTION_INSURANCE': 'take insurance',
+  'PLAYOPTION_NOINSURANCE': 'decline insurance',
+  'PLAYOPTION_SPLIT': 'split',
+  'PLAYOPTION_SURRENDER': 'surrender',
+  'OUTCOME_BLACKJACK': 'You win with a natural Blackjack! ',
+  'OUTCOME_WIN': 'You won! ',
+  'OUTCOME_LOSS': 'You lost. ',
+  'OUTCOME_PUSH': 'It\'s a push. ',
+  'OUTCOME_SURRENDER': 'You surrendered. ',
+  'OUTCOME_TWOHAND_WIN': 'You won both hands!',
+  'OUTCOME_TWOHAND_LOSS': 'You lost both hands.',
+  'OUTCOME_TWOHAND_PUSH': 'Both hands pushed.',
+  'OUTCOME_TWOHAND_SURRENDER': 'You surrendered both hands.',
+  'OUTCOME_MULTIPLEHAND_WIN': 'You won all your hands.',
+  'OUTCOME_MULTIPLEHAND_LOSS': 'You lost all your hands.',
+  'OUTCOME_MULTIPLEHAND_PUSH': 'You pushed on all your hands.',
+  'OUTCOME_MULTIPLEHAND_SURRENDER': 'You surrendered all your hands.',
+  'DOUBLE_ANY': 'on any cards',
+  'DOUBLE_ANYCARDS': 'on any number of cards',
+  'DOUBLE_10OR11': 'on 10 or 11 only',
+  'DOUBLE_9OR10OR11': 'on 9 thru 11 only',
+  'DOUBLE_NONE': 'not allowed',
+  'BLACKJACKPAYOUT_EVEN': 'even money',
+  'BLACKJACKPAYOUT_3To2': '3 to 2',
+  'BLACKJACKPAYOUT_6TO5': '6 to 5',
+  'MAP_ERROR_OVER_BANKROLL': 'Your bet is more than your available bankroll',
+  'MAP_ACTION_INSURANCE': 'take insurance',
+  'MAP_ACTION_NOINSURANCE': 'not take insurance',
+  'MAP_ACTION_HIT': 'hit',
+  'MAP_ACTION_STAND': 'stand',
+  'MAP_ACTION_SPLIT': 'split',
+  'MAP_ACTION_DOUBLE': 'double',
+  'MAP_ACTION_SURRENDER': 'surrender',
+  'SAY_CARD_ACE': 'ace',
+  'SAY_CARD_JACK': 'jack',
+  'SAY_CARD_QUEEN': 'queen',
+  'SAY_CARD_KING': 'king',
+  'SAY_CARD_CLUB': 'clubs',
+  'SAY_CARD_DIAMONDS': 'diamonds',
+  'SAY_CARD_HEARTS': 'hearts',
+  'SAY_CARD_SPADES': 'spades',
+  'SAY_CARD_WITH_SUIT': '{Rank} of {Suit}',
+  'SAY_CARD_A_ACE': 'an ace',
+  'SAY_CARD_A_TWO': 'a two',
+  'SAY_CARD_A_THREE': 'a three',
+  'SAY_CARD_A_FOUR': 'a four',
+  'SAY_CARD_A_FIVE': 'a five',
+  'SAY_CARD_A_SIX': 'a six',
+  'SAY_CARD_A_SEVEN': 'a seven',
+  'SAY_CARD_A_EIGHT': 'an eight',
+  'SAY_CARD_A_NINE': 'a nine',
+  'SAY_CARD_A_TEN': 'a ten',
+  'SAY_CARD_A_JACK': 'a jack',
+  'SAY_CARD_A_QUEEN': 'a queen',
+  'SAY_CARD_A_KING': 'a king',
   // From BetAmount.js
   'BAD_BET_FORMAT': 'I can\'t place a bet for {0}',
   'BET_ERROR_REPROMPT': 'Say an amount you would like to bet. ',
@@ -69,6 +137,29 @@ const common = {
   'TRAINING_ON': 'Training mode turned on. I will let you know when your play differs from Basic Strategy. ',
   'TRAINING_OFF': 'Training mode turned off. ',
   'TRAINING_REPROMPT': 'What can I help you with?',
+  // From Unhandled.js
+  'UNHANDLED_FORMAT': 'I can\'t {Action} {State}. ',
+  'UNHANDLED_STATE_NEWGAME': 'before the hand has started',
+  'UNHANDLED_STATE_INSURANCEOFFERED': 'while I\'m waiting to hear if you want insurance',
+  'UNHANDLED_STATE_INGAME': 'during the middle of a hand',
+  'UNHANDLED_STATE_ADDINGPLAYER': 'while I\'m waiting for you to confirm a new player name',
+  'UNHANLDED_STATE_FIRSTHAND': 'while you are adding players to the table',
+  'UNHANDLED_STATE_CHANGINGBETS': 'while you are changing player bets',
+  'UNHANDLED_STATE_OTHER': 'at this time',
+  'UNHANDLED_ACTION_SUGGESTION': 'give a suggesiton',
+  'UNHANDLED_ACTION_CHANGEBET': 'change bets',
+  'UNHANDLED_TO_CHANGE_BET': 'To change the amount bet, please say change bets.',
+  'UNHANDLED_ACTION_RESET': 'reset the game',
+  'UNHANDLED_ACTION_YES': 'Yes doesn\'t make sense',
+  'UNHANDLED_ACTION_NO': 'No doesn\'t make sense',
+  'UNHANDLED_ACTION_DEAL': 'deal a new game',
+  'UNHANDLED_ACTION_READRULES': 'read the rules',
+  'UNHANDLED_ACTION_HIGHSCORE': 'read the leader board',
+  'UNHANDLED_ACTION_ENABLETRAINING': 'turn on training mode',
+  'UNHANDLED_ACTION_DISABLETRAINING': 'turn off training mode',
+  'UNHANDLED_ACTION_CONFIRMNAME': 'You first have to confirm the player name. ',
+  'UNHANDLED_ACTION_CHANGEPLAYERS': 'To change the players at the table, you have to exit the skill. ',
+  'UNHANDLED_ACTION_GENERIC': 'do that',
   // From PlayGame.js
   'CURRENT_PLAYER': '<say-as interpret-as="ordinal">{0}</say-as> player <break time=\'200ms\'/> ',
   'PROMPT_TRAINING': 'You can say enter training mode if you would like me to tell you when your play differs from Basic Strategy',
@@ -108,8 +199,16 @@ const common = {
   'DEALER_TOTAL': ' for a total of {0}.',
   'DEALER_DRAW': '. I drew ',
   'DEALER_SHOWING': ' I am showing {0}.',
-  'SPLIT_TENS': 'You split tens. ',
-  'SPLIT_PAIR': 'You split a pair of {0}. ',
+  'SPLIT_PAIR_ACE': 'You split a pair of aces',
+  'SPLIT_PAIR_TWO': 'You split a pair of twos',
+  'SPLIT_PAIR_THREE': 'You split a pair of threes',
+  'SPLIT_PAIR_FOUR': 'You split a pair of fours',
+  'SPLIT_PAIR_FIVE': 'You split a pair of fives',
+  'SPLIT_PAIR_SIX': 'You split a pair of sixes',
+  'SPLIT_PAIR_SEVEN': 'You split a pair of sevens',
+  'SPLIT_PAIR_EIGHT': 'You split a pair of eights',
+  'SPLIT_PAIR_NINE': 'You split a pair of nines',
+  'SPLIT_PAIR_TEN': 'You split tens. ',
   'SURRENDER_RESULT': 'You surrendered. ',
   'DEALER_HAD_BLACKJACK': 'I had a blackjack. ',
   'DEALER_NO_BLACKJACK': 'I didn\'t have a blackjack. ',
@@ -155,6 +254,9 @@ const dollar = {
   'EVERYONE_BET_TEXT': 'Everyone bet ${0}. ',
   'YOUR_BANKROLL_TEXT': 'You have ${0}. ',
   'RULES_BET_RANGE': 'Bet from ${0} to ${1}. ',
+  // From utils.js
+  'MAP_ERROR_TOOSMALL': 'Your bet is below the minimum of $5',
+  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of $1000',
 };
 
 const pound = {
@@ -170,6 +272,9 @@ const pound = {
   'EVERYONE_BET_TEXT': 'Everyone bet £{0}. ',
   'YOUR_BANKROLL_TEXT': 'You have £{0}. ',
   'RULES_BET_RANGE': 'Bet from £{0} to £{1}. ',
+  // From utils.js
+  'MAP_ERROR_TOOSMALL': 'Your bet is below the minimum of £5',
+  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of £1000',
 };
 
 const resources = {
@@ -191,261 +296,6 @@ const utils = (locale) => {
 
   return {
     strings: translation,
-    pickRandomOption: function(res) {
-      if (res && translation[res]) {
-        const options = translation[res].split('|');
-        return options[Math.floor(Math.random() * options.length)];
-      } else {
-        return undefined;
-      }
-    },
-    getBlackjackAction: function(actionSlot) {
-      const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit', 'draw': 'hit',
-        'stand': 'stand', 'stay': 'stand', 'done': 'stand', 'stick': 'stand', 'hold': 'stand',
-        'surrender': 'surrender', 'give up': 'surrender',
-        'double': 'double', 'double down': 'double',
-        'split': 'split',
-        'shuffle': 'shuffle', 'shuffle deck': 'shuffle',
-        'reset': 'resetbankroll', 'reset bankroll': 'resetbankroll',
-        'bet': 'deal', 'deal': 'deal'};
-      const action = actionSlot.value.toLowerCase();
-      const actionLen = action.length;
-      let map;
-      let ratio;
-      let bestMapping;
-      let bestRatio = 0;
-
-      for (map in actionMapping) {
-        if (map) {
-          const lensum = map.length + actionLen;
-          ratio = Math.round(100 * ((lensum - leven(action, map)) / lensum));
-          if (ratio > bestRatio) {
-            bestRatio = ratio;
-            bestMapping = map;
-          }
-        }
-      }
-
-      if (bestRatio < 90) {
-        console.log('Near match: ' + bestMapping + ', ' + bestRatio);
-      }
-      return ((bestMapping && (bestRatio > 60)) ? actionMapping[bestMapping] : null);
-    },
-    mapChangeValue: function(value) {
-      const valueMapping = {'on': true, 'off': false, 'enable': true, 'disable': false, 'enabled': true, 'disabled': false,
-        '3 to 2': 0.5, 'three to two': 0.5, '6 to 5': 0.2, 'six to five': 0.2, 'even': 0, 'even money': 0,
-        'one deck': 1, 'two decks': 2, 'four decks': 4, 'six decks': 6, 'eight decks': 8,
-        'two deck': 2, 'four deck': 4, 'six deck': 6, 'eight deck': 8,
-        'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'eight': 8,
-        '1': 1, '2': 2, '3': 3, '4': 4, '6': 6, '8': 8};
-      return valueMapping[value];
-    },
-    mapChangeRule: function(rule) {
-      const ruleMapping = {'hit soft seventeen': 'hitSoft17', 'soft seventeen': 'hitSoft17', 'dealer hits seventeen': 'hitSoft17',
-        'hit seventeen': 'hitSoft17', 'hits seventeen': 'hitSoft17',
-        'dealer hit seventeen': 'hitSoft17', 'dealer hits soft seventeen': 'hitSoft17', 'dealer hit soft seventeen': 'hitSoft17',
-        'hit soft 17': 'hitSoft17', 'soft 17': 'hitSoft17', 'dealer hits 17': 'hitSoft17',
-        'hit 17': 'hitSoft17', 'hits 17': 'hitSoft17',
-        'dealer hit 17': 'hitSoft17', 'dealer hits soft 17': 'hitSoft17', 'dealer hit soft 17': 'hitSoft17',
-        'surrender': 'surrender',
-        'double': 'double', 'double down': 'double', 'double after split': 'doubleaftersplit',
-        'resplit aces': 'resplitAces',
-        'blackjack pays': 'blackjackBonus', 'blackjack bonus': 'blackjackBonus', 'number of decks': 'numberOfDecks',
-        'decks': 'numberOfDecks', 'deck count': 'numberOfDecks', 'number of splits': 'maxSplitHands',
-        'number of split hands': 'maxSplitHands', 'split hands': 'maxSplitHands'};
-      return ruleMapping[rule];
-    },
-    mapActionToSuggestion: function(action) {
-      const actionMapping = {'insurance': 'take insurance', 'noinsurance': 'not take insurance', 'hit': 'hit',
-                      'stand': 'stand', 'split': 'split', 'double': 'double', 'surrender': 'surrender'};
-      return actionMapping[action];
-    },
-    mapActionPastTense: function(action) {
-      const actionMapping = {'insurance': 'taken insurance', 'noinsurance': 'not taken insurance', 'hit': 'hit',
-                      'stand': 'stood', 'split': 'split', 'double': 'doubled', 'surrender': 'surrendered'};
-      return actionMapping[action];
-    },
-    mapServerError: function(error) {
-      let errorMapping;
-
-      if (locale == 'en-GB') {
-        errorMapping = {'bettoosmall': 'Your bet is below the minimum of £5',
-                        'bettoolarge': 'Your bet is above the maximum of £1000',
-                        'betoverbankroll': 'Your bet is more than your available bankroll'};
-      } else {
-        errorMapping = {'bettoosmall': 'Your bet is below the minimum of $5',
-                        'bettoolarge': 'Your bet is above the maximum of $1000',
-                        'betoverbankroll': 'Your bet is more than your available bankroll'};
-      }
-      return (errorMapping[error] ? errorMapping[error] : 'Internal error');
-    },
-    readCard: function(card, withArticle, readSuit) {
-      const names = ['none', 'ace', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king'];
-      const suits = {'C': 'clubs', 'D': 'diamonds', 'H': 'hearts', 'S': 'spades'};
-      const articleNames = ['none', 'an ace', 'a two', 'a three', 'a four', 'a five', 'a six', 'a seven', 'an eight', 'a nine', 'a ten', 'a jack', 'a queen', 'a king'];
-      let result;
-
-      if (withArticle === 'article') {
-        result = articleNames[card.rank];
-      } else {
-        result = names[card.rank];
-      }
-
-      if (readSuit) {
-        result += (' of ' + suits[card.suit]);
-      }
-
-      return result;
-    },
-    pluralCardRanks: function(card) {
-      const names = ['none', 'aces', 'twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'jacks', 'queens', 'kings'];
-      return names[card.rank];
-    },
-    mapPlayOption: function(option) {
-      const optionMapping = {'resetbankroll': 'reset game',
-                            'shuffle': 'shuffle',
-                            'deal': 'deal',
-                            'hit': 'hit',
-                            'stand': 'stand',
-                            'double': 'double down',
-                            'insurance': 'take insurance',
-                            'noinsurance': 'decline insurance',
-                            'split': 'split',
-                            'surrender': 'surrender'};
-      return (optionMapping[option] ? optionMapping[option] : option);
-    },
-    mapOutcome: function(outcome) {
-      const outcomeMapping = {'blackjack': 'You win with a Natural Blackjack! ',
-                 'win': 'You won! ',
-                 'loss': 'You lost. ',
-                 'push': 'It\'s a push. ',
-                 'surrender': 'You surrendered. '};
-      return outcomeMapping[outcome];
-    },
-    mapMultipleOutcomes: function(outcome, numHands) {
-      const twoHandMapping = {'win': 'You won both hands!',
-                 'loss': 'You lost both hands.',
-                 'push': 'Both hands pushed.',
-                 'surrender': 'You surrendered both hands.'};
-      const multipleHandMapping = {'win': 'You won all your hands!',
-                 'loss': 'You lost all your hands.',
-                 'push': 'You pushed on all your hands.',
-                 'surrender': 'You surrendered all your hands.'};
-      return (numHands == 2) ? twoHandMapping[outcome] : multipleHandMapping[outcome];
-    },
-    mapHandNumber: function(hand) {
-      const mapping = ['First hand ', 'Second hand ', 'Third hand ', 'Fourth hand '];
-      return mapping[hand];
-    },
-    mapDouble: function(rule) {
-      const doubleMapping = {'any': 'on any cards',
-                            'anyCards': 'on any number of cards',
-                            '10or11': 'on 10 or 11 only',
-                            '9or10or11': 'on 9 thru 11 only',
-                            'none': 'not allowed'};
-      return doubleMapping[rule];
-    },
-    mapBlackjackPayout: function(rule) {
-      const blackjackPayout = {'0.5': '3 to 2',
-                             '0.2': '6 to 5',
-                             '0': 'even money'};
-      return blackjackPayout[rule];
-    },
-    buildUnhandledResponse: function(intent, attributes) {
-      const game = attributes[attributes.currentGame];
-      let response = 'I can\'t ';
-
-      // What are they trying to do?
-      switch (intent.name) {
-        case 'BlackjackIntent':
-          // This one is a little more involved - need to get the ActionSlot
-          if (intent.slots && intent.slots.Action && intent.slots.Action.value) {
-            response += (intent.slots.Action.value + ' ');
-          } else {
-            // Really shouldn't happen
-            console.log('Error - unhandled BlackjackIntent with no action in ' + state);
-            response += 'do that ';
-          }
-          break;
-        case 'SuggestIntent':
-          response += 'give a suggestion ';
-          break;
-        case 'ChangeBetsIntent':
-          response += 'change bets ';
-          break;
-        case 'BetAmountIntent':
-          // Let them know they have to say change bet first
-          if (game && game.possibleActions && game.possibleActions.length
-            && (game.possibleActions.indexOf('deal') >= 0)) {
-            return 'To change the amount bet, please say change bets. ';
-          }
-          response += 'change bets ';
-          break;
-        case 'ResetIntent':
-          response += 'reset the game ';
-          break;
-        case 'AMAZON.YesIntent':
-          response = 'Yes doesn\'t make sense ';
-          break;
-        case 'AMAZON.NoIntent':
-          response = 'No doesn\'t make sense ';
-          break;
-        case 'DealIntent':
-          response += 'deal a new game ';
-          break;
-        case 'RulesIntent':
-          response += 'read the rules ';
-          break;
-        case 'HighScoreIntent':
-          response += 'read the leader board ';
-          break;
-        case 'EnableTrainingIntent':
-          response += 'turn on training mode ';
-          break;
-        case 'DisableTrainingIntent':
-          response += 'turn off training mode ';
-          break;
-        case 'AddPlayerIntent':
-          // This can only be done at the start of the game
-          // and not while you are confirming a name
-          return (attributes.temp.addingName)
-            ? 'You first have to confirm the player name. '
-            : 'To change the players at the table, you have to exit the skill. ';
-
-        // These should be handled - so log an error
-        case 'AMAZON.RepeatIntent':
-        case 'AMAZON.HelpIntent':
-        case 'AMAZON.StopIntent':
-        case 'AMAZON.CancelIntent':
-        case 'SessionEndedRequest':
-        default:
-          console.log('Error - unhandled ' + intent.name);
-          response += 'do that ';
-          break;
-      }
-
-      // New game - ready to start a new game
-      if (attributes.temp.addingName) {
-        response += 'while I\'m waiting for you to confirm a new player name';
-      } else if (attributes.temp.firsthand) {
-        response += 'while you are adding players to the table';
-      } else if (attributes.temp.changingBets !== undefined) {
-        response += 'while you are changing player bets';
-      } else if (game && game.possibleActions && game.possibleActions.length) {
-        if (game.possibleActions.indexOf('deal') >= 0) {
-          response += 'before the hand has started';
-        } else if (game.possibleActions.indexOf('noinsurance') >= 0) {
-          response += 'while I\'m waiting to hear if you want insurance';
-        } else {
-          response += 'during the middle of a hand';
-        }
-      } else {
-        response += 'at this time';
-      }
-      response += '. ';
-
-      return response;
-    },
   };
 };
 

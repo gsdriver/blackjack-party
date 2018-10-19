@@ -55,8 +55,7 @@ module.exports = {
       } else if (event.request.intent.name == 'BlackjackIntent') {
         if (event.request.intent.slots && event.request.intent.slots.Action
           && event.request.intent.slots.Action.value) {
-          const res = require('../resources')(event.request.locale);
-          valid = res.getBlackjackAction(event.request.intent.slots.Action);
+          valid = utils.getBlackjackAction(event.request.locale, event.request.intent.slots.Action);
         }
       }
     }

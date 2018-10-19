@@ -8,6 +8,7 @@ const gameService = require('./GameService');
 const buttons = require('./buttons');
 const speechUtils = require('alexa-speech-utils')();
 const Jimp = require('jimp');
+const leven = require('leven');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
@@ -28,8 +29,8 @@ module.exports = {
 
       if (suggestText === 'notplayerturn') {
         speech = resources.strings.SUGGEST_TURNOVER;
-      } else if (resources.mapActionToSuggestion(suggestText)) {
-        speech = resources.pickRandomOption('SUGGEST_OPTIONS').replace('{0}', resources.mapActionToSuggestion(suggestText));
+      } else if (mapActionToSuggestion(suggestText)) {
+        speech = pickRandomOption('SUGGEST_OPTIONS').replace('{0}', mapActionToSuggestion(suggestText));
       } else {
         speech = suggestText;
       }
@@ -56,7 +57,7 @@ module.exports = {
       if (!game.possibleActions
             || (game.possibleActions.indexOf(action.action) < 0)) {
         // Probably need a way to read out the game state better
-        speechError = resources.strings.INVALID_ACTION.replace('{0}', resources.mapPlayOption(action.action));
+        speechError = resources.strings.INVALID_ACTION.replace('{0}', mapPlayOption(action.action));
         speechError += readHand(attributes, game, locale);
         speechError += ' ' + listValidActions(game, locale, 'full');
         sendUserCallback(attributes, speechError, null, null, null, callback);
@@ -75,12 +76,12 @@ module.exports = {
             game.suggestion = {suggestion: suggestion, player: action.action};
 
             let suggestText;
-            if (resources.mapActionToSuggestion(suggestion)) {
-              suggestText = resources.mapActionToSuggestion(suggestion);
+            if (mapActionToSuggestion(suggestion)) {
+              suggestText = mapActionToSuggestion(suggestion);
             } else {
               suggestText = suggestion;
             }
-            let speech = resources.pickRandomOption('SUGGESTED_PLAY').replace('{0}', suggestText);
+            let speech = pickRandomOption('SUGGESTED_PLAY').replace('{0}', suggestText);
             const reprompt = resources.strings.SUGGESTED_PLAY_REPROMPT.replace('{0}', suggestText);
 
             speech += reprompt;
@@ -95,7 +96,7 @@ module.exports = {
           let error;
 
           if (speechError) {
-            error = resources.mapServerError(speechError);
+            error = mapServerError(speechError);
           } else {
             // Player took an action - the board will need to be redrawn
             if (!attributes.temp) {
@@ -204,7 +205,7 @@ module.exports = {
           result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
         }
       } else {
-        const actions = game.possibleActions.map((x) => resources.mapPlayOption(x));
+        const actions = game.possibleActions.map((x) => mapPlayOption(x));
         actions.push(resources.strings.HELP_YOU_CAN_SAY_LEADER);
         if (helpPrompt && !game.training) {
           actions.push(resources.strings.HELP_YOU_CAN_SAY_ENABLE_TRAINING);
@@ -329,6 +330,32 @@ module.exports = {
       callback();
     }
   },
+  getBlackjackAction: function(locale, actionSlot) {
+    const res = require('./resources')(locale);
+    const actionMapping = ['hit', 'stand', 'surrender', 'double', 'split', 'shuffle', 'resetbankroll', 'deal'];
+    const action = actionSlot.value.toLowerCase();
+    const actionLen = action.length;
+    let ratio;
+    let bestMapping;
+    let bestRatio = 0;
+
+    actionMapping.forEach((map) => {
+      const options = res.strings['BLACKJACK_ACTION_' + map.toUpperCase()].split('|');
+      options.forEach((value) => {
+        const lensum = value.length + actionLen;
+        ratio = Math.round(100 * ((lensum - leven(action, value)) / lensum));
+        if (ratio > bestRatio) {
+          bestRatio = ratio;
+          bestMapping = map;
+        }
+      });
+    });
+
+    if (bestRatio < 90) {
+      console.log('Near match: ' + bestMapping + ', ' + bestRatio);
+    }
+    return ((bestMapping && (bestRatio > 60)) ? bestMapping : null);
+  },
 };
 
 //
@@ -394,7 +421,7 @@ function listValidActions(game, locale, type) {
       }
     } else if (type === 'full') {
       result = resources.strings.ASK_POSSIBLE_ACTIONS.replace('{0}',
-        speechUtils.or(game.possibleActions.map((x) => resources.mapPlayOption(x)),
+        speechUtils.or(game.possibleActions.map((x) => mapPlayOption(x)),
         {locale: locale}));
     } else {
       // Provide a summary
@@ -429,7 +456,7 @@ function tellResult(handlerInput, locale, action, oldGame) {
     // Start by reading the dealer hand (so they know the round is over)
     // Then read everyone's hand and whether they won or pushed
     // (if they happened to have blackjack too)
-    const dealerCardText = resources.readCard(game.dealerHand.cards[1], 'article', game.readSuit);
+    const dealerCardText = sayCard(game.dealerHand.cards[1], 'article', game.readSuit);
     result += resources.strings.READHAND_DEALER_DONE.replace('{0}', dealerCardText);
     result += readDealerAction(game, locale);
     result += ' ';
@@ -454,10 +481,10 @@ function tellResult(handlerInput, locale, action, oldGame) {
           result += resources.strings.CARD_DEAL_SOUND;
           if (oldHand.total > 21) {
             result += resources.strings.RESULT_AFTER_HIT_BUST
-              .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
+              .replace('{0}', sayCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
           } else {
             result += resources.strings.RESULT_AFTER_HIT_NOBUST
-              .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit))
+              .replace('{0}', sayCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit))
               .replace('{1}', oldHand.total);
           }
 
@@ -538,7 +565,7 @@ function tellResult(handlerInput, locale, action, oldGame) {
 function readDealerAction(game, locale) {
   let result;
 
-  result = resources.strings.DEALER_HOLE_CARD.replace('{0}', resources.readCard(game.dealerHand.cards[0], 'article', game.readSuit));
+  result = resources.strings.DEALER_HOLE_CARD.replace('{0}', sayCard(game.dealerHand.cards[0], 'article', game.readSuit));
   if (game.dealerHand.cards.length > 2) {
     result += resources.strings.DEALER_DRAW;
 
@@ -547,9 +574,9 @@ function readDealerAction(game, locale) {
     // should NOT have additional audio.  Sorry to kill the suspense
     let readCards;
     if (game.dealerHand.cards.length <= 6) {
-      readCards = game.dealerHand.cards.slice(2).map((x) => resources.strings.CARD_DEAL_SOUND + resources.readCard(x, 'article', game.readSuit));
+      readCards = game.dealerHand.cards.slice(2).map((x) => resources.strings.CARD_DEAL_SOUND + sayCard(x, 'article', game.readSuit));
     } else {
-      readCards = game.dealerHand.cards.slice(2).map((x) => resources.readCard(x, 'article', game.readSuit));
+      readCards = game.dealerHand.cards.slice(2).map((x) => sayCard(x, 'article', game.readSuit));
     }
     result += speechUtils.and(readCards, {locale: locale, pause: '300ms'});
   }
@@ -600,7 +627,7 @@ function readPlayerResult(attributes, playerPos, fullHand) {
   if (fullHand) {
     const currentHand = currentPlayer.hands[0];
     const readCards = speechUtils.and(currentHand.cards.map((x) => {
-      return resources.readCard(x, false, game.readSuit);
+      return sayCard(x, false, game.readSuit);
     }));
     if ((currentPlayer.hands.length == 1) && (currentHand.cards.length == 2)
       && (currentHand.total == 21)) {
@@ -623,18 +650,18 @@ function readPlayerResult(attributes, playerPos, fullHand) {
 
     if (allSame) {
       // This means you have multiple hands that all had the same outcome
-      outcome += resources.mapMultipleOutcomes(currentPlayer.hands[0].outcome,
+      outcome += mapMultipleOutcomes(currentPlayer.hands[0].outcome,
           currentPlayer.hands.length);
       outcome += ' ';
     } else {
       // Read each hand
       for (i = 0; i < currentPlayer.hands.length; i++) {
         outcome += readHandNumber(game, i);
-        outcome += resources.mapOutcome(currentPlayer.hands[i].outcome);
+        outcome += mapOutcome(currentPlayer.hands[i].outcome);
       }
     }
   } else {
-    outcome += resources.mapOutcome(currentPlayer.hands[0].outcome);
+    outcome += mapOutcome(currentPlayer.hands[0].outcome);
   }
 
   outcome += resources.strings.YOUR_BANKROLL_TEXT
@@ -650,12 +677,12 @@ function readPlayerResult(attributes, playerPos, fullHand) {
 function readHit(attributes, locale) {
   const game = attributes[attributes.currentGame];
   const currentHand = gameService.getCurrentHand(game);
-  const cardText = resources.readCard(currentHand.cards[currentHand.cards.length - 1], 'article', game.readSuit);
+  const cardText = sayCard(currentHand.cards[currentHand.cards.length - 1], 'article', game.readSuit);
   const cardRank = currentHand.cards[currentHand.cards.length - 1].rank;
   let result = resources.strings.CARD_DEAL_SOUND;
 
   if (currentHand.total > 21) {
-    result += resources.pickRandomOption('PLAYER_HIT_BUSTED').replace('{0}', cardText);
+    result += pickRandomOption('PLAYER_HIT_BUSTED').replace('{0}', cardText);
   } else {
     let formatChoices;
 
@@ -679,9 +706,9 @@ function readHit(attributes, locale) {
       }
     }
 
-    result += resources.pickRandomOption(formatChoices).replace('{0}', cardText).replace('{1}', currentHand.total);
+    result += pickRandomOption(formatChoices).replace('{0}', cardText).replace('{1}', currentHand.total);
     if (game.activePlayer === 'player') {
-      result += resources.strings.DEALER_SHOWING.replace('{0}', resources.readCard(game.dealerHand.cards[1], 'article', game.readSuit));
+      result += resources.strings.DEALER_SHOWING.replace('{0}', sayCard(game.dealerHand.cards[1], 'article', game.readSuit));
     }
   }
 
@@ -718,11 +745,21 @@ function readSplit(attributes, locale) {
   const game = attributes[attributes.currentGame];
   let result;
   const pairCard = gameService.getCurrentHand(game).cards[0];
+  const pairs = [resources.strings.SPLIT_PAIR_ACE,
+    resources.strings.SPLIT_PAIR_TWO,
+    resources.strings.SPLIT_PAIR_THREE,
+    resources.strings.SPLIT_PAIR_FOUR,
+    resources.strings.SPLIT_PAIR_FIVE,
+    resources.strings.SPLIT_PAIR_SIX,
+    resources.strings.SPLIT_PAIR_SEVEN,
+    resources.strings.SPLIT_PAIR_EIGHT,
+    resources.strings.SPLIT_PAIR_NINE,
+  ];
 
   if (pairCard.rank >= 10) {
-    result = resources.strings.SPLIT_TENS;
+    result = resources.strings.SPLIT_PAIR_TEN;
   } else {
-    result = resources.strings.SPLIT_PAIR.replace('{0}', resources.pluralCardRanks(pairCard));
+    result = pairs[pairCard.rank - 1];
   }
 
   // Now read the current hand
@@ -807,7 +844,7 @@ function readHand(attributes, game, locale, initial) {
     result += resources.strings.CARD_DEAL_SOUND;
   }
   const readCards = speechUtils.and(currentHand.cards.map((x) => {
-    return resources.readCard(x, false, game.readSuit);
+    return sayCard(x, false, game.readSuit);
   }), {locale: locale});
 
   // Read the full hand
@@ -836,7 +873,7 @@ function readHand(attributes, game, locale, initial) {
     }
   }
 
-  const dealerCardText = resources.readCard(game.dealerHand.cards[1], 'article', game.readSuit);
+  const dealerCardText = sayCard(game.dealerHand.cards[1], 'article', game.readSuit);
 
   if (game.activePlayer == 'none') {
     // Game over, so read the whole dealer hand
@@ -857,7 +894,7 @@ function readHandNumber(game, handNumber) {
   const currentPlayer = gameService.getCurrentPlayer(game);
 
   if (currentPlayer.hands.length > 1) {
-    result = resources.mapHandNumber(handNumber);
+    result = resources.strings.HAND_NUMBER.replace('{Hand}', handNumber + 1);
   }
 
   return result;
@@ -884,7 +921,7 @@ function rulesToText(locale, rules, changeRules) {
 
   // Double rules
   if (!changeRules || changeRules.hasOwnProperty('double') || changeRules.hasOwnProperty('doubleaftersplit')) {
-    const doubleRule = resources.mapDouble(rules.double);
+    const doubleRule = mapDouble(rules.double);
     if (doubleRule) {
       text += resources.strings.RULES_DOUBLE.replace('{0}', doubleRule);
       if (rules.double != 'none') {
@@ -917,13 +954,145 @@ function rulesToText(locale, rules, changeRules) {
 
   if (!changeRules || changeRules.hasOwnProperty('blackjackBonus')) {
     // Blackjack payout
-    const payoutText = resources.mapBlackjackPayout(rules.blackjackBonus.toString());
+    const payoutText = mapBlackjackPayout(rules.blackjackBonus.toString());
     if (payoutText) {
       text += resources.strings.RULES_BLACKJACK.replace('{0}', payoutText);
     }
   }
 
   return text;
+}
+
+function mapActionToSuggestion(action) {
+  const actionMapping = {'insurance': resources.strings.MAP_ACTION_INSURANCE,
+      'noinsurance': resources.strings.MAP_ACTION_NOINSURANCE,
+      'hit': resources.strings.MAP_ACTION_HIT,
+      'stand': resources.strings.MAP_ACTION_STAND,
+      'split': resources.strings.MAP_ACTION_SPLIT,
+      'double': resources.strings.MAP_ACTION_DOUBLE,
+      'surrender': resources.strings.MAP_ACTION_SURRENDER};
+  return actionMapping[action];
+}
+
+function mapServerError(error) {
+  const errorMapping = {'bettoosmall': resources.strings.MAP_ERROR_TOOSMALL,
+            'bettoolarge': resources.strings.MAP_ERROR_TOOLARGE,
+            'betoverbankroll': resources.strings.MAP_ERROR_OVER_BANKROLL};
+  return (errorMapping[error] ? errorMapping[error] : 'Internal error');
+}
+
+function mapOutcome(outcome) {
+  const outcomeMapping = {'blackjack': resources.strings.OUTCOME_BLACKJACK,
+             'win': resources.strings.OUTCOME_WIN,
+             'loss': resources.strings.OUTCOME_LOSS,
+             'push': resources.strings.OUTCOME_PUSH,
+             'surrender': resources.strings.OUTCOME_SURRENDER};
+  return outcomeMapping[outcome];
+}
+
+function mapMultipleOutcomes(outcome, numHands) {
+  const twoHandMapping = {'win': resources.strings.OUTCOME_TWOHAND_WIN,
+             'loss': resources.strings.OUTCOME_TWOHAND_LOSS,
+             'push': resources.strings.OUTCOME_TWOHAND_PUSH,
+             'surrender': resources.strings.OUTCOME_TWOHAND_SURRENDER};
+  const multipleHandMapping = {'win': resources.strings.OUTCOME_MULTIPLEHAND_WIN,
+             'loss': resources.strings.OUTCOME_MULTIPLEHAND_LOSS,
+             'push': resources.strings.OUTCOME_MULTIPLEHAND_PUSH,
+             'surrender': resources.strings.OUTCOME_MULTIPLEHAND_SURRENDER};
+  return (numHands == 2) ? twoHandMapping[outcome] : multipleHandMapping[outcome];
+}
+
+function mapDouble(rule) {
+  const doubleMapping = {'any': resources.strings.DOUBLE_ANY,
+                        'anyCards': resources.strings.DOUBLE_ANYCARDS,
+                        '10or11': resources.strings.DOUBLE_10OR11,
+                        '9or10or11': resources.strings.DOUBLE_9OR10OR11,
+                        'none': resources.strings.DOUBLE_NONE};
+  return doubleMapping[rule];
+}
+
+function mapBlackjackPayout(rule) {
+  const blackjackPayout = {'0.5': resources.strings.BLACKJACKPAYOUT_3To2,
+                         '0.2': resources.strings.BLACKJACKPAYOUT_6TO5,
+                         '0': resources.strings.BLACKJACKPAYOUT_EVEN};
+  return blackjackPayout[rule];
+}
+
+function mapPlayOption(option) {
+  const optionMapping = {'resetbankroll': resources.strings.PLAYOPTION_RESET,
+                        'shuffle': resources.strings.PLAYOPTION_SHUFFLE,
+                        'deal': resources.strings.PLAYOPTION_DEAL,
+                        'hit': resources.strings.PLAYOPTION_HIT,
+                        'stand': resources.strings.PLAYOPTION_STAND,
+                        'double': resources.strings.PLAYOPTION_DOUBLE,
+                        'insurance': resources.strings.PLAYOPTION_INSURANCE,
+                        'noinsurance': resources.strings.PLAYOPTION_NOINSURANCE,
+                        'split': resources.strings.PLAYOPTION_SPLIT,
+                        'surrender': resources.strings.PLAYOPTION_SURRENDER};
+  return (optionMapping[option] ? optionMapping[option] : option);
+}
+
+function sayCard(card, withArticle, readSuit) {
+  const suits = {'C': resources.strings.SAY_CARD_CLUB,
+    'D': resources.strings.SAY_CARD_DIAMONDS,
+    'H': resources.strings.SAY_CARD_HEARTS,
+    'S': resources.strings.SAY_CARD_SPADES};
+  const articleNames = ['none',
+    resources.strings.SAY_CARD_A_ACE,
+    resources.strings.SAY_CARD_A_TWO,
+    resources.strings.SAY_CARD_A_THREE,
+    resources.strings.SAY_CARD_A_FOUR,
+    resources.strings.SAY_CARD_A_FIVE,
+    resources.strings.SAY_CARD_A_SIX,
+    resources.strings.SAY_CARD_A_SEVEN,
+    resources.strings.SAY_CARD_A_EIGHT,
+    resources.strings.SAY_CARD_A_NINE,
+    resources.strings.SAY_CARD_A_TEN,
+    resources.strings.SAY_CARD_A_JACK,
+    resources.strings.SAY_CARD_A_QUEEN,
+    resources.strings.SAY_CARD_A_KING,
+  ];
+  let result;
+  let rank;
+
+  if (withArticle === 'article') {
+    rank = articleNames[card.rank];
+  } else {
+    switch (card.rank) {
+      case 1:
+        rank = resources.strings.SAY_CARD_ACE;
+        break;
+      case 11:
+        rank = resources.strings.SAY_CARD_JACK;
+        break;
+      case 12:
+        rank = resources.strings.SAY_CARD_QUEEN;
+        break;
+      case 13:
+        rank = resources.strings.SAY_CARD_KING;
+        break;
+      default:
+        rank = card.rank;
+        break;
+    }
+  }
+
+  if (readSuit) {
+    result = resources.strings.SAY_CARD_WITH_SUIT.replace('{Rank}', rank).replace('{Suit}', suits[card.suit]);
+  } else {
+    result = rank;
+  }
+
+  return result;
+}
+
+function pickRandomOption(res) {
+  if (res && resources.strings[res]) {
+    const options = resources.strings[res].split('|');
+    return options[Math.floor(Math.random() * options.length)];
+  } else {
+    return undefined;
+  }
 }
 
 //

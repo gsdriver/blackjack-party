@@ -32,18 +32,7 @@
           "en-US": {
             "eTag": "d8e5ba3d0b7feea8b0be68fb769cb93d"
           }
-        },
-        "lambda": [
-          {
-            "arn": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty",
-            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:BlackjackParty",
-            "awsRegion": "us-east-1",
-            "alexaUsage": [
-              "custom/default"
-            ],
-            "revisionId": "350497c8-83c3-4517-921a-6cb3d94ace0c"
-          }
-        ]
+        }
       }
     }
   }
