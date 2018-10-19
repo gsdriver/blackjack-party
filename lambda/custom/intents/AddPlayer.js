@@ -60,6 +60,7 @@ module.exports = {
     }
 
     // If we have four players, you cannot add another player
+    buttons.startInputHandler(handlerInput);
     if (game.players.length == 4) {
       return handlerInput.responseBuilder
         .speak(res.strings.ADD_PLAYER_TABLE_FULL)
@@ -82,9 +83,6 @@ module.exports = {
         format = res.strings.ADD_PLAYER;
       }
 
-      if (event.request.type === 'GameEngine.InputHandlerEvent') {
-        buttons.startInputHandler(handlerInput);
-      }
       return handlerInput.responseBuilder
         .speak(format.replace('{0}', (game.players.length + 1)))
         .reprompt(res.strings.ADD_PLAYER_REPROMPT)

@@ -6,6 +6,7 @@
 'use strict';
 
 const utils = require('../utils');
+const buttons = require('../buttons');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -20,8 +21,11 @@ module.exports = {
     // Echo back the action that we heard, why this isn't valid at this time,
     // and what the possible actions are for them to say
     if (event.request.type === 'GameEngine.InputHandlerEvent') {
-      // Probably a timeout - fail silently
+      // Probably a timeout - fail silently and restart input
       console.log('Unhandled button event: ' + JSON.stringify(event.request.events));
+      buttons.startInputHandler(handlerInput);
+      return handlerInput.responseBuilder
+        .getResponse();
     } else if (!event.request.intent) {
       // Something we really don't handle
       console.log('Error - Unhandled didn\'t get an intent');
@@ -48,19 +52,18 @@ function buildUnhandledResponse(handlerInput) {
   const res = require('../resources')(handlerInput.requestEnvelope.request.locale);
 
   const game = attributes[attributes.currentGame];
-  let action;
-  let state;
+  let action = res.strings.UNHANDLED_ACTION_GENERIC;
+  let state = res.strings.UNHANDLED_STATE_OTHER;
 
   // What are they trying to do?
   switch (intent.name) {
     case 'BlackjackIntent':
       // This one is a little more involved - need to get the ActionSlot
       if (intent.slots && intent.slots.Action && intent.slots.Action.value) {
-        action += (intent.slots.Action.value + ' ');
+        action = (intent.slots.Action.value + ' ');
       } else {
         // Really shouldn't happen
         console.log('Error - unhandled BlackjackIntent with no action in ' + state);
-        action = res.strings.UNHANDLED_ACTION_GENERIC;
       }
       break;
     case 'SuggestIntent':
@@ -116,7 +119,6 @@ function buildUnhandledResponse(handlerInput) {
     case 'SessionEndedRequest':
     default:
       console.log('Error - unhandled ' + intent.name);
-      action = res.strings.UNHANDLED_ACTION_GENERIC;
       break;
   }
 
@@ -135,8 +137,6 @@ function buildUnhandledResponse(handlerInput) {
     } else {
       state = res.strings.UNHANDLED_STATE_INGAME;
     }
-  } else {
-    state = res.strings.UNHANDLED_STATE_OTHER;
   }
 
   return res.strings.UNHANDLED_FORMAT.replace('{Action}', action).replace('{State}', state);

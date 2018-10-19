@@ -52,8 +52,42 @@ module.exports = {
     const colors = ['00FE10', 'FF0000', '0000FF', 'FFFF00'];
     return ((player >= 0) && (player < colors.length)) ? colors[player] : 'FFFFFF';
   },
+ stopInputHandler: function(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if (attributes.temp.inputHandlerRequestId) {
+      handlerInput.responseBuilder.addDirective({
+        'type': 'GameEngine.StopInputHandler',
+        'originatingRequestId': attributes.temp.inputHandlerRequestId,
+      });
+      module.exports.disableButtons(handlerInput);
+      attributes.temp.inputHandlerRequestId = undefined;
+    }
+  },
   startInputHandler: function(handlerInput) {
     if (module.exports.supportButtons(handlerInput)) {
+      const request = handlerInput.requestEnvelope.request;
+      const attributes = handlerInput.attributesManager.getSessionAttributes();
+      let gadgetIds;
+
+      if (!attributes.temp.firsthand) {
+        // We'll only enable for registered buttons
+        // or not at all if no buttons have been pressed
+        gadgetIds = [];
+
+        if (attributes.temp.buttons) {
+          let id;
+          for (id in attributes.temp.buttons) {
+            if (id) {
+              gadgetIds.push(attributes.temp.buttons[id].id);
+            }
+          }
+        } else {
+          // No buttons means no input handler
+          return;
+        }
+      }
+
       // We'll allow them to press the button again
       handlerInput.responseBuilder.addDirective({
         'type': 'GameEngine.StartInputHandler',
@@ -63,6 +97,7 @@ module.exports = {
             'type': 'match',
             'fuzzy': false,
             'anchor': 'end',
+            'gadgetIds': gadgetIds,
             'pattern': [{
               'action': 'down',
             }],
@@ -72,10 +107,11 @@ module.exports = {
           'button_down_event': {
             'meets': ['button_down_recognizer'],
             'reports': 'matches',
-            'shouldEndInputHandler': false,
+            'shouldEndInputHandler': true,
           },
         },
       });
+      attributes.temp.inputHandlerRequestId = request.requestId;
     }
   },
   colorButton: function(handlerInput, buttonId, buttonColor) {

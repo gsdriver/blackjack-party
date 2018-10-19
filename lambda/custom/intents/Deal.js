@@ -5,6 +5,7 @@
 'use strict';
 
 const utils = require('../utils');
+const buttons = require('../buttons');
 
 module.exports = {
   canHandle(handlerInput) {
@@ -43,6 +44,15 @@ module.exports = {
         if (!error) {
           attributes.temp.firsthand = undefined;
           attributes.temp.firstplay = undefined;
+
+          // If there were no buttons pressed, turn off the input handler
+          // otherwise call start input handler to restrict input to
+          // only those buttons that are registered
+          if (!attributes.temp.buttons) {
+            buttons.stopInputHandler(handlerInput);
+          } else {
+            buttons.startInputHandler(handlerInput);
+          }
 
           // Set each player's timestamp and hands played
           const now = Date.now();

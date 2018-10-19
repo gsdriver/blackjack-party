@@ -39,11 +39,7 @@ module.exports = {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
-    // If they pushed a button, re-open for input
-    if (event.request.type === 'GameEngine.InputHandlerEvent') {
-      buttons.startInputHandler(handlerInput);
-    }
-
+    buttons.startInputHandler(handlerInput);
     return new Promise((resolve, reject) => {
       attributes.suggestRequests = (attributes.suggestRequests + 1) || 1;
       utils.playBlackjackAction(handlerInput,

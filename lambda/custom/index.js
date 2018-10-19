@@ -94,6 +94,9 @@ const saveResponseInterceptor = {
             resolve();
           }
         });
+        if (!process.env.NOLOG) {
+          console.log(JSON.stringify(response));
+        }
       } else {
         resolve();
       }

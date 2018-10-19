@@ -2,6 +2,7 @@ var mainApp = require('../lambda/custom/index');
 
 const attributeFile = 'attributes.txt';
 
+const fs = require('fs');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
@@ -246,7 +247,6 @@ function BuildEvent(argv)
     };
 
     // If there is an attributes.txt file, read the attributes from there
-    const fs = require('fs');
     if (fs.existsSync(attributeFile)) {
       data = fs.readFileSync(attributeFile, 'utf8');
       if (data) {
@@ -388,6 +388,13 @@ function myResponse(appId) {
 }
 
 function myResponse(err, result) {
+  // Write the last action
+  fs.writeFile('lastResponse.txt', JSON.stringify(result), (err) => {
+    if (err) {
+      console.log('ERROR; ' + err.stack);
+    }
+  });
+
   if (err) {
     console.log('ERROR; ' + err.stack);
   } else if (!result.response || !result.response.outputSpeech) {
@@ -407,7 +414,6 @@ function myResponse(err, result) {
     }
     if (result.sessionAttributes) {
       // Output the attributes too
-      const fs = require('fs');
       fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
         if (err) {
           console.log(err);
@@ -419,8 +425,6 @@ function myResponse(err, result) {
 
 // Build the event object and call the app
 if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
-  const fs = require('fs');
-
   // Clear is a special case - delete this entry from the DB and delete the attributes.txt file
   dynamodb.deleteItem({TableName: 'BlackjackParty', Key: { id: {S: USERID}}}, function (error, data) {
     console.log("Deleted " + error);

@@ -32,6 +32,7 @@ module.exports = {
     const game = attributes[attributes.currentGame];
     const res = require('../resources')(event.request.locale);
 
+    buttons.startInputHandler(handlerInput);
     if ((handlerInput.requestEnvelope.request.type === 'GameEngine.InputHandlerEvent') ||
       (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent')) {
       // Great, add the player
@@ -62,11 +63,6 @@ module.exports = {
           : res.strings.CONFIRM_ADD_PLAYER;
         if (!utils.addPlayer(handlerInput)) {
           speech = res.strings.CONFIRM_WELCOME_BACK.replace('{0}', name) + speech;
-        }
-
-        if ((event.request.type === 'GameEngine.InputHandlerEvent') &&
-          (game.players.length < 4)) {
-          buttons.startInputHandler(handlerInput);
         }
 
         return handlerInput.responseBuilder
