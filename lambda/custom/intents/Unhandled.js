@@ -56,7 +56,7 @@ function buildUnhandledResponse(handlerInput) {
     case 'BlackjackIntent':
       // This one is a little more involved - need to get the ActionSlot
       if (intent.slots && intent.slots.Action && intent.slots.Action.value) {
-        response += (intent.slots.Action.value + ' ');
+        action += (intent.slots.Action.value + ' ');
       } else {
         // Really shouldn't happen
         console.log('Error - unhandled BlackjackIntent with no action in ' + state);

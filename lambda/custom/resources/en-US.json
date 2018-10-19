@@ -1,0 +1,13 @@
+{
+  "BET_AMOUNT_SET": "Bet set to ${0}. ",
+  "BET_BELOW_MIN": "A bet of ${0} is below the table minimum of ${1}. ",
+  "BET_ABOVE_BANKROLL": "A bet of ${0} exceeds you bankroll of ${1}. ",
+  "BET_ABOVE_MAX": "A bet of ${0} is above the table maximum of ${1}. ",
+  "HIGHSCORE_LEADER_FORMAT": "{0} at ${1}",
+  "PLAYER_BET_TEXT": "{0} bet ${1} ",
+  "EVERYONE_BET_TEXT": "Everyone bet ${0}. ",
+  "YOUR_BANKROLL_TEXT": "You have ${0}. ",
+  "RULES_BET_RANGE": "Bet from ${0} to ${1}. ",
+  "MAP_ERROR_TOOSMALL": "Your bet is below the minimum of $5",
+  "MAP_ERROR_TOOLARGE": "Your bet is above the maximum of $1000"
+}
