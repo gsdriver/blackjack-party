@@ -19,6 +19,20 @@
           "description": "Play blackjack with your friends on Alexa!  You and up to 3 friends can play against the dealer at the same table, optionally using Echo Buttons to keep track of each player's turn.  Each player's bankroll is saved and you can change the group of players from the table each time you play.  Players start with 5,000 dollars in credit and can vary bets from 5 to 1,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand!  This full-featured game has it all - hit, stand, split, double down, and even surrender.\n\nCompare your peak bankroll with other players by saying \"read high scores\" to hear the leader board for all players on your device.\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
           "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/a194/9daa84cf5c8a43ae91485e94d26609eb/APP_ICON_LARGE?versionId=M3IFOd0N82Wrpp6tCs3Yiz3MGEPtWqWN&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1532099668&Signature=0FhBaHkiS3t2uUFyQ6UK78GXwkc%3D"
         },
+        "de-DE": {
+          "description": "Spiele mit deinen Freunden Blackjack mit Alexa! Du kannst mit bis zu 3 Freunden an einem Tisch gegen die Bank spielen. Wenn du willst, kannst du dabei Echo Buttons verwenden, um immer zu wissen, wer gerade an der Reihe ist. \n\nDie Bankroll jedes Spielers wird gespeichert. Auch wenn du mehrere Runden Blackjack spielst, kannst du deine Bankroll immer im Auge behalten. Bei jedem neuen Spiel lässt sich die Spielerzusammenstellung am Tisch ändern. \n\nZu Beginn hast du 5000 Dollar zur Verfügung. Dein Einsatz kann zwischen 5 und 1000 Dollar liegen. \n\nVerbessere deine Blackjack Skills, in dem du vor deinen Zügen um Hinweise bittest (\"Was soll ich tun?\") oder indem du im Trainingsmodus spielst (\"Trainingsmodus anschalten\"), in dem Alexa dir vor jedem Zug sagt, was basierenden auf den aktuell angewandten Spielregeln die beste Taktik ist.  \n\nDieses umfangreiche Spiel bietet alle Spieloptionen -  Hit, Stand, Split, Double Down und Surrender.\n\nVergleiche deine Bankroll mit denen der anderen Spieler und sage \"Lies die High Scores vor\", um die aktuelle Rangliste zu hören.",
+          "examplePhrases": [
+            "Alexa, lass Blackjack Party die Karten austeilen ",
+            "Einen Spieler hinzufügen ",
+            "Trainingsmodus anschalten "
+          ],
+          "keywords": [
+            "Blackjack",
+            "Spiel"
+          ],
+          "name": "Blackjack Party",
+          "summary": "Spiele die Partyversion von Blackjack mit deinen Freunden! Nutze den Trainingsmodus, um Blackjack spielen zu lernen!"
+        },
         "en-CA": {
           "summary": "Play blackjack with your friends in this party version of Blackjack! Use training mode to learn as you play!",
           "examplePhrases": [

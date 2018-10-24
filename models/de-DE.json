@@ -4,29 +4,6 @@
       "invocationName": "Blackjack Party",
       "intents": [
         {
-          "name": "ResetIntent",
-          "samples": [
-            "setze das Spiel zurück",
-            "Spiel zurücksetzen",
-            "setze die Bankroll zurück",
-            "Bankroll zurücksetzen",
-            "setze das Spiel zurück",
-            "das Spiel zurücksetzen",
-            "Regeln zurücksetzen",
-            "setze Regeln zurück",
-            "mein Spiel zurücksetzen",
-            "setze mein Spiel zurück",
-            "setze meine Bankroll zurück",
-            "meine Bankroll zurücksetzen",
-            "setze Regeln zurück",
-            "Regeln zurücksetzen",
-            "die Regeln zurücksetzen",
-            "setze die Regeln zurück",
-            "meine Regeln zurücksetzen",
-            "setze meine Regeln zurück"
-          ]
-        },
-        {
           "name": "AMAZON.RepeatIntent"
         },
         {
@@ -70,34 +47,11 @@
           "slots": [
             {
               "name": "Name",
-              "type": "AMAZON.US_FIRST_NAME"
+              "type": "AMAZON.DE_FIRST_NAME"
             }
           ],
           "samples": [
             "{Name}"
-          ]
-        },
-        {
-          "name": "ChangeRulesIntent",
-          "slots": [
-            {
-              "name": "Change",
-              "type": "LIST_OF_RULE_OPTIONS"
-            },
-            {
-              "name": "ChangeOption",
-              "type": "LIST_OF_RULE_VALUES"
-            }
-          ],
-          "samples": [
-            "ändere {Change} in {ChangeOption}",
-            "{Change} auf {ChangeOption} festlegen",
-            "{Change} zu {ChangeOption} ändern",
-            "{Change} in {ChangeOption} ändern",
-            "für {Change} {ChangeOption} festlegen",
-            "{Change} zu {ChangeOption} machen",
-            "{ChangeOption} {Change}",
-            "{Change} {ChangeOption}"
           ]
         },
         {
@@ -131,62 +85,6 @@
         },
         {
           "name": "AMAZON.NextIntent"
-        },
-        {
-          "name": "RemoveSideBetIntent",
-          "samples": [
-            "entferne die Zusatzwette",
-            "Zusatzwette entfernen",
-            "entferne eine Zusatzwette",
-            "eine Zusatzwette enfernen",
-            "schließe Zusatzwette ab",
-            "Zusatzwette abschließen",
-            "schließe eine Zusatzwette ab",
-            "eine Zusatzwette abschließen",
-            "Zusatzwette beenden",
-            "beende die Zusatzwette",
-            "entferne die progressive Zusatzwette",
-            "progressive Zusatzwette entfernen",
-            "eine progressive Wette entfernen",
-            "entferne eine progressive Wette",
-            "progressive Wette abschließen",
-            "schließe progressive Wette ab",
-            "schließe eine progressive Wette ab",
-            "eine progressive Wette abschließen",
-            "beende die progressive Wette",
-            "Progressive Wette beenden",
-            "progressive Zusatzwette entfernen",
-            "eine progressive Zusatzwette entfernen",
-            "entferne eine progressive Zusatzwette ",
-            "progressive Zusatzwette abschließen",
-            "schließe eine progressive Zusatzwette ab",
-            "progressive Zusatzwette abschließen",
-            "beende die progressive Zusatzwette",
-            "progressive Zusatzwette beenden"
-          ]
-        },
-        {
-          "name": "SelectIntent",
-          "samples": [
-            "suche ein anderes Spiel aus",
-            "ein neues Spiel aussuchen",
-            "ein anderes Spiel aussuchen",
-            "wechsele zu einem anderen Spiel",
-            "zu einem neuen Spiel wechseln",
-            "zu einem anderen Spiel wechseln",
-            "ein anderes Spiel auswählen",
-            "wähle ein anderes Spiel aus",
-            "wähle ein neues Spiel aus",
-            "ein anderes Spiel wählen",
-            "suche ein anderes Spiel aus",
-            "ein neues Spiel auswählen",
-            "wähle ein anderes Spiel",
-            "ein anderes Spiel spielen",
-            "spiele ein anderes Spiel",
-            "wechsele zu einem neuen Spiel",
-            "zu einem anderen Spiel wechseln",
-            "wechsle zu einem anderen Spiel"
-          ]
         },
         {
           "name": "HighScoreIntent",
@@ -249,29 +147,6 @@
           ]
         },
         {
-          "name": "PurchaseIntent",
-          "slots": [
-            {
-              "name": "Product",
-              "type": "LIST_OF_PRODUCTS"
-            }
-          ],
-          "samples": [
-            "Was kann ich kaufen ",
-            "Was kann ich einkaufen",
-            "Sag mir, was ich kaufen kann ",
-            "Was kann ich bezahlen ",
-            "Sag mir, was ich bezahlen kann ",
-            "Ich möchte {Product} kaufen",
-            "Ich will {Product} kaufen",
-            "Ich möchte {Product}",
-            "Ich will {Product}",
-            "gib mir {Product}",
-            "{Product} kaufen",
-            "{Product} bezahlen"
-          ]
-        },
-        {
           "name": "AMAZON.NavigateSettingsIntent"
         },
         {
@@ -283,40 +158,6 @@
             "geben",
             "gib",
             "spielen"
-          ]
-        },
-        {
-          "name": "PlaceSideBetIntent",
-          "samples": [
-            "Zusatzwette abschließen",
-            "eine Zusatzwette platzieren",
-            "platziere eine Zusatzwette",
-            "Zusatzwette abschließen",
-            "schließe eine Zusatzwette ab",
-            "Zusatzwette abschließen",
-            "schließe eine Zusatzwette ab",
-            "Zusatzwette abschließen",
-            "schließe eine Zusatzwette ab",
-            "schließe eine progressive Wette ab",
-            "progressive Wette abschließen",
-            "eine progressive Wette abschließen",
-            "schließe eine progressive Wette ab",
-            "schließe progressive Wette ab",
-            "progressive Wette abschließen",
-            "eine progressive Zusatzwette machen",
-            "mache eine progressive Zusatzwette",
-            "progressive Wette abschließen",
-            "schließe eine progressive Wette ab",
-            "platziere eine progressive Zusatzwette",
-            "progressive Zusatzwette platzieren",
-            "eine progressive Zusatzwette platzieren",
-            "platziere eine progressive Zusatzwette",
-            "mache eine progressive Zusatzwette",
-            "eine progressive Zusatzwette machen",
-            "mache eine progressive Zusatzwette",
-            "eine progressive Zusatzwette machen",
-            "progressive Zusatzwette abschließen",
-            "schließe eine progressive Zusatzwette ab"
           ]
         },
         {
@@ -387,25 +228,6 @@
           ]
         },
         {
-          "name": "RefundIntent",
-          "slots": [
-            {
-              "name": "Product",
-              "type": "LIST_OF_PRODUCTS"
-            }
-          ],
-          "samples": [
-            "{Product} zurückgeben",
-            "erstatte Geld für {Product} zurück",
-            "Geld für {Product} rückerstatten",
-            "zahle Geld für {Product} zurück",
-            "Geld für {Product} zurückzahlen"
-          ]
-        },
-        {
-          "name": "AMAZON.FallbackIntent"
-        },
-        {
           "name": "AMAZON.StopIntent"
         },
         {
@@ -458,36 +280,6 @@
           "name": "AMAZON.ScrollUpIntent"
         },
         {
-          "name": "BettingIntent",
-          "slots": [
-            {
-              "name": "Amount",
-              "type": "AMAZON.NUMBER"
-            }
-          ],
-          "samples": [
-            "{Amount} setzen",
-            "um {Amount} spielen",
-            "um {Amount} spielen",
-            "spiele um {Amount}",
-            "setze {Amount} Dollar ein",
-            "{Amount} Dollar einsetzen",
-            "setze {Amount} Dollar ein",
-            "setze {Amount} Dollar",
-            "{Amount} Dollar setzen",
-            "Einsatz {Amount} Dollar",
-            "{Amount} Dollar einsetzen",
-            "um {Amount} Dollar spielen",
-            "Einsatz setzen",
-            "Jetzt einen Einsatz setzen",
-            " Karten austeilen",
-            "Teil die Karten aus",
-            " Teil die Karten aus",
-            " Karten austeilen",
-            "setzen"
-          ]
-        },
-        {
           "name": "EnableTrainingIntent",
           "samples": [
             "Trainingsmodus anschalten",
@@ -529,131 +321,6 @@
         }
       ],
       "types": [
-        {
-          "name": "LIST_OF_RULE_VALUES",
-          "values": [
-            {
-              "name": {
-                "value": "ein"
-              }
-            },
-            {
-              "name": {
-                "value": "aus"
-              }
-            },
-            {
-              "name": {
-                "value": "aktivieren"
-              }
-            },
-            {
-              "name": {
-                "value": "deaktivieren"
-              }
-            },
-            {
-              "name": {
-                "value": "aktiviert"
-              }
-            },
-            {
-              "name": {
-                "value": "deaktiviert"
-              }
-            },
-            {
-              "name": {
-                "value": "drei zu zwei"
-              }
-            },
-            {
-              "name": {
-                "value": "sechs zu fünf"
-              }
-            },
-            {
-              "name": {
-                "value": "even money"
-              }
-            },
-            {
-              "name": {
-                "value": "even"
-              }
-            },
-            {
-              "name": {
-                "value": "ein Deck"
-              }
-            },
-            {
-              "name": {
-                "value": "eins"
-              }
-            },
-            {
-              "name": {
-                "value": "zwei Deck"
-              }
-            },
-            {
-              "name": {
-                "value": "zwei Decks"
-              }
-            },
-            {
-              "name": {
-                "value": "zwei"
-              }
-            },
-            {
-              "name": {
-                "value": "vier Deck"
-              }
-            },
-            {
-              "name": {
-                "value": "vier Decks"
-              }
-            },
-            {
-              "name": {
-                "value": "vier"
-              }
-            },
-            {
-              "name": {
-                "value": "sechs Deck"
-              }
-            },
-            {
-              "name": {
-                "value": "sechs Decks"
-              }
-            },
-            {
-              "name": {
-                "value": "sechs"
-              }
-            },
-            {
-              "name": {
-                "value": "acht Deck"
-              }
-            },
-            {
-              "name": {
-                "value": "acht Decks"
-              }
-            },
-            {
-              "name": {
-                "value": "acht"
-              }
-            }
-          ]
-        },
         {
           "name": "LIST_OF_ACTIONS",
           "values": [
@@ -720,131 +387,6 @@
             {
               "name": {
                 "value": "Karten ausgeben"
-              }
-            }
-          ]
-        },
-        {
-          "name": "LIST_OF_PRODUCTS",
-          "values": [
-            {
-              "name": {
-                "value": "spanish 21"
-              }
-            },
-            {
-              "name": {
-                "value": "spanish"
-              }
-            }
-          ]
-        },
-        {
-          "name": "LIST_OF_RULE_OPTIONS",
-          "values": [
-            {
-              "name": {
-                "value": "Karte bei Soft Siebzehn"
-              }
-            },
-            {
-              "name": {
-                "value": "Karte bei Siebzehn"
-              }
-            },
-            {
-              "name": {
-                "value": "zieht bei Siebzehn"
-              }
-            },
-            {
-              "name": {
-                "value": "Soft Siebzehn"
-              }
-            },
-            {
-              "name": {
-                "value": "Dealer zieht bei Siebzehn"
-              }
-            },
-            {
-              "name": {
-                "value": "Dealer zieht bei Siebzehn"
-              }
-            },
-            {
-              "name": {
-                "value": "Dealer zieht bei Soft Siebzehn"
-              }
-            },
-            {
-              "name": {
-                "value": "Dealer zieht bei Soft Siebzehn"
-              }
-            },
-            {
-              "name": {
-                "value": "aufgeben"
-              }
-            },
-            {
-              "name": {
-                "value": "verdoppeln"
-              }
-            },
-            {
-              "name": {
-                "value": "double down"
-              }
-            },
-            {
-              "name": {
-                "value": "nach Split verdoppeln"
-              }
-            },
-            {
-              "name": {
-                "value": "Asse erneut teilen"
-              }
-            },
-            {
-              "name": {
-                "value": "Auszahlung"
-              }
-            },
-            {
-              "name": {
-                "value": "Blackjack-Bonus"
-              }
-            },
-            {
-              "name": {
-                "value": "Anzahl der Decks"
-              }
-            },
-            {
-              "name": {
-                "value": "Decks"
-              }
-            },
-            {
-              "name": {
-                "value": "Anzahl der Decks"
-              }
-            },
-            {
-              "name": {
-                "value": "Anzahl der Splits"
-              }
-            },
-            {
-              "name": {
-                "value": "Anzahl der geteilten Hände"
-              }
-            },
-            {
-              "name": {
-                "value": "Hände teilen"
               }
             }
           ]

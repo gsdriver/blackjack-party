@@ -6,6 +6,7 @@ let data;
 let en;
 let us;
 let gb;
+let de;
 data = fs.readFileSync(__dirname + '/resources/en.json', 'utf8');
 if (data) {
   en = JSON.parse(data);
@@ -21,12 +22,20 @@ if (data) {
   gb = JSON.parse(data);
 }
 
+data = fs.readFileSync(__dirname + '/resources/de-DE.json', 'utf8');
+if (data) {
+  de = JSON.parse(data);
+}
+
 const resources = {
   'en-US': {
     'translation': Object.assign({}, en, us),
   },
   'en-GB': {
     'translation': Object.assign({}, en, gb),
+  },
+  'de-DE': {
+    'translation': Object.assign({}, de),
   },
 };
 
