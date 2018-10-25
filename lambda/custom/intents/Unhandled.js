@@ -126,7 +126,7 @@ function buildUnhandledResponse(handlerInput) {
   if (attributes.temp.addingName) {
     state = res.strings.UNHANDLED_STATE_ADDINGPLAYER;
   } else if (attributes.temp.firsthand) {
-    state = res.strings.UNHANLDED_STATE_FIRSTHAND;
+    state = res.strings.UNHANDLED_STATE_FIRSTHAND;
   } else if (attributes.temp.changingBets !== undefined) {
     state = res.strings.UNHANDLED_STATE_CHANGINGBETS;
   } else if (game && game.possibleActions && game.possibleActions.length) {

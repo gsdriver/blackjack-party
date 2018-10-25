@@ -124,7 +124,7 @@
   "UNHANDLED_STATE_INSURANCEOFFERED": "while I'm waiting to hear if you want insurance",
   "UNHANDLED_STATE_INGAME": "during the middle of a hand",
   "UNHANDLED_STATE_ADDINGPLAYER": "while I'm waiting for you to confirm a new player name",
-  "UNHANLDED_STATE_FIRSTHAND": "while you are adding players to the table",
+  "UNHANDLED_STATE_FIRSTHAND": "while you are adding players to the table",
   "UNHANDLED_STATE_CHANGINGBETS": "while you are changing player bets",
   "UNHANDLED_STATE_OTHER": "at this time",
   "UNHANDLED_ACTION_SUGGESTION": "give a suggesiton",
