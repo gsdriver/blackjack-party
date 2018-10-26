@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "Blackjack Party",
+      "invocationName": "blackjack party",
       "intents": [
         {
           "name": "AMAZON.RepeatIntent"
@@ -157,7 +157,9 @@
           "samples": [
             "geben",
             "gib",
-            "spielen"
+            "spielen",
+            "teil die karten",
+            "teil die karten aus"
           ]
         },
         {

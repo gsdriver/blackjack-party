@@ -17,20 +17,23 @@
       "in_skill_products": [],
       "resources": {
         "manifest": {
-          "eTag": "bd33b7004a1abad23419cb2e90825435"
+          "eTag": "1b12e24b40c58199b65b14692ddccf34"
         },
         "interactionModel": {
           "en-AU": {
-            "eTag": "2475da10c33e37fc30e9de7a1b78c04d"
+            "eTag": "7fd34c78ddfcfabaeafa6945605842c3"
           },
           "en-GB": {
-            "eTag": "1d33e7d552cb1e0cc6f4fad6305b14d9"
+            "eTag": "3c42d1c5a0049cb44308ed1f0927b0c4"
           },
           "en-CA": {
-            "eTag": "2475da10c33e37fc30e9de7a1b78c04d"
+            "eTag": "7fd34c78ddfcfabaeafa6945605842c3"
           },
           "en-US": {
-            "eTag": "d8e5ba3d0b7feea8b0be68fb769cb93d"
+            "eTag": "25cc105ceb67c5c588cdb2b996e801c6"
+          },
+          "de-DE": {
+            "eTag": "8ae13afda8ca3459e6f2cce0daf52d5e"
           }
         },
         "lambda": [
@@ -41,7 +44,7 @@
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "221785d6-891d-46f7-a965-b3192471e907"
+            "revisionId": "a615e8b0-eaa4-46d4-90e5-55bc82532724"
           }
         ]
       }

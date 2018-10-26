@@ -103,7 +103,7 @@ module.exports = {
           // On to the next player
           attributes.temp.changingBets++;
           reprompt = res.strings.CHANGEBETS_REPROMPT;
-          speech += (utils.readPlayerName(attributes, attributes.temp.changingBets) + reprompt);
+          speech += (utils.readPlayerName(event.request.locale, attributes, attributes.temp.changingBets) + reprompt);
 
           // Color this player if they have a button associated
           buttons.disableButtons(handlerInput);

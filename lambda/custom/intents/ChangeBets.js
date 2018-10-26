@@ -37,7 +37,7 @@ module.exports = {
     // Now, we'll loop through each player and prompt for a new amount to bet
     attributes.temp.changingBets = 0;
     const reprompt = res.strings.CHANGEBETS_REPROMPT;
-    const speech = utils.readPlayerName(attributes, attributes.temp.changingBets) + reprompt;
+    const speech = utils.readPlayerName(event.request.locale, attributes, attributes.temp.changingBets) + reprompt;
 
     // Color this player if they have a button associated
     buttons.disableButtons(handlerInput);

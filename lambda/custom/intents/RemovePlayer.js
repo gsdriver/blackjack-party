@@ -27,7 +27,7 @@ module.exports = {
     // OK, let's remove the last added player if they aren't in the
     // middle of adding a new player
     if (!attributes.temp.addingPlayer) {
-      name = utils.readPlayerName(attributes, game.players.length - 1);
+      name = utils.readPlayerName(event.request.locale, attributes, game.players.length - 1);
       const id = game.players.pop();
       if (attributes.temp.buttons) {
         attributes.temp.buttons[id] = undefined;

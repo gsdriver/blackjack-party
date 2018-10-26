@@ -20,11 +20,13 @@
           "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/a194/9daa84cf5c8a43ae91485e94d26609eb/APP_ICON_LARGE?versionId=M3IFOd0N82Wrpp6tCs3Yiz3MGEPtWqWN&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1532099668&Signature=0FhBaHkiS3t2uUFyQ6UK78GXwkc%3D"
         },
         "de-DE": {
-          "description": "Spiele mit deinen Freunden Blackjack mit Alexa! Du kannst mit bis zu 3 Freunden an einem Tisch gegen die Bank spielen. Wenn du willst, kannst du dabei Echo Buttons verwenden, um immer zu wissen, wer gerade an der Reihe ist. \n\nDie Bankroll jedes Spielers wird gespeichert. Auch wenn du mehrere Runden Blackjack spielst, kannst du deine Bankroll immer im Auge behalten. Bei jedem neuen Spiel lässt sich die Spielerzusammenstellung am Tisch ändern. \n\nZu Beginn hast du 5000 Dollar zur Verfügung. Dein Einsatz kann zwischen 5 und 1000 Dollar liegen. \n\nVerbessere deine Blackjack Skills, in dem du vor deinen Zügen um Hinweise bittest (\"Was soll ich tun?\") oder indem du im Trainingsmodus spielst (\"Trainingsmodus anschalten\"), in dem Alexa dir vor jedem Zug sagt, was basierenden auf den aktuell angewandten Spielregeln die beste Taktik ist.  \n\nDieses umfangreiche Spiel bietet alle Spieloptionen -  Hit, Stand, Split, Double Down und Surrender.\n\nVergleiche deine Bankroll mit denen der anderen Spieler und sage \"Lies die High Scores vor\", um die aktuelle Rangliste zu hören.",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/27d0/b70f22efd0954f2cb13cc1667ba56149/APP_ICON?versionId=Y.0zpPGX5zZMzm83XEVp03AJMNtiif3I&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1532099668&Signature=exikdpnUgo%2FfhnErFufVNrkvnHE%3D",
+          "description": "Spiele mit deinen Freunden Blackjack mit Alexa! Du kannst mit bis zu 3 Freunden an einem Tisch gegen die Bank spielen. Wenn du willst, kannst du dabei Echo Buttons verwenden, um immer zu wissen, wer gerade an der Reihe ist. \n\nDie Bankroll jedes Spielers wird gespeichert. Auch wenn du mehrere Runden Blackjack spielst, kannst du deine Bankroll immer im Auge behalten. Bei jedem neuen Spiel lässt sich die Spielerzusammenstellung am Tisch ändern. \n\nZu Beginn hast du 5000 Dollar zur Verfügung. Dein Einsatz kann zwischen 5 und 1000 Dollar liegen. \n\nVerbessere deine Blackjack Skills, in dem du vor deinen Zügen um Hinweise bittest (\"Was soll ich tun?\") oder indem du im Trainingsmodus spielst (\"Trainingsmodus anschalten\"), in dem Alexa dir vor jedem Zug sagt, was basierenden auf den aktuell angewandten Spielregeln die beste Taktik ist.  \n\nDieses umfangreiche Spiel bietet alle Spieloptionen -  hit, stand, teilen, verdoppeln und aufgeben.\n\nVergleiche deine Bankroll mit denen der anderen Spieler und sage \"Lies die High Scores vor\", um die aktuelle Rangliste zu hören.",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/a194/9daa84cf5c8a43ae91485e94d26609eb/APP_ICON_LARGE?versionId=M3IFOd0N82Wrpp6tCs3Yiz3MGEPtWqWN&AWSAccessKeyId=AKIAIEYXX6DHY7O4XWMA&Expires=1532099668&Signature=0FhBaHkiS3t2uUFyQ6UK78GXwkc%3D",
           "examplePhrases": [
-            "Alexa, lass Blackjack Party die Karten austeilen ",
-            "Einen Spieler hinzufügen ",
-            "Trainingsmodus anschalten "
+            "Alexa, starte blackjack party",
+            "Einen Spieler hinzufügen",
+            "Trainingsmodus anschalten"
           ],
           "keywords": [
             "Blackjack",

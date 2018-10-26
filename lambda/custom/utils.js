@@ -126,7 +126,7 @@ module.exports = {
                     samebet = undefined;
                   }
                 }
-                betsForPlayers[bet].push(module.exports.readPlayerName(attributes, i));
+                betsForPlayers[bet].push(module.exports.readPlayerName(locale, attributes, i));
               }
 
               if (samebet) {
@@ -172,7 +172,7 @@ module.exports = {
     const game = attributes[attributes.currentGame];
     const reprompt = listValidActions(game, locale, 'full');
 
-    let speech = module.exports.readPlayerName(attributes);
+    let speech = module.exports.readPlayerName(locale, attributes);
     if (readBankroll) {
       speech += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', gameService.getBankroll(attributes));
     }
@@ -286,8 +286,8 @@ module.exports = {
     attributes.temp.addingName = undefined;
     return newPlayer;
   },
-  readPlayerName: function(attributes, playerPos) {
-    resources = require('./resources')(attributes.playerLocale);
+  readPlayerName: function(locale, attributes, playerPos) {
+    resources = require('./resources')(locale);
     const game = attributes[attributes.currentGame];
     const currentPlayer = (playerPos === undefined) ? game.currentPlayer : playerPos;
     const id = game.players[currentPlayer];
@@ -460,7 +460,7 @@ function tellResult(handlerInput, locale, action, oldGame) {
     result += resources.strings.READHAND_DEALER_DONE.replace('{0}', dealerCardText);
     result += readDealerAction(game, locale);
     result += ' ';
-    result += readGameResult(attributes, true);
+    result += readGameResult(locale, attributes, true);
   } else {
     if (oldGame.activePlayer == 'player') {
       // It's possible they did something other than stand on the previous hand if this is a split
@@ -496,8 +496,8 @@ function tellResult(handlerInput, locale, action, oldGame) {
     }
     // Always say new player and read their hand if current player shifted
     if ((game.currentPlayer != oldGame.currentPlayer) && (game.players.length > 1)) {
-      result += module.exports.readPlayerName(attributes);
-      result += readHand(attributes, game, attributes.playerLocale, true);
+      result += module.exports.readPlayerName(locale, attributes);
+      result += readHand(attributes, game, locale, true);
 
       buttons.disableButtons(handlerInput);
       if (attributes.temp.buttons && attributes.temp.buttons[game.players[game.currentPlayer]]) {
@@ -519,7 +519,7 @@ function tellResult(handlerInput, locale, action, oldGame) {
           // If it is not the player's turn (could happen on dealer blackjack)
           // then read the game result here too
           if (game.activePlayer != 'player') {
-            result += ' ' + readGameResult(attributes);
+            result += ' ' + readGameResult(locale, attributes);
           }
           break;
         case 'hit':
@@ -595,14 +595,14 @@ function readDealerAction(game, locale) {
 //
 // Read the result of the game
 //
-function readGameResult(attributes, fullHand) {
+function readGameResult(locale, attributes, fullHand) {
   // Read the result for each player
   let outcome = '';
   const game = attributes[attributes.currentGame];
   let i;
 
   for (i = 0; i < game.players.length; i++) {
-    outcome += readPlayerResult(attributes, i, fullHand);
+    outcome += readPlayerResult(locale, attributes, i, fullHand);
   }
 
   // They are no longer a new user
@@ -616,13 +616,13 @@ function readGameResult(attributes, fullHand) {
 //
 // Read the result of the game
 //
-function readPlayerResult(attributes, playerPos, fullHand) {
+function readPlayerResult(locale, attributes, playerPos, fullHand) {
   let i;
   let outcome = '';
   const game = attributes[attributes.currentGame];
   const currentPlayer = game.playerHands[game.players[playerPos]];
 
-  outcome = module.exports.readPlayerName(attributes, playerPos);
+  outcome = module.exports.readPlayerName(locale, attributes, playerPos);
 
   if (fullHand) {
     const currentHand = currentPlayer.hands[0];
@@ -714,7 +714,7 @@ function readHit(attributes, locale) {
 
   if (game.activePlayer != 'player') {
     result += readDealerAction(game, locale);
-    result += ' ' + readGameResult(attributes);
+    result += ' ' + readGameResult(locale, attributes);
   }
 
   return result;
@@ -733,7 +733,7 @@ function readStand(attributes, locale) {
     result = readHand(attributes, game, locale);
   } else {
     result = readDealerAction(game, locale);
-    result += ' ' + readGameResult(attributes);
+    result += ' ' + readGameResult(locale, attributes);
   }
   return result;
 }
@@ -782,7 +782,7 @@ function readSurrender(attributes, locale, surrenderResult) {
   } else if (game.activePlayer != 'player') {
     // Rub it in by saying what the dealer had
     result = readDealerAction(game, locale);
-    result += ' ' + readGameResult(attributes);
+    result += ' ' + readGameResult(locale, attributes);
   } else {
     // Next player - read their hand
     result = readHand(attributes, game, locale);
@@ -810,7 +810,7 @@ function readInsurance(attributes, locale, readDealer) {
   } else {
     if (game.dealerHand.outcome == 'dealerblackjack') {
       // Game over
-      result = readGameResult(attributes);
+      result = readGameResult(locale, attributes);
     } else {
       // Game is still active - what do you want to do?
       result = readHand(attributes, game, locale);
