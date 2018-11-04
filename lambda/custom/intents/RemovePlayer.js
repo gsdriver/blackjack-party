@@ -15,6 +15,7 @@ module.exports = {
     return ((request.type === 'IntentRequest')
       && (request.intent.name === 'AMAZON.CancelIntent')
       && attributes.temp.firstplay
+      && !attributes.temp.resetTable
       && (game.players.length > 0));
   },
   handle: function(handlerInput) {

@@ -118,7 +118,7 @@
   "PLAYER_BET_TEXT": "{0} setzt €{1} ",
   "PLAYER_GOTNAME": "Ich habe {0} verstanden, ist das richtig?",
   "PLAYER_GOTNAME_REPROMPT": "Sag Ja, wenn {0} der Name ist, den du hinzufügen willst.",
-  "PLAYER_HIT_BUSTED": "Sorry, du hast eine {Card} gezogen. Du landest somit leider bei über 21. |Du erhältst {Card} und hast somit überboten. Du hast mehr als 21. ",
+  "PLAYER_HIT_BUSTED": "Sorry, du hast eine {0} gezogen. Du landest somit leider bei über 21. |Du erhältst {0} und hast somit überboten. Du hast mehr als 21. ",
   "PLAYER_HIT_NOTBUSTED": "Du hast {0} und somit insgesamt {1}. |Hier ist {0}, das macht insgesamt {1}. |Ich habe {0} für dich und du hast nun insgesamt {1}. ",
   "PLAYER_HIT_NOTBUSTED_SOFT": "Du hast {0}, und somit insgesamt eine soft {1}. |Hier ist {0}, das ergibt eine Soft {1}. |Ich habe eine {0} für dich. Jetzt hast du eine soft {1}. ",
   "PLAYOPTION_RESET": "reset game",
